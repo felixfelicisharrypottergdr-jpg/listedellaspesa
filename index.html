@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -141,7 +142,7 @@
   .output-box { background: var(--ink-panel); color: #EDE3CE; border-left: 4px solid var(--green); white-space: pre-wrap; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; min-height: 90px; }
   .role-summary { background: #fff; border: 1px dashed var(--gold-soft); border-radius: 8px; padding: 10px 14px; margin: 8px 0; font-size: 12.5px; font-family: 'JetBrains Mono', monospace; color: var(--ink-soft); }
   .fixed-value-riga { padding: 9px 11px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--green); font-weight: 700; background: var(--green-soft); border-radius: 7px; border: 1px solid var(--green-soft); }
-  .format-tag { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 500; background: var(--ink); color: var(--parchment); padding: 2px 8px; border-radius: 999px; letter-spacing: .02em; margin-left: 8px; vertical-align: middle; }
+  .format-tag { display: inline-block; font-family: 'Source Sans 3', sans-serif; font-size: 10.5px; font-weight: 700; background: var(--amber-soft); color: var(--gold-deep); padding: 2px 8px; border-radius: 999px; letter-spacing: .01em; margin-left: 6px; vertical-align: middle; white-space: nowrap; border: 1px solid var(--gold-soft); }
   .empty-state { text-align: center; padding: 30px 10px; color: var(--ink-soft); font-size: 13px; }
 </style>
 </head>
@@ -151,6 +152,33 @@
   <div class="masthead">
         <h1>Lista della Spesa</h1>
     <div class="rule"></div>
+  </div>
+
+  <div class="panel">
+    <div class="acc-header" id="tutorial_toggle">
+      <span class="acc-chevron">▾</span>
+      <h2 style="margin:0; flex:1;">📖 Come funziona questo tool <span class="format-tag">apri se è la prima volta che lo usi</span></h2>
+    </div>
+    <div class="acc-body">
+      <div class="fmt-guide">
+        <div class="fmt-case">
+          <div class="fmt-case-label">1. Scegli le sezioni che ti servono</div>
+          <div class="fmt-case-desc">In alto trovi una barra con tutte le sezioni della Lista della Spesa (Segnala Role, Migliora Voti, Migliora Sapienze, Acquista Dialettica e Parametri, Acquista Conoscenze, Commercio Magico). Puoi compilarne una sola o tutte quelle che ti servono nella stessa richiesta — non sei obbligato a passare da tutte.</div>
+        </div>
+        <div class="fmt-case">
+          <div class="fmt-case-label">2. Compila i campi di ogni sezione</div>
+          <div class="fmt-case-desc">Ogni sezione è divisa in blocchi che puoi aggiungere quanti vuoi (Role, Materie, Sapienze, Negozi...). Puoi chiudere un blocco già compilato cliccando sulla sua intestazione, per tenere la pagina più leggibile. I calcoli (costi, PP, Galeoni) li fa il tool: a te serve solo scrivere cosa vuoi fare.</div>
+        </div>
+        <div class="fmt-case">
+          <div class="fmt-case-label">3. Premi "Calcola totali"</div>
+          <div class="fmt-case-desc">Il pulsante è presente in fondo a ogni sezione, ma non importa da quale lo premi: il calcolo raccoglie automaticamente tutto quello che hai scritto in TUTTE le sezioni compilate, non solo in quella in cui ti trovi.</div>
+        </div>
+        <div class="fmt-case">
+          <div class="fmt-case-label">4. Copia il risultato dove serve</div>
+          <div class="fmt-case-desc">Si apre la pagina "Risultato" con un riepilogo per ogni sezione compilata, più i Box pronti da incollare: Box A, E, F, G vanno nel <b>Generatore Accrediti</b>; il blocco "Conoscenze Acquistate" (se presente) va incollato direttamente nella <b>scheda del PG</b>, non nel Generatore.</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="tab-bar" id="tab_bar"></div>
@@ -177,7 +205,7 @@
     <div class="panel">
       <div class="acc-header" id="oggetti_toggle">
         <span class="acc-chevron">▾</span>
-        <h2 style="margin:0; flex:1;">Oggetti consumati <span class="format-tag">tutte le Role · opzionale</span></h2>
+        <h2 style="margin:0; flex:1;">Oggetti consumati <span class="format-tag">Usati in tutte le Role che stai riscattando · opzionale</span></h2>
       </div>
       <div class="acc-body">
         <div class="hint">
@@ -295,8 +323,8 @@
     <div class="panel">
       <h2>Dialettica <span class="format-tag">opzionale</span></h2>
       <div class="row">
-        <div style="max-width:170px;"><label class="tight">Livello attuale</label><select id="dialetticaPartenza"></select></div>
-        <div style="max-width:170px;"><label class="tight">Livello desiderato</label><select id="dialetticaFinale"></select></div>
+        <div style="max-width:170px;"><label class="tight">Livello partenza</label><select id="dialetticaPartenza"></select></div>
+        <div style="max-width:170px;"><label class="tight">Livello finale</label><select id="dialetticaFinale"></select></div>
       </div>
       <div id="riepilogoDialettica" class="role-summary" style="margin-top:10px;">Nessun acquisto di Dialettica impostato.</div>
     </div>
@@ -310,7 +338,7 @@
     <div class="panel">
       <h2>Parametri da acquistare <span id="param_counter_badge" class="format-tag">0</span></h2>
       <div id="parametri_list"></div>
-      <div id="parametri_empty" class="empty-state">Nessun Parametro ancora aggiunto.</div>
+      <div id="parametri_empty" class="empty-state">Nessun Parametro ancora aggiunto — inizia da qui.</div>
       <button type="button" class="secondary" id="add_param_btn">+ Aggiungi Parametro</button>
     </div>
 
@@ -332,8 +360,8 @@
     <div class="panel">
       <h2>Acquisti <span id="acquisto_counter_badge" class="format-tag">0</span></h2>
       <div id="acquisti_list"></div>
-      <div id="acquisti_empty" class="empty-state">Nessun acquisto ancora aggiunto.</div>
-      <button type="button" class="secondary" id="add_acquisto_btn">+ Aggiungi blocco di acquisto</button>
+      <div id="acquisti_empty" class="empty-state">Nessun acquisto ancora aggiunto — inizia da qui.</div>
+      <button type="button" class="secondary" id="add_acquisto_btn">+ Aggiungi acquisto</button>
     </div>
 
     <button type="button" class="big" id="calcola_btn_conoscenze">Calcola totali →</button>
@@ -354,14 +382,14 @@
     <div class="panel">
       <h2>Acquisti (da Negozio) <span id="negozio_counter_badge" class="format-tag">0</span></h2>
       <div id="negozi_list"></div>
-      <div id="negozi_empty" class="empty-state">Nessun acquisto ancora aggiunto.</div>
+      <div id="negozi_empty" class="empty-state">Nessun Negozio ancora aggiunto — inizia da qui.</div>
       <button type="button" class="secondary" id="add_negozio_btn">+ Aggiungi Negozio</button>
     </div>
 
     <div class="panel">
       <h2>Vendite (a PNG Commerciante) <span id="commerciante_counter_badge" class="format-tag">0</span></h2>
       <div id="commercianti_list"></div>
-      <div id="commercianti_empty" class="empty-state">Nessuna vendita ancora aggiunta.</div>
+      <div id="commercianti_empty" class="empty-state">Nessun PNG Commerciante ancora aggiunto — inizia da qui.</div>
       <button type="button" class="secondary" id="add_commerciante_btn">+ Aggiungi PNG Commerciante</button>
     </div>
 
@@ -745,7 +773,7 @@ function abilitaAccordion(headerEl) {
     headerEl.parentElement.classList.toggle('collapsed');
   });
 }
-['oggetti_toggle', 'conversione_toggle', 'info_toggle_segnala', 'info_toggle_voti', 'info_toggle_sapienze', 'info_toggle_parametri', 'info_toggle_conoscenze', 'info_toggle_commercio'].forEach(id => {
+['oggetti_toggle', 'conversione_toggle', 'info_toggle_segnala', 'info_toggle_voti', 'info_toggle_sapienze', 'info_toggle_parametri', 'info_toggle_conoscenze', 'info_toggle_commercio', 'tutorial_toggle'].forEach(id => {
   const header = document.getElementById(id);
   header.addEventListener('click', () => header.parentElement.classList.toggle('collapsed'));
   header.parentElement.classList.add('collapsed'); // chiusi di default
@@ -757,7 +785,7 @@ let missioneCounter = 0;
 
 const CAMPI_PP = [
   { key: 'ppPostRate', label: 'PP a post' },
-  { key: 'ppPostCap', label: 'Tetto post (vuoto=nessuno)' },
+  { key: 'ppPostCap', label: 'Tetto post', placeholder: 'vuoto=nessuno' },
   { key: 'ppFisso', label: 'PP fisso' }
 ];
 const CAMPI_ALTRI = [
@@ -781,7 +809,7 @@ function aggiornaContatoreRole() {
 function creaCampo(c, extraClass) {
   const f = document.createElement('div');
   f.className = 'field';
-  f.innerHTML = `<label>${c.label}</label><input type="number" step="0.5" class="${extraClass}" data-key="${c.key}">`;
+  f.innerHTML = `<label>${c.label}</label><input type="number" step="0.5" class="${extraClass}" data-key="${c.key}" placeholder="${c.placeholder || ''}">`;
   return f;
 }
 
@@ -936,10 +964,10 @@ function creaRoleCard() {
   rigaBase.className = 'row';
   rigaBase.innerHTML = `
     <div><label class="tight">Titolo Role</label><input type="text" class="f-titolo" placeholder="es. Studio matto in Biblioteca"></div>
-    <div><label class="tight">Link Role (opzionale)</label><input type="text" class="f-link" placeholder="?t=...#entry..."></div>
+    <div><label class="tight">Link Role</label><input type="text" class="f-link" placeholder="?t=...#entry..."></div>
     <div style="max-width:130px"><label class="tight">Post scritti</label><input type="number" class="f-numposts" min="0" step="1"></div>
-    <div style="max-width:150px"><label class="tight">Galeoni spesi <span class="format-tag">es. locande</span></label><input type="number" class="f-galeonispesi" min="0" step="1"></div>
-    <div class="f-coeff-debito-wrap" style="max-width:170px; display:none;"><label class="tight">Coefficiente di Debito <span class="format-tag">1 = nessun debito</span></label><input type="number" class="f-coeff-debito" min="1" step="0.1" value="1"></div>
+    <div style="max-width:150px"><label class="tight">Galeoni spesi</label><input type="number" class="f-galeonispesi" min="0" step="1" placeholder="es. locande"></div>
+    <div class="f-coeff-debito-wrap" style="max-width:190px; display:none;"><label class="tight">Coeff. di Debito <span class="format-tag">1=nessuno</span></label><input type="number" class="f-coeff-debito" min="1" step="0.1" value="1"></div>
   `;
   body.appendChild(rigaBase);
 
@@ -1034,7 +1062,7 @@ function creaConoscenzaRow(datalistId) {
   div.dataset.rowId = 'cr' + conoscenzaRowCounter;
   div.innerHTML = `
     <div style="flex:2;"><label class="tight">Conoscenza</label><input type="text" class="f-conoscenza" list="${datalistId}" placeholder="es. Aguamenti"></div>
-    <div style="max-width:150px;"><label class="tight">Voto di partenza</label>
+    <div style="max-width:150px;"><label class="tight">Voto partenza</label>
       <select class="f-voto-partenza">${VOTI_PARTENZA.map(v => `<option value="${v}">${v} — ${VOTI_LABEL[v]}</option>`).join('')}</select>
     </div>
     <div style="max-width:170px;"><label class="tight">Voto finale</label>
@@ -1532,7 +1560,7 @@ function creaRigaOggettoAcquisto() {
   div.innerHTML = `
     <div style="flex:2;"><label class="tight">Nome oggetto</label><input type="text" class="f-nome-ogg" placeholder="es. Abiti da tutti i giorni"></div>
     <div style="max-width:110px;"><label class="tight">Quantità</label><input type="number" class="f-qty-ogg" min="1" step="1" value="1"></div>
-    <div style="max-width:160px;"><label class="tight">Va in <span class="format-tag">dove finisce l'oggetto</span></label>
+    <div style="max-width:180px;"><label class="tight">Destinazione</label>
       <select class="f-destinazione-ogg">
         <option value="bagaglio">Bagaglio (Oggetti)</option>
         <option value="dispensa">Dispensa (Ingredienti/Piante/Creature)</option>
@@ -1572,7 +1600,7 @@ function creaRigaOggettoVendita() {
   div.style.alignItems = 'flex-end';
   div.innerHTML = `
     <div style="flex:2;"><label class="tight">Nome oggetto (già posseduto)</label><input type="text" class="f-nome-ogg" placeholder="es. Ingrediente Raro"></div>
-    <div style="max-width:110px;"><label class="tight">Quantità venduta</label><input type="number" class="f-qty-ogg" min="1" step="1" value="1"></div>
+    <div style="max-width:110px;"><label class="tight">Quantità</label><input type="number" class="f-qty-ogg" min="1" step="1" value="1"></div>
     <div style="max-width:150px;"><label class="tight">Prezzo ricevuto (Galeoni)</label><input type="number" class="f-prezzo-ogg" min="0" step="0.5" value="0"></div>
     <div style="max-width:120px;"><label class="tight">Totale riga</label><div class="f-totale-riga fixed-value-riga">0 G</div></div>
     <div style="max-width:44px;"><button type="button" class="danger" style="width:100%;">✕</button></div>
@@ -1636,7 +1664,7 @@ function creaCardCommercio(tipo) {
   if (!isAcquisto) {
     const rigaNote = document.createElement('div');
     rigaNote.style.marginTop = '8px';
-    rigaNote.innerHTML = `<label class="tight">Note <span class="format-tag">opzionale · es. requisiti di eleggibilità</span></label><input type="text" class="f-note-com" placeholder="es. Punti Virtuosi 6-10: acquista esclusivamente Ingredienti, Pozioni, Piante e Creature X">`;
+    rigaNote.innerHTML = `<label class="tight">Note <span class="format-tag">opzionale</span></label><input type="text" class="f-note-com" placeholder="es. Punti Virtuosi 6-10: acquista esclusivamente Ingredienti, Pozioni, Piante e Creature X">`;
     body.appendChild(rigaNote);
   }
 
