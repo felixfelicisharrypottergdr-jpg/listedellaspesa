@@ -787,11 +787,6 @@ function abilitaAccordion(headerEl) {
 let roleCounter = 0;
 let missioneCounter = 0;
 
-const CAMPI_PP = [
-  { key: 'ppPostRate', label: 'PP a post' },
-  { key: 'ppPostCap', label: 'Tetto post', placeholder: 'vuoto=nessuno' },
-  { key: 'ppFisso', label: 'PP fisso' }
-];
 const CAMPI_ALTRI = [
   { key: 'Prestigio', label: 'Prestigio' },
   { key: 'Popolarità', label: 'Popolarità' },
@@ -856,74 +851,84 @@ function creaMissioneCard() {
   `;
   body.appendChild(rigaNome);
 
-  const chk = document.createElement('div');
-  chk.className = 'checkbox-row';
-  chk.innerHTML = `<input type="checkbox" class="f-completamento" id="${mid}_comp"><label for="${mid}_comp">Missione a completamento (premio sempre sommato per intero)</label>`;
-  body.appendChild(chk);
+  // --- helper per costruire una domanda a scelta radio ---
+  function creaDomanda(numero, titolo, nomeGruppo, opzioni, onChange) {
+    const wrap = document.createElement('div');
+    wrap.className = 'fmt-case';
+    wrap.style.marginTop = '12px';
+    const label = document.createElement('div');
+    label.className = 'fmt-case-label';
+    label.textContent = `${numero}. ${titolo}`;
+    wrap.appendChild(label);
+    opzioni.forEach((op, i) => {
+      const id = `${mid}_${nomeGruppo}_${i}`;
+      const row = document.createElement('div');
+      row.className = 'radio-option';
+      row.innerHTML = `<input type="radio" name="${mid}_${nomeGruppo}" value="${op.value}" id="${id}" class="f-${nomeGruppo}-radio" ${i === 0 ? 'checked' : ''}>
+        <label for="${id}"><b>${op.label}</b>${op.desc ? ` — ${op.desc}` : ''}</label>`;
+      wrap.appendChild(row);
+    });
+    wrap.addEventListener('change', (e) => {
+      if (e.target.name === `${mid}_${nomeGruppo}`) onChange(e.target.value);
+    });
+    return wrap;
+  }
 
-  const helpWrap = document.createElement('div');
-  helpWrap.className = 'altri-collapsed';
-  helpWrap.style.marginTop = '10px';
-  const helpToggle = document.createElement('div');
-  helpToggle.className = 'altri-toggle';
-  helpToggle.innerHTML = `
-    <span class="acc-chevron">▾</span>
-    <span>❔ Come si legge il premio in PP della missione? <span style="font-weight:400; color:var(--ink-soft);">— apri se non sai cosa mettere nei tre campi qui sotto</span></span>
-  `;
-  helpToggle.addEventListener('click', () => helpWrap.classList.toggle('altri-collapsed'));
-  helpWrap.appendChild(helpToggle);
+  // --- Domanda 1: a completamento? ---
+  const domandaComp = creaDomanda(1, 'Questa missione è "a completamento"?', 'completamento', [
+    { value: 'no', label: 'No', desc: 'è una missione normale: se hai più missioni nella stessa Role, vale solo il premio più alto tra quelle non a completamento' },
+    { value: 'si', label: 'Sì', desc: 'il premio si somma sempre per intero, indipendentemente dalle altre missioni' }
+  ], () => aggiornaPreview());
+  body.appendChild(domandaComp);
 
-  const helpBody = document.createElement('div');
-  helpBody.className = 'altri-body fmt-guide';
-  helpBody.innerHTML = `
-    <div class="fmt-case">
-      <div class="fmt-case-label">A. Il testo della missione promette PP per ogni post scritto</div>
-      <div class="fmt-case-desc">Riconosci questo caso quando leggi qualcosa come "1,5 PP per post", eventualmente con un limite massimo di post a cui si applica.</div>
-      <div class="fmt-case-syntax">Compila: <code>PP a post</code> con il valore per ogni post, e <code>Tetto post</code> con il numero massimo di post a cui si applica (lascialo vuoto se il testo non menziona nessun limite).</div>
-      <div class="fmt-case-example">Esempio: il testo dice <i>"1,5 PP per post (fino ad un massimo di 5 post)"</i> → scrivi <code>PP a post</code> = 1,5 e <code>Tetto post</code> = 5. Se avessi scritto 7 post in quella Role, i primi 5 rendono il bonus, gli altri 2 rendono il tasso base.</div>
-    </div>
-    <div class="fmt-case">
-      <div class="fmt-case-label">B. Il testo della missione promette un valore fisso, non legato ai post</div>
-      <div class="fmt-case-desc">Riconosci questo caso quando il premio è un numero unico, che non cambia in base a quanti post scrivi (tipico delle missioni a completamento, ma non solo).</div>
-      <div class="fmt-case-syntax">Compila solo: <code>PP fisso</code> con quel valore, lasciando vuoti gli altri due campi.</div>
-      <div class="fmt-case-example">Esempio: il testo dice <i>"+10 PP da richiedere nella propria Lista della Spesa"</i> → scrivi solo <code>PP fisso</code> = 10.</div>
-    </div>
-    <div class="fmt-case">
-      <div class="fmt-case-label">Attenzione</div>
-      <div class="fmt-case-desc">Per ogni missione, compila di norma <u>uno solo</u> tra il caso A e il caso B — guarda il testo della missione per capire quale dei due usa. Non serve fare calcoli a mano: se hai più missioni nella stessa Role, il tool sceglie automaticamente da solo quale rende di più, secondo la regola del "premio più alto per tipo".</div>
-    </div>
-  `;
-  helpWrap.appendChild(helpBody);
-  body.appendChild(helpWrap);
+  // --- Domanda 2: formato del premio in PP ---
+  const gridPPa = creaCampo({ key: 'ppPostRate', label: 'PP a post' }, 'f-premio');
+  const gridPPtetto = creaCampo({ key: 'ppPostCap', label: 'Tetto post', placeholder: 'vuoto = nessun limite' }, 'f-premio');
+  const campoPPfisso = creaCampo({ key: 'ppFisso', label: 'PP fisso' }, 'f-premio');
+  const wrapPPaPost = document.createElement('div');
+  wrapPPaPost.className = 'grid-rewards';
+  wrapPPaPost.style.cssText = 'margin-top:10px; display:none; grid-template-columns: repeat(2,1fr);';
+  wrapPPaPost.appendChild(gridPPa); wrapPPaPost.appendChild(gridPPtetto);
+  const wrapPPfisso = document.createElement('div');
+  wrapPPfisso.style.cssText = 'margin-top:10px; display:none; max-width:220px;';
+  wrapPPfisso.appendChild(campoPPfisso);
 
-  const gridPP = document.createElement('div');
-  gridPP.className = 'grid-rewards';
-  gridPP.style.marginTop = '10px';
-  CAMPI_PP.forEach(c => gridPP.appendChild(creaCampo(c, 'f-premio')));
-  body.appendChild(gridPP);
+  const domandaPP = creaDomanda(2, 'Come è scritto il premio in PP nel testo della missione?', 'formatopp', [
+    { value: 'post', label: '"X PP per ogni post scritto"', desc: 'es. "1,5 PP per post, fino ad un massimo di 5 post"' },
+    { value: 'fisso', label: 'Un valore fisso di PP', desc: 'es. "+10 PP", non legato al numero di post' },
+    { value: 'nessuno', label: 'Questa missione non dà Punti Post' }
+  ], (val) => {
+    wrapPPaPost.style.display = val === 'post' ? 'grid' : 'none';
+    wrapPPfisso.style.display = val === 'fisso' ? 'block' : 'none';
+    if (val !== 'post') { gridPPa.querySelector('input').value = ''; gridPPtetto.querySelector('input').value = ''; }
+    if (val !== 'fisso') { campoPPfisso.querySelector('input').value = ''; }
+  });
+  body.appendChild(domandaPP);
+  body.appendChild(wrapPPaPost);
+  body.appendChild(wrapPPfisso);
 
-  const altriWrap = document.createElement('div');
-  altriWrap.className = 'altri-collapsed';
-  const altriToggle = document.createElement('div');
-  altriToggle.className = 'altri-toggle';
-  altriToggle.innerHTML = `
-    <span class="acc-chevron">▾</span>
-    <span>Altri punteggi <span style="font-weight:400; color:var(--ink-soft);">— clicca qui se la missione dà come premio anche Prestigio, Virtuoso, Popolarità o altro oltre ai PP</span></span>
-  `;
-  altriToggle.addEventListener('click', () => altriWrap.classList.toggle('altri-collapsed'));
-  altriWrap.appendChild(altriToggle);
+  // --- Domanda 3: altri premi oltre ai PP? ---
   const altriBody = document.createElement('div');
-  altriBody.className = 'altri-body grid-rewards wide';
+  altriBody.className = 'grid-rewards wide';
+  altriBody.style.cssText = 'margin-top:10px; display:none;';
   CAMPI_ALTRI.forEach(c => altriBody.appendChild(creaCampo(c, 'f-premio')));
-  altriWrap.appendChild(altriBody);
-  body.appendChild(altriWrap);
+
+  const domandaAltri = creaDomanda(3, 'Dà anche altri premi, oltre ai PP?', 'altripremi', [
+    { value: 'no', label: 'No', desc: 'solo PP' },
+    { value: 'si', label: 'Sì', desc: 'es. Prestigio, Virtuoso, Sinistro, Popolarità, Stima Docenti...' }
+  ], (val) => {
+    altriBody.style.display = val === 'si' ? 'grid' : 'none';
+    if (val !== 'si') altriBody.querySelectorAll('input').forEach(i => i.value = '');
+  });
+  body.appendChild(domandaAltri);
+  body.appendChild(altriBody);
 
   div.appendChild(body);
 
   function aggiornaPreview() {
     const nome = div.querySelector('.f-nome').value.trim();
     const livello = div.querySelector('.f-livello').value;
-    const comp = div.querySelector('.f-completamento').checked;
+    const comp = div.querySelector('.f-completamento-radio:checked')?.value === 'si';
     header.querySelector('.missione-title-preview').textContent = nome || 'Nuova missione';
     const lvlBadge = header.querySelector('.missione-level-badge');
     lvlBadge.style.display = livello ? 'inline-block' : 'none';
@@ -932,7 +937,6 @@ function creaMissioneCard() {
   }
   div.querySelector('.f-nome').addEventListener('input', aggiornaPreview);
   div.querySelector('.f-livello').addEventListener('change', aggiornaPreview);
-  div.querySelector('.f-completamento').addEventListener('change', aggiornaPreview);
 
   return div;
 }
@@ -968,7 +972,7 @@ function creaRoleCard() {
   rigaBase.className = 'row';
   rigaBase.innerHTML = `
     <div><label class="tight">Titolo Role</label><input type="text" class="f-titolo" placeholder="es. Sparks Fly"></div>
-    <div><label class="tight">Link Role <span class="format-tag">serve per chiudere il topic</span></label><input type="text" class="f-link" placeholder="?t=...#entry..."></div>
+    <div><label class="tight">Link Role</label><input type="text" class="f-link" placeholder="?t=...#entry..."></div>
     <div style="max-width:130px"><label class="tight">Post scritti</label><input type="number" class="f-numposts" min="0" step="1"></div>
     <div style="max-width:150px"><label class="tight">Galeoni spesi</label><input type="number" class="f-galeonispesi" min="0" step="1" placeholder="es. locande"></div>
     <div class="f-coeff-debito-wrap" style="max-width:190px; display:none;"><label class="tight">Coeff. di Debito <span class="format-tag">1=nessuno</span></label><input type="number" class="f-coeff-debito" min="1" step="0.1" value="1"></div>
@@ -1128,11 +1132,15 @@ function creaMateriaCard() {
   `;
   body.appendChild(rigaBase);
 
-  const chkPiano = document.createElement('div');
-  chkPiano.className = 'checkbox-row';
-  chkPiano.style.color = 'var(--ink-soft)';
-  chkPiano.innerHTML = `<input type="checkbox" class="f-in-piano" id="${mid}_piano" checked><label for="${mid}_piano" style="color:var(--ink-soft);">Nel Piano di Studi di quest'anno (influisce sul costo di Oltre Ogni Previsione → Eccezionale)</label>`;
-  body.appendChild(chkPiano);
+  const domandaPiano = document.createElement('div');
+  domandaPiano.className = 'fmt-case';
+  domandaPiano.style.marginTop = '12px';
+  domandaPiano.innerHTML = `
+    <div class="fmt-case-label">Questa Materia è nel Piano di Studi di quest'anno?</div>
+    <div class="radio-option"><input type="radio" name="${mid}_piano" value="si" id="${mid}_piano_si" class="f-in-piano-radio" checked><label for="${mid}_piano_si"><b>Sì</b> — le Eccezionale ottenute qui contano per far salire il prezzo delle prossime Eccezionale</label></div>
+    <div class="radio-option"><input type="radio" name="${mid}_piano" value="no" id="${mid}_piano_no" class="f-in-piano-radio"><label for="${mid}_piano_no"><b>No</b> — è una Materia di un altro anno, o acquistata: costo fisso di 4 PP per ogni Eccezionale, senza aumenti</label></div>
+  `;
+  body.appendChild(domandaPiano);
 
   // --- blocco T->D e D->S, a livello di intera Materia: scelta esclusiva a 3 opzioni ---
   function creaPassaggioBulk(stepId, fromV, toV, titolo, descrizione) {
@@ -1190,8 +1198,8 @@ function creaMateriaCard() {
   }
   div.querySelector('.f-materia').addEventListener('change', () => {
     const isAltro = div.querySelector('.f-materia').value === 'ALTRO';
-    div.querySelector('.f-in-piano').checked = !isAltro && div.querySelector('.f-in-piano').checked;
-    div.querySelector('.f-in-piano').disabled = isAltro;
+    domandaPiano.style.display = isAltro ? 'none' : 'block';
+    if (isAltro) { domandaPiano.querySelector(`#${mid}_piano_no`).checked = true; }
     aggiornaDatalist(); aggiornaPreview();
   });
   div.querySelector('.f-anno').addEventListener('change', () => { aggiornaDatalist(); aggiornaPreview(); });
@@ -1560,6 +1568,22 @@ function aggiornaContatoreCommercio() {
   document.getElementById('commercianti_empty').style.display = nCom ? 'none' : 'block';
 }
 
+let oggettoRigaCounter = 0;
+
+function creaDomandaPrezzoRiga(wrapperContainer, div) {
+  oggettoRigaCounter++;
+  const gruppo = `prezzoriga_${oggettoRigaCounter}`;
+  const wrap = document.createElement('div');
+  wrap.className = 'fmt-case';
+  wrap.style.marginTop = '10px';
+  wrap.innerHTML = `
+    <div class="fmt-case-label">Il prezzo che hai scritto sopra è:</div>
+    <div class="radio-option"><input type="radio" name="${gruppo}" value="riga" id="${gruppo}_riga" class="f-prezzo-tipo-radio" checked><label for="${gruppo}_riga"><b>Il totale di questa riga</b> — la quantità è già inclusa nel prezzo</label></div>
+    <div class="radio-option"><input type="radio" name="${gruppo}" value="unitario" id="${gruppo}_unit" class="f-prezzo-tipo-radio"><label for="${gruppo}_unit"><b>Il prezzo di UN solo oggetto</b> — il tool lo moltiplica per la quantità</label></div>
+  `;
+  return wrap;
+}
+
 function creaRigaOggettoAcquisto() {
   const div = document.createElement('div');
   div.className = 'row';
@@ -1567,7 +1591,7 @@ function creaRigaOggettoAcquisto() {
   div.innerHTML = `
     <div style="flex:2;"><label class="tight">Nome oggetto</label><input type="text" class="f-nome-ogg" placeholder="es. Abiti da tutti i giorni"></div>
     <div style="max-width:110px;"><label class="tight">Quantità</label><input type="number" class="f-qty-ogg" min="1" step="1" value="1"></div>
-    <div style="max-width:180px;"><label class="tight">Destinazione</label>
+    <div style="max-width:180px;"><label class="tight">Destinazione <span class="format-tag">Ingredienti/Piante/Creature → Dispensa</span></label>
       <select class="f-destinazione-ogg">
         <option value="bagaglio">Bagaglio (Oggetti)</option>
         <option value="dispensa">Dispensa (Ingredienti/Piante/Creature)</option>
@@ -1578,25 +1602,22 @@ function creaRigaOggettoAcquisto() {
     <div style="max-width:120px;"><label class="tight">Totale riga</label><div class="f-totale-riga fixed-value-riga">0 G</div></div>
     <div style="max-width:44px;"><button type="button" class="danger" style="width:100%;">✕</button></div>
   `;
-  const rigaCheck = document.createElement('div');
-  rigaCheck.className = 'checkbox-row';
-  rigaCheck.style.color = 'var(--ink-soft)';
-  rigaCheck.innerHTML = `<input type="checkbox" class="f-prezzo-a-oggetto"><label style="color:var(--ink-soft);">Spunta SOLO se il prezzo scritto sopra vale per un singolo oggetto (il tool lo moltiplica per la quantità). Lasciala vuota se il prezzo scritto è già il totale di tutta la riga.</label>`;
   const wrapper = document.createElement('div');
   wrapper.className = 'oggetto-riga-wrapper';
   wrapper.appendChild(div);
-  wrapper.appendChild(rigaCheck);
+  const domandaPrezzo = creaDomandaPrezzoRiga(wrapper, div);
+  wrapper.appendChild(domandaPrezzo);
 
   const aggiorna = () => {
     const qty = parseFloat(div.querySelector('.f-qty-ogg').value) || 0;
     const prezzo = parseFloat(div.querySelector('.f-prezzo-ogg').value) || 0;
-    const perOggetto = rigaCheck.querySelector('.f-prezzo-a-oggetto').checked;
+    const perOggetto = domandaPrezzo.querySelector('.f-prezzo-tipo-radio:checked')?.value === 'unitario';
     const totale = perOggetto ? qty * prezzo : prezzo;
     div.querySelector('.f-totale-riga').textContent = normNum(totale) + ' G';
   };
   div.querySelector('.f-qty-ogg').addEventListener('input', aggiorna);
   div.querySelector('.f-prezzo-ogg').addEventListener('input', aggiorna);
-  rigaCheck.querySelector('.f-prezzo-a-oggetto').addEventListener('change', aggiorna);
+  domandaPrezzo.addEventListener('change', aggiorna);
   div.querySelector('button').addEventListener('click', () => wrapper.remove());
   return wrapper;
 }
@@ -1612,25 +1633,22 @@ function creaRigaOggettoVendita() {
     <div style="max-width:120px;"><label class="tight">Totale riga</label><div class="f-totale-riga fixed-value-riga">0 G</div></div>
     <div style="max-width:44px;"><button type="button" class="danger" style="width:100%;">✕</button></div>
   `;
-  const rigaCheck = document.createElement('div');
-  rigaCheck.className = 'checkbox-row';
-  rigaCheck.style.color = 'var(--ink-soft)';
-  rigaCheck.innerHTML = `<input type="checkbox" class="f-prezzo-a-oggetto"><label style="color:var(--ink-soft);">Spunta SOLO se il prezzo scritto sopra vale per un singolo oggetto (il tool lo moltiplica per la quantità). Lasciala vuota se il prezzo scritto è già il totale di tutta la riga.</label>`;
   const wrapper = document.createElement('div');
   wrapper.className = 'oggetto-riga-wrapper';
   wrapper.appendChild(div);
-  wrapper.appendChild(rigaCheck);
+  const domandaPrezzo = creaDomandaPrezzoRiga(wrapper, div);
+  wrapper.appendChild(domandaPrezzo);
 
   const aggiorna = () => {
     const qty = parseFloat(div.querySelector('.f-qty-ogg').value) || 0;
     const prezzo = parseFloat(div.querySelector('.f-prezzo-ogg').value) || 0;
-    const perOggetto = rigaCheck.querySelector('.f-prezzo-a-oggetto').checked;
+    const perOggetto = domandaPrezzo.querySelector('.f-prezzo-tipo-radio:checked')?.value === 'unitario';
     const totale = perOggetto ? qty * prezzo : prezzo;
     div.querySelector('.f-totale-riga').textContent = normNum(totale) + ' G';
   };
   div.querySelector('.f-qty-ogg').addEventListener('input', aggiorna);
   div.querySelector('.f-prezzo-ogg').addEventListener('input', aggiorna);
-  rigaCheck.querySelector('.f-prezzo-a-oggetto').addEventListener('change', aggiorna);
+  domandaPrezzo.addEventListener('change', aggiorna);
   div.querySelector('button').addEventListener('click', () => wrapper.remove());
   return wrapper;
 }
@@ -1839,7 +1857,7 @@ function leggiRoleDalDOM(roleEl) {
   const missioni = [...roleEl.querySelectorAll('.missione-card')].map(mEl => {
     const m = {
       nome: mEl.querySelector('.f-nome').value.trim(),
-      completamento: mEl.querySelector('.f-completamento').checked
+      completamento: mEl.querySelector('.f-completamento-radio:checked')?.value === 'si'
     };
     mEl.querySelectorAll('.f-premio').forEach(inp => {
       const key = inp.dataset.key;
@@ -1855,7 +1873,7 @@ function leggiRoleDalDOM(roleEl) {
 function leggiMateriaDalDOM(matEl) {
   const materia = matEl.querySelector('.f-materia').value;
   const anno = matEl.querySelector('.f-anno').value;
-  const inPiano = matEl.querySelector('.f-in-piano').checked && materia !== 'ALTRO';
+  const inPiano = matEl.querySelector('.f-in-piano-radio:checked')?.value === 'si' && materia !== 'ALTRO';
 
   const stepCards = [...matEl.querySelectorAll('.f-bulk-step')];
   const valoreScelto = (stepCard) => {
@@ -2115,7 +2133,7 @@ function calcolaTutto() {
       const usi = r.querySelector('.f-usi-ogg').value;
       const destinazione = r.querySelector('.f-destinazione-ogg').value;
       const prezzo = parseFloat(r.querySelector('.f-prezzo-ogg').value) || 0;
-      const perOggetto = r.querySelector('.f-prezzo-a-oggetto').checked;
+      const perOggetto = r.querySelector('.f-prezzo-tipo-radio:checked')?.value === 'unitario';
       if (!nomeOgg || qty <= 0) return;
       const totRiga = perOggetto ? qty * prezzo : prezzo;
       subtotale += totRiga;
@@ -2153,7 +2171,7 @@ function calcolaTutto() {
       const nomeOgg = r.querySelector('.f-nome-ogg').value.trim();
       const qty = parseInt(r.querySelector('.f-qty-ogg').value, 10) || 0;
       const prezzo = parseFloat(r.querySelector('.f-prezzo-ogg').value) || 0;
-      const perOggetto = r.querySelector('.f-prezzo-a-oggetto').checked;
+      const perOggetto = r.querySelector('.f-prezzo-tipo-radio:checked')?.value === 'unitario';
       if (!nomeOgg || qty <= 0) return;
       const totRiga = perOggetto ? qty * prezzo : prezzo;
       subtotale += totRiga;
