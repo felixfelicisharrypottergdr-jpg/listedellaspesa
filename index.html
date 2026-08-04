@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -205,7 +203,7 @@
     <div class="panel">
       <div class="acc-header" id="oggetti_toggle">
         <span class="acc-chevron">▾</span>
-        <h2 style="margin:0; flex:1;">Oggetti consumati <span class="format-tag">Usati in tutte le Role che stai riscattando · opzionale</span></h2>
+        <h2 style="margin:0; flex:1;">Oggetti consumati <span class="format-tag">tutte le Role · opzionale</span></h2>
       </div>
       <div class="acc-body">
         <div class="hint">
@@ -405,6 +403,11 @@
       </div>
     </div>
     <div id="risultato_pieno" style="display:none; flex-direction:column; gap:18px;">
+      <div class="panel" style="border: 2px solid var(--gold);">
+        <h2>📋 Lista della Spesa da pubblicare sul Forum <span class="format-tag">questo è l'UNICO post che devi pubblicare</span></h2>
+        <div class="hint">Copia questo intero blocco, senza toglierne pezzi, e pubblicalo così com'è nel topic della tua Lista della Spesa — <b>compreso il riquadro richiudibile "📎 Dati per l'Accredito"</b> in fondo. Chi si occupa degli accrediti non vede mai questo tool: legge solo il post che pubblichi, quindi tutto quello che gli serve deve essere dentro di esso.</div>
+        <textarea id="outPostForum" class="output-box" readonly style="min-height:260px;"></textarea>
+      </div>
       <div class="panel">
         <h2>Riepilogo per Role</h2>
         <div id="riepilogo_roles"></div>
@@ -425,6 +428,7 @@
         <h2>Riepilogo Commercio Magico</h2>
         <div id="riepilogo_commercio"></div>
       </div>
+      <div class="hint" style="margin: 0 4px;">⚠ I box qui sotto sono un <b>doppione di comodo</b>, utile solo se stai testando il tool: gli stessi identici dati sono già dentro il post qui sopra, nel riquadro richiudibile "📎 Dati per l'Accredito". Chi fa gli accrediti lavora sempre a partire dal post pubblicato sul forum, mai da questa pagina.</div>
       <div class="panel">
         <h2>Box A — Elenco Variazioni <span class="format-tag">incolla nel Generatore Accrediti</span></h2>
         <textarea id="outBoxA" class="output-box" readonly></textarea>
@@ -963,8 +967,8 @@ function creaRoleCard() {
   const rigaBase = document.createElement('div');
   rigaBase.className = 'row';
   rigaBase.innerHTML = `
-    <div><label class="tight">Titolo Role</label><input type="text" class="f-titolo" placeholder="es. Studio matto in Biblioteca"></div>
-    <div><label class="tight">Link Role</label><input type="text" class="f-link" placeholder="?t=...#entry..."></div>
+    <div><label class="tight">Titolo Role</label><input type="text" class="f-titolo" placeholder="es. Sparks Fly"></div>
+    <div><label class="tight">Link Role <span class="format-tag">serve per chiudere il topic</span></label><input type="text" class="f-link" placeholder="?t=...#entry..."></div>
     <div style="max-width:130px"><label class="tight">Post scritti</label><input type="number" class="f-numposts" min="0" step="1"></div>
     <div style="max-width:150px"><label class="tight">Galeoni spesi</label><input type="number" class="f-galeonispesi" min="0" step="1" placeholder="es. locande"></div>
     <div class="f-coeff-debito-wrap" style="max-width:190px; display:none;"><label class="tight">Coeff. di Debito <span class="format-tag">1=nessuno</span></label><input type="number" class="f-coeff-debito" min="1" step="0.1" value="1"></div>
@@ -1371,7 +1375,10 @@ function creaParametroRow() {
   div.style.alignItems = 'flex-end';
   div.innerHTML = `
     <div style="flex:2;"><label class="tight">Parametro</label>
-      <select class="f-param-nome">${PARAMETRI_MAGICI_FISICI.map(p => `<option value="${p}">${p}</option>`).join('')}</select>
+      <select class="f-param-nome">
+        <option value="">—</option>
+        ${PARAMETRI_MAGICI_FISICI.map(p => `<option value="${p}">${p}</option>`).join('')}
+      </select>
     </div>
     <div style="max-width:150px;"><label class="tight">Quanti punti acquista</label><input type="number" class="f-param-qty" min="1" step="1" value="1"></div>
     <div style="max-width:44px;"><button type="button" class="danger" style="width:100%;">✕</button></div>
@@ -1566,7 +1573,7 @@ function creaRigaOggettoAcquisto() {
         <option value="dispensa">Dispensa (Ingredienti/Piante/Creature)</option>
       </select>
     </div>
-    <div style="max-width:130px;"><label class="tight">Usi/Post max <span class="format-tag">opz.</span></label><input type="number" class="f-usi-ogg" min="0" step="1"></div>
+    <div style="max-width:130px;"><label class="tight">Usi/Post max</label><input type="number" class="f-usi-ogg" min="0" step="1"></div>
     <div style="max-width:140px;"><label class="tight">Prezzo (Galeoni)</label><input type="number" class="f-prezzo-ogg" min="0" step="0.5" value="0"></div>
     <div style="max-width:120px;"><label class="tight">Totale riga</label><div class="f-totale-riga fixed-value-riga">0 G</div></div>
     <div style="max-width:44px;"><button type="button" class="danger" style="width:100%;">✕</button></div>
@@ -1574,7 +1581,7 @@ function creaRigaOggettoAcquisto() {
   const rigaCheck = document.createElement('div');
   rigaCheck.className = 'checkbox-row';
   rigaCheck.style.color = 'var(--ink-soft)';
-  rigaCheck.innerHTML = `<input type="checkbox" class="f-prezzo-a-oggetto"><label style="color:var(--ink-soft);">Il prezzo scritto è per UN SOLO oggetto (il tool lo moltiplica per la quantità) — se lasci vuoto, il prezzo è già il totale della riga</label>`;
+  rigaCheck.innerHTML = `<input type="checkbox" class="f-prezzo-a-oggetto"><label style="color:var(--ink-soft);">Spunta SOLO se il prezzo scritto sopra vale per un singolo oggetto (il tool lo moltiplica per la quantità). Lasciala vuota se il prezzo scritto è già il totale di tutta la riga.</label>`;
   const wrapper = document.createElement('div');
   wrapper.className = 'oggetto-riga-wrapper';
   wrapper.appendChild(div);
@@ -1608,7 +1615,7 @@ function creaRigaOggettoVendita() {
   const rigaCheck = document.createElement('div');
   rigaCheck.className = 'checkbox-row';
   rigaCheck.style.color = 'var(--ink-soft)';
-  rigaCheck.innerHTML = `<input type="checkbox" class="f-prezzo-a-oggetto"><label style="color:var(--ink-soft);">Il prezzo scritto è per UN SOLO oggetto (il tool lo moltiplica per la quantità) — se lasci vuoto, il prezzo è già il totale della riga</label>`;
+  rigaCheck.innerHTML = `<input type="checkbox" class="f-prezzo-a-oggetto"><label style="color:var(--ink-soft);">Spunta SOLO se il prezzo scritto sopra vale per un singolo oggetto (il tool lo moltiplica per la quantità). Lasciala vuota se il prezzo scritto è già il totale di tutta la riga.</label>`;
   const wrapper = document.createElement('div');
   wrapper.className = 'oggetto-riga-wrapper';
   wrapper.appendChild(div);
@@ -1705,9 +1712,128 @@ document.getElementById('commercianti_list').appendChild(creaCardCommercio('vend
 aggiornaContatoreCommercio();
 
 // ============ LETTURA DEL FORM E CALCOLO ============
+// ============ COSTRUZIONE DEL POST UFFICIALE DA PUBBLICARE SUL FORUM ============
+// Questo e' l'output che il player pubblica come richiesta: contiene link, nomi,
+// note — tutto cio' che finora veniva raccolto nel form ma non appariva in nessun
+// output. Chi accredita legge QUESTO post e ne ricava i dati per il Generatore.
+function descriviPremiMissione(m) {
+  const parti = [];
+  if (m.ppPostRate) parti.push(`${normNum(m.ppPostRate)} PP/post` + (m.ppPostCap ? ` (fino a ${m.ppPostCap} post)` : ''));
+  if (m.ppFisso) parti.push(`${normNum(m.ppFisso)} PP fissi`);
+  CAMPI_ALTRI.forEach(c => {
+    const v = m[c.key];
+    if (v) parti.push(`${v >= 0 ? '+' : ''}${normNum(v)} ${c.label}`);
+  });
+  return parti.length ? parti.join(', ') : 'nessun premio dichiarato';
+}
+
+function descriviRole(role, idx, totaliRole) {
+  const righe = [];
+  const titoloLink = role.link ? `[URL=${role.link}]${role.titolo || 'Role senza titolo'}[/URL]` : (role.titolo || 'Role senza titolo');
+  righe.push(`${idx + 1}) ${titoloLink} — ${role.numPosts} post scritti`);
+  const missioniValide = role.missioni.filter(m => m.nome);
+  if (missioniValide.length) {
+    righe.push(`[b]Missioni FH/FW completate:[/b]`);
+    missioniValide.forEach(m => {
+      righe.push(`- ${m.nome}${m.completamento ? ' (missione a completamento)' : ''}: ${descriviPremiMissione(m)}`);
+    });
+  }
+  if (role.galeoniSpesi) {
+    righe.push(`[b]Galeoni spesi durante la Role:[/b] ${normNum(role.galeoniSpesi)}` +
+      (role.coeffDebito && role.coeffDebito !== 1 ? ` (Coefficiente di Debito ×${normNum(role.coeffDebito)})` : ''));
+  }
+  const righeTotale = fmtRighe(totaliRole).join(', ');
+  righe.push(`[b]Totale da questa Role:[/b] ${righeTotale || 'nessuna variazione'}`);
+  return righe.join('\n');
+}
+
+function descriviMateria(mat, totaliMat) {
+  const righe = [];
+  const nomeMostrato = mat.materia === 'ALTRO' ? 'Extra / Avanzata' : mat.materia;
+  const etichettaAnno = mat.materia !== 'ALTRO' ? ` (anno ${mat.anno === '5' ? 'V' : mat.anno === '6' ? 'VI' : 'VII'})` : '';
+  righe.push(`[u]${nomeMostrato}${etichettaAnno}[/u]`);
+  if (mat.bulkTD) righe.push(`- Tutte le Conoscenze da Troll a Desolante` + (mat.bulkTDRole ? ' (pagata con una role di studio)' : ' (100 Galeoni)'));
+  if (mat.bulkDS) righe.push(`- Tutte le Conoscenze da Desolante a Scadente` + (mat.bulkDSRole ? ' (pagata con una role di studio)' : ' (100 Galeoni)'));
+  mat.righe.forEach(r => righe.push(`- ${r.conoscenza}: da ${r.votoPartenza} a ${r.votoArrivo}`));
+  const righeTotale = fmtRighe(totaliMat).join(', ');
+  righe.push(`[b]Totale:[/b] ${righeTotale || 'nessuna variazione'}`);
+  return righe.join('\n');
+}
+
+function descriviSapienza(sap, totaliSap) {
+  const righe = [];
+  righe.push(`[u]Sapienza ${sap.sapienza}[/u]`);
+  if (sap.tipo === 'magica') {
+    sap.righe.forEach(r => {
+      if (r.livelloFinale <= r.livelloPartenza) return;
+      righe.push(`- ${r.conoscenza} > Livello ${ROMANI[r.livelloPartenza] || r.livelloPartenza} → ${ROMANI[r.livelloFinale]}`);
+    });
+  } else if (sap.livelloFinale > sap.livelloPartenza) {
+    righe.push(`- Livello ${ROMANI[sap.livelloPartenza] || sap.livelloPartenza} → ${ROMANI[sap.livelloFinale]}`);
+  }
+  const righeTotale = fmtRighe(totaliSap).join(', ');
+  righe.push(`[b]Totale:[/b] ${righeTotale || 'nessuna variazione'}`);
+  return righe.join('\n');
+}
+
+function costruisciRecapFinale(totaleGenerale) {
+  const pp = totaleGenerale['Punti Post'] || 0;
+  const gal = totaleGenerale['Galeoni'] || 0;
+  const altri = Object.entries(totaleGenerale).filter(([k, v]) => k !== 'Punti Post' && k !== 'Galeoni' && Math.round((v || 0) * 100) !== 0);
+  const righe = [];
+  righe.push(`[size=10][font=medievalsharp][b][color=maroon]COMPLESSIVO ACCREDITO[/color][/b][/font][/size]`);
+  righe.push(`[b]Complessivo PP spesi e guadagnati:[/b] ${pp ? (pp >= 0 ? '+' : '') + normNum(pp) + ' PP' : '//'}`);
+  righe.push(`[b]Complessivo Galeoni spesi e guadagnati:[/b] ${gal ? (gal >= 0 ? '+' : '') + normNum(gal) + ' G' : '//'}`);
+  righe.push(`[b]Altri punti/altro guadagnati o persi:[/b] ${altri.length ? altri.map(([k, v]) => `${v >= 0 ? '+' : ''}${normNum(v)} ${k}`).join(', ') : '//'}`);
+  return righe.join('\n');
+}
+
+// I Box A/E/F/G devono stare DENTRO il post pubblicato: chi fa gli accrediti
+// non vede mai il tool compilato, vede solo il testo pubblicato sul forum.
+// Un riquadro richiudibile li tiene fuori dai piedi nella lettura narrativa,
+// ma restano comunque testo presente e copiabile dal post stesso.
+function costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG) {
+  const righe = [];
+  righe.push(`<details><summary><b>📎 Dati per l'Accredito — click per aprire (non modificare, copiare così come sono nel Generatore Accrediti)</b></summary>`);
+  righe.push('');
+  righe.push(`[b]BOX A — Elenco Variazioni:[/b]`);
+  righe.push(fmtRighe(totaleGenerale).join('\n') || '(nessuna variazione)');
+  if (tutteBoxELines.length) {
+    righe.push('');
+    righe.push(`[b]BOX E — Materie Studenti:[/b]`);
+    righe.push(tutteBoxELines.join(', '));
+  }
+  if (tutteBoxFLines.length) {
+    righe.push('');
+    righe.push(`[b]BOX F — Sapienze Adulti:[/b]`);
+    righe.push(tutteBoxFLines.join(', '));
+  }
+  if (tutteRigheBoxG.length) {
+    righe.push('');
+    righe.push(`[b]BOX G — Inventario:[/b]`);
+    righe.push(tutteRigheBoxG.join('\n'));
+  }
+  righe.push('</details>');
+  return righe.join('\n');
+}
+
+function assemblaPostForum(sezioni) {
+  const blocchi = [];
+  if (sezioni.segnala.length) blocchi.push(`[size=13][color=sienna][font=medievalsharp][b]Segnala e riscatta role e converti PP in Galeoni[/b][/font][/color][/size]\n` + sezioni.segnala.join('\n\n'));
+  if (sezioni.voti.length) blocchi.push(`[size=13][color=cadetblue][font=medievalsharp][b]Migliora i tuoi Voti[/b][/font][/color][/size]\n` + sezioni.voti.join('\n\n'));
+  if (sezioni.sapienze.length) blocchi.push(`[size=13][color=cadetblue][font=medievalsharp][b]Migliora le tue Sapienze[/b][/font][/color][/size]\n` + sezioni.sapienze.join('\n\n'));
+  if (sezioni.parametri.length) blocchi.push(`[size=13][color=coral][font=medievalsharp][b]Acquista Parametri Magici, Fisici e Dialettica[/b][/font][/color][/size]\n` + sezioni.parametri.join('\n'));
+  if (sezioni.conoscenze) blocchi.push(`[size=13][color=darkblue][font=medievalsharp][b]Acquista Conoscenze[/b][/font][/color][/size]\n` + sezioni.conoscenze);
+  if (sezioni.commercio.length) blocchi.push(`[size=13][color=seagreen][font=medievalsharp][b]Commercio Magico[/b][/font][/color][/size]\n` + sezioni.commercio.join('\n'));
+  if (!blocchi.length) return '';
+  blocchi.push(sezioni.recap);
+  return blocchi.join('\n<hr>\n');
+}
+
 function leggiRoleDalDOM(roleEl) {
   const numPosts = parseFloat(roleEl.querySelector('.f-numposts').value) || 0;
   const titolo = roleEl.querySelector('.f-titolo').value.trim();
+  const link = roleEl.querySelector('.f-link').value.trim();
   const galeoniSpesi = parseFloat(roleEl.querySelector('.f-galeonispesi').value) || 0;
   const coeffDebito = parseFloat(roleEl.querySelector('.f-coeff-debito').value) || 1;
   const missioni = [...roleEl.querySelectorAll('.missione-card')].map(mEl => {
@@ -1723,7 +1849,7 @@ function leggiRoleDalDOM(roleEl) {
     });
     return m;
   });
-  return { titolo, numPosts, galeoniSpesi, coeffDebito, missioni };
+  return { titolo, link, numPosts, galeoniSpesi, coeffDebito, missioni };
 }
 
 function leggiMateriaDalDOM(matEl) {
@@ -1827,6 +1953,7 @@ function calcolaSapienza(sap) {
 function calcolaTutto() {
   const tassoBase = parseFloat(document.getElementById('tassoBase').value) || 0;
   const totaleGenerale = {};
+  const sezioniPost = { segnala: [], voti: [], sapienze: [], parametri: [], conoscenze: '', commercio: [] };
 
   // --- Role (Segnala e Riscatta) ---
   const roleEls = [...document.querySelectorAll('#roles_list > .role-card')];
@@ -1836,6 +1963,7 @@ function calcolaTutto() {
     const role = leggiRoleDalDOM(roleEl);
     const totaliRole = calcolaRole(role, tassoBase);
     sommaIn(totaleGenerale, totaliRole);
+    if (role.titolo || role.missioni.some(m => m.nome)) sezioniPost.segnala.push(descriviRole(role, idx, totaliRole));
 
     const righeTesto = fmtRighe(totaliRole).join(', ');
     const box = document.createElement('div');
@@ -1862,6 +1990,7 @@ function calcolaTutto() {
     contatoreE = risultato.contatoreFinale;
     sommaIn(totaleGenerale, risultato.totali);
     tutteBoxELines.push(...risultato.boxELines);
+    sezioniPost.voti.push(descriviMateria(mat, risultato.totali));
 
     const righeTesto = fmtRighe(risultato.totali).join(', ');
     const box = document.createElement('div');
@@ -1887,6 +2016,7 @@ function calcolaTutto() {
     const risultato = calcolaSapienza(sap);
     sommaIn(totaleGenerale, risultato.totali);
     tutteBoxFLines.push(...risultato.boxFLines);
+    sezioniPost.sapienze.push(descriviSapienza(sap, risultato.totali));
 
     const righeTesto = fmtRighe(risultato.totali).join(', ');
     const box = document.createElement('div');
@@ -1915,6 +2045,7 @@ function calcolaTutto() {
     totaleGenerale[nome] = (totaleGenerale[nome] || 0) + qty;
     totaleGenerale['Punti Post'] = (totaleGenerale['Punti Post'] || 0) - costo.pp;
     righeRiepilogoParam.push(`+${qty} ${nome} (-${costo.pp} PP)`);
+    sezioniPost.parametri.push(`Vorrei acquistare +${qty} ${nome} per ${costo.pp} PP`);
   });
 
   const dialPartenza = parseInt(document.getElementById('dialetticaPartenza').value, 10) || 1;
@@ -1924,6 +2055,7 @@ function calcolaTutto() {
     totaleGenerale['Dialettica'] = (totaleGenerale['Dialettica'] || 0) + (dialFinale - dialPartenza);
     totaleGenerale['Galeoni'] = (totaleGenerale['Galeoni'] || 0) - costoGal;
     righeRiepilogoParam.push(`+${dialFinale - dialPartenza} Dialettica (-${costoGal} Galeoni)`);
+    sezioniPost.parametri.push(`Vorrei acquistare il ${dialFinale}° Punto Dialettica per ${costoGal} Galeoni`);
   }
   riepilogoParametriDiv.innerHTML = righeRiepilogoParam.length
     ? righeRiepilogoParam.map(r => `<div class="role-summary">${r}</div>`).join('')
@@ -1957,6 +2089,7 @@ function calcolaTutto() {
     totaleGenerale['Galeoni'] = (totaleGenerale['Galeoni'] || 0) - totaleGaleoniConoscenze;
     righeOutputConoscenze.push(`TOTALE GALEONI SPESI: -${totaleGaleoniConoscenze} G`);
   }
+  sezioniPost.conoscenze = righeOutputConoscenze.join('\n');
   if (righeScartateTotali) {
     righeOutputConoscenze.push('');
     righeOutputConoscenze.push(`⚠ ${righeScartateTotali} riga/e scartata/e in totale perché senza nome o link validi (formato richiesto: Nome | link).`);
@@ -1975,6 +2108,7 @@ function calcolaTutto() {
     const righeOggetti = [...negEl.querySelectorAll('.oggetti_commercio_list > .oggetto-riga-wrapper')];
     let subtotale = 0;
     let quantiInDispensa = 0;
+    const righeNarrativa = [];
     righeOggetti.forEach(r => {
       const nomeOgg = r.querySelector('.f-nome-ogg').value.trim();
       const qty = parseInt(r.querySelector('.f-qty-ogg').value, 10) || 0;
@@ -1983,15 +2117,20 @@ function calcolaTutto() {
       const prezzo = parseFloat(r.querySelector('.f-prezzo-ogg').value) || 0;
       const perOggetto = r.querySelector('.f-prezzo-a-oggetto').checked;
       if (!nomeOgg || qty <= 0) return;
-      subtotale += perOggetto ? qty * prezzo : prezzo;
+      const totRiga = perOggetto ? qty * prezzo : prezzo;
+      subtotale += totRiga;
+      righeNarrativa.push(`- ${nomeOgg} [${qty}]${usi ? ` (0/${usi} usi)` : ''}${destinazione === 'dispensa' ? ' [va in Dispensa]' : ''} - ${normNum(totRiga)} G`);
       if (destinazione === 'dispensa') {
         quantiInDispensa++;
         return; // la Dispensa non è gestita dal Box G del Generatore Accrediti
       }
       const desc = usi ? `(0/${usi} usi)` : '';
-      righeBoxGCommercio.push(`NUOVO: ${nomeOgg} [${qty}]: ${desc}`.replace(/:\s*$/, ''));
+      righeBoxGCommercio.push(`NUOVO: ${nomeOgg} [${qty}]: ${desc}`.trimEnd());
     });
     if (subtotale) totaleGenerale['Galeoni'] = (totaleGenerale['Galeoni'] || 0) - subtotale;
+    if (nome || righeNarrativa.length) {
+      sezioniPost.commercio.push([`[b]Negozio scelto:[/b] ${nome || '—'}`, `[b]Lista acquisti:[/b]`, ...righeNarrativa, `[b]Totale:[/b] -${normNum(subtotale)} G`].join('\n'));
+    }
 
     const box = document.createElement('div');
     box.className = 'role-summary';
@@ -2005,18 +2144,29 @@ function calcolaTutto() {
 
   commercianteEls.forEach((comEl, idx) => {
     const nome = comEl.querySelector('.f-nome-neg').value.trim();
+    const noteEl = comEl.querySelector('.f-note-com');
+    const note = noteEl ? noteEl.value.trim() : '';
     const righeOggetti = [...comEl.querySelectorAll('.oggetti_commercio_list > .oggetto-riga-wrapper')];
     let subtotale = 0;
+    const righeNarrativa = [];
     righeOggetti.forEach(r => {
       const nomeOgg = r.querySelector('.f-nome-ogg').value.trim();
       const qty = parseInt(r.querySelector('.f-qty-ogg').value, 10) || 0;
       const prezzo = parseFloat(r.querySelector('.f-prezzo-ogg').value) || 0;
       const perOggetto = r.querySelector('.f-prezzo-a-oggetto').checked;
       if (!nomeOgg || qty <= 0) return;
-      subtotale += perOggetto ? qty * prezzo : prezzo;
+      const totRiga = perOggetto ? qty * prezzo : prezzo;
+      subtotale += totRiga;
+      righeNarrativa.push(`- ${nomeOgg} [${qty}] - ${normNum(totRiga)} G`);
       righeBoxGCommercio.push(`${nomeOgg}: -${qty}`);
     });
     if (subtotale) totaleGenerale['Galeoni'] = (totaleGenerale['Galeoni'] || 0) + subtotale;
+    if (nome || righeNarrativa.length) {
+      const bloccoCom = [`[b]PNG Commerciante scelto:[/b] ${nome || '—'}`];
+      if (note) bloccoCom.push(`[b]Note:[/b] ${note}`);
+      bloccoCom.push(`[b]Lista vendite:[/b]`, ...righeNarrativa, `[b]Totale:[/b] +${normNum(subtotale)} G`);
+      sezioniPost.commercio.push(bloccoCom.join('\n'));
+    }
 
     const box = document.createElement('div');
     box.className = 'role-summary';
@@ -2044,6 +2194,13 @@ function calcolaTutto() {
   const righeBoxGManuali = document.getElementById('oggettiGlobali').value.trim();
   const tutteRigheBoxG = [...righeBoxGCommercio, ...(righeBoxGManuali && righeBoxGManuali !== '(nessuno)' ? righeBoxGManuali.split('\n') : [])];
   document.getElementById('outBoxG').value = tutteRigheBoxG.length ? tutteRigheBoxG.join('\n') : '(nessuno)';
+
+  sezioniPost.recap = costruisciRecapFinale(totaleGenerale);
+  const postNarrativo = assemblaPostForum(sezioniPost);
+  const bloccoDati = postNarrativo ? costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG) : '';
+  document.getElementById('outPostForum').value = postNarrativo
+    ? postNarrativo + '\n<hr>\n' + bloccoDati
+    : '(nessuna sezione compilata)';
 
   document.getElementById('risultato_vuoto').style.display = 'none';
   document.getElementById('risultato_pieno').style.display = 'flex';
