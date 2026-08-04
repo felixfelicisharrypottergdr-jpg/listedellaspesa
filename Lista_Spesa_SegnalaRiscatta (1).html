@@ -1,0 +1,2034 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lista della Spesa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --parchment: #EEE4CD;
+    --parchment-panel: #FBF7EC;
+    --parchment-card: #F5EEDC;
+    --ink: #2B2233;
+    --ink-soft: #5B5468;
+    --gold: #9C6B24;
+    --gold-deep: #7A5119;
+    --gold-soft: #D8C08A;
+    --line: #D9C79A;
+    --green: #3F6B4F;
+    --green-soft: #E4EEE6;
+    --red: #8B3A3A;
+    --red-soft: #F5E6E1;
+    --amber: #A9762F;
+    --amber-soft: #FBF0D9;
+    --ink-panel: #241A2E;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Source Sans 3', 'Segoe UI', sans-serif;
+    background:
+      radial-gradient(ellipse at top left, rgba(156,107,36,0.06), transparent 55%),
+      radial-gradient(ellipse at bottom right, rgba(63,107,79,0.05), transparent 55%),
+      var(--parchment);
+    color: var(--ink); margin: 0; padding: 28px 20px 60px; line-height: 1.5;
+  }
+  .container { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+
+  .masthead { text-align: center; margin-bottom: 2px; }
+  .masthead .eyebrow { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 15px; color: var(--gold-deep); letter-spacing: .04em; display: block; margin-bottom: 2px; }
+  .masthead h1 { font-family: 'Cinzel', serif; font-size: 28px; letter-spacing: .03em; margin: 0; }
+  .masthead .rule { width: 200px; height: 1px; margin: 12px auto 0; position: relative; background: linear-gradient(90deg, transparent, var(--gold-soft) 20%, var(--gold) 50%, var(--gold-soft) 80%, transparent); }
+  .masthead .rule::after { content: "✦"; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-52%); background: var(--parchment); color: var(--gold); padding: 0 10px; font-size: 13px; }
+
+  /* --- barra di sezione --- */
+  .tab-bar { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .tab-btn {
+    padding: 9px 16px; border-radius: 999px; border: 1px solid var(--gold-soft); background: #fff;
+    color: var(--ink-soft); font-weight: 700; font-size: 12.5px; cursor: pointer; font-family: 'Source Sans 3', sans-serif;
+    transition: all .15s ease; white-space: nowrap;
+  }
+  .tab-btn:hover { border-color: var(--gold); color: var(--ink); }
+  .tab-btn.active { background: var(--gold); color: #fff; border-color: var(--gold); box-shadow: 0 4px 10px rgba(122,81,25,.25); }
+  .tab-btn .lock { opacity: .55; font-size: 11px; margin-left: 3px; }
+
+  .page { display: none; flex-direction: column; gap: 18px; }
+  .page.active { display: flex; }
+
+  .panel { background: var(--parchment-panel); padding: 22px 24px; border-radius: 12px; border: 1px solid var(--line); box-shadow: 0 1px 2px rgba(43,34,51,.04), 0 8px 24px rgba(43,34,51,.06); }
+  .panel h2 { font-family: 'Cormorant Garamond', serif; font-size: 21px; font-weight: 600; margin: 0 0 6px; display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+  .panel .subtitle { font-size: 12.5px; color: var(--ink-soft); margin: 0 0 16px; }
+
+  .placeholder-page { text-align: center; padding: 50px 20px; color: var(--ink-soft); }
+  .placeholder-page .glyph { font-size: 30px; color: var(--gold-soft); margin-bottom: 10px; }
+  .placeholder-page h3 { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--ink); margin: 0 0 6px; }
+
+  .info-box { background: var(--green-soft); border-left: 3px solid var(--green); padding: 12px 15px; border-radius: 0 8px 8px 0; font-size: 13px; color: #234132; line-height: 1.55; }
+  .hint { background: var(--amber-soft); border-left: 3px solid var(--amber); padding: 10px 13px; border-radius: 0 8px 8px 0; font-size: 12px; color: #5C4517; line-height: 1.5; margin-bottom: 10px; }
+
+  .fmt-guide { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .fmt-case { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; }
+  .fmt-case-label { font-weight: 700; font-size: 12.5px; color: var(--ink); margin-bottom: 3px; }
+  .fmt-case-desc { font-size: 12px; color: var(--ink-soft); margin-bottom: 6px; }
+  .fmt-case-syntax { font-size: 12px; color: var(--ink-soft); margin-bottom: 4px; }
+  .fmt-case-example { font-size: 12px; color: var(--green); }
+  .fmt-case-example span { color: var(--ink-soft); font-style: italic; }
+  .fmt-case code { background: var(--amber-soft); padding: 1px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; color: var(--gold-deep); font-weight: 500; }
+
+  label { font-weight: 700; display: block; margin-bottom: 5px; margin-top: 10px; color: var(--ink-soft); font-size: 12.5px; }
+  label.tight { margin-top: 0; }
+  textarea, input, select {
+    width: 100%; padding: 9px 11px; border: 1px solid var(--gold-soft); border-radius: 7px;
+    font-family: 'JetBrains Mono', Consolas, monospace; font-size: 13px; background: #fff; color: var(--ink);
+  }
+  textarea:focus, input:focus, select:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(156,107,36,.14); }
+  textarea { resize: vertical; min-height: 64px; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .row > div { flex: 1; min-width: 130px; }
+
+  /* --- accordion generico --- */
+  .acc-header { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+  .acc-chevron { display: inline-block; transition: transform .15s ease; color: var(--gold); font-size: 11px; flex-shrink: 0; }
+  .collapsed > .acc-header .acc-chevron { transform: rotate(-90deg); }
+  .acc-body { margin-top: 12px; }
+  .collapsed > .acc-body { display: none; }
+
+  /* --- role card --- */
+  .role-card { background: var(--parchment-card); border: 1px solid var(--gold-soft); border-radius: 10px; padding: 14px 18px; margin-bottom: 12px; }
+  .role-badge { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: var(--gold); color: #fff; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .role-title-preview { font-weight: 700; font-size: 14px; flex: 1; }
+  .role-meta { font-size: 11.5px; color: var(--ink-soft); font-weight: 600; }
+  .role-total-badge { font-size: 11.5px; color: var(--green); font-weight: 700; background: #fff; border: 1px solid var(--green-soft); padding: 2px 9px; border-radius: 999px; }
+
+  /* --- missione card --- */
+  .missione-card { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; margin: 10px 0; }
+  .missione-title-preview { font-weight: 700; font-size: 13px; flex: 1; }
+  .missione-level-badge { font-size: 10.5px; color: var(--gold-deep); background: var(--amber-soft); padding: 1px 8px; border-radius: 999px; font-weight: 700; }
+  .missione-comp-badge { font-size: 10.5px; color: var(--red); background: var(--red-soft); padding: 1px 8px; border-radius: 999px; font-weight: 700; }
+
+  .grid-rewards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 12px; }
+  .grid-rewards.wide { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 720px) { .grid-rewards, .grid-rewards.wide { grid-template-columns: repeat(2, 1fr); } }
+  .grid-rewards .field label { font-size: 10.5px; margin: 0 0 4px; }
+  .grid-rewards .field input { padding: 6px 8px; font-size: 12px; }
+
+  .altri-toggle { display: flex; align-items: flex-start; gap: 6px; cursor: pointer; font-size: 12px; font-weight: 700; color: var(--gold-deep); margin-top: 12px; user-select: none; line-height: 1.4; }
+  .altri-toggle .acc-chevron { color: var(--gold-deep); margin-top: 2px; }
+  .altri-body { margin-top: 10px; }
+  .altri-collapsed .altri-body { display: none; }
+  .altri-collapsed .altri-toggle .acc-chevron { transform: rotate(-90deg); }
+
+  .checkbox-row { display: flex; align-items: center; gap: 8px; margin: 8px 0 2px; }
+  .checkbox-row input[type=checkbox] { width: auto; accent-color: var(--gold); }
+  .checkbox-row label { margin: 0; font-weight: 600; font-size: 12px; color: var(--red); }
+
+  .radio-option { display: flex; align-items: center; gap: 8px; margin: 6px 0 0; }
+  .radio-option input[type=radio] { width: auto; accent-color: var(--gold); }
+  .radio-option label { margin: 0; font-weight: 600; font-size: 12.5px; color: var(--ink); text-transform: none; }
+
+  button { background: linear-gradient(180deg, #B4813A, var(--gold-deep)); color: #fff9ec; border: 0; border-radius: 9px; padding: 11px 18px; cursor: pointer; font-family: 'Source Sans 3', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: .02em; box-shadow: 0 1px 0 rgba(255,255,255,.25) inset, 0 6px 14px rgba(122,81,25,.28); transition: transform .12s ease; }
+  button:hover { transform: translateY(-1px); }
+  button.secondary { background: #fff; color: var(--gold-deep); border: 1px solid var(--gold-soft); box-shadow: none; }
+  button.secondary:hover { background: var(--amber-soft); transform: none; }
+  button.ghost { background: transparent; color: var(--gold-deep); border: none; box-shadow: none; padding: 6px 4px; font-size: 12.5px; }
+  button.ghost:hover { text-decoration: underline; transform: none; }
+  button.danger { background: #fff; color: var(--red); border: 1px solid #DDBBBB; box-shadow: none; padding: 5px 11px; font-size: 11.5px; }
+  button.danger:hover { background: var(--red-soft); }
+  button.big { width: 100%; padding: 15px 22px; font-size: 14.5px; }
+
+  .output-box { background: var(--ink-panel); color: #EDE3CE; border-left: 4px solid var(--green); white-space: pre-wrap; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; min-height: 90px; }
+  .role-summary { background: #fff; border: 1px dashed var(--gold-soft); border-radius: 8px; padding: 10px 14px; margin: 8px 0; font-size: 12.5px; font-family: 'JetBrains Mono', monospace; color: var(--ink-soft); }
+  .fixed-value-riga { padding: 9px 11px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--green); font-weight: 700; background: var(--green-soft); border-radius: 7px; border: 1px solid var(--green-soft); }
+  .format-tag { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 500; background: var(--ink); color: var(--parchment); padding: 2px 8px; border-radius: 999px; letter-spacing: .02em; margin-left: 8px; vertical-align: middle; }
+  .empty-state { text-align: center; padding: 30px 10px; color: var(--ink-soft); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="masthead">
+        <h1>Lista della Spesa</h1>
+    <div class="rule"></div>
+  </div>
+
+  <div class="tab-bar" id="tab_bar"></div>
+
+  <!-- ============ PAGINA: SEGNALA E RISCATTA ROLE ============ -->
+  <div class="page active" data-page="segnala">
+    <div class="collapsed">
+      <div class="acc-header" id="info_toggle_segnala">
+        <span class="acc-chevron">▾</span>
+        <span style="font-weight:700; color: var(--green); font-size:13px;">ℹ️ Come funziona questa sezione</span>
+      </div>
+      <div class="acc-body info-box" style="margin-top:10px;">
+        Compila una scheda per ogni <b>Role</b> segnalata. Tra le missioni <i>non a completamento</i> vale solo il premio più alto per tipo; le missioni <i>a completamento</i> si sommano sempre per intero.
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Role segnalate <span id="role_counter_badge" class="format-tag">0</span></h2>
+      <div id="roles_list"></div>
+      <div id="roles_empty" class="empty-state">Nessuna Role ancora aggiunta — inizia da qui.</div>
+      <button type="button" class="secondary" id="add_role_btn">+ Aggiungi Role</button>
+    </div>
+
+    <div class="panel">
+      <div class="acc-header" id="oggetti_toggle">
+        <span class="acc-chevron">▾</span>
+        <h2 style="margin:0; flex:1;">Oggetti consumati <span class="format-tag">tutte le Role · opzionale</span></h2>
+      </div>
+      <div class="acc-body">
+        <div class="hint">
+          Una riga per ogni oggetto coinvolto. Ci sono tre casi possibili — usa quello giusto a seconda di cosa è successo:
+        </div>
+        <div class="fmt-guide">
+          <div class="fmt-case">
+            <div class="fmt-case-label">1. Cambia la quantità di un oggetto già in scheda</div>
+            <div class="fmt-case-desc">L'hai consumato, perso o ne hai guadagnati altri esemplari.</div>
+            <div class="fmt-case-syntax">Scrivi: <code>Nome Oggetto: +numero</code> oppure <code>Nome Oggetto: -numero</code></div>
+            <div class="fmt-case-example">Esempio: <code>Pozione Curativa: -1</code> <span>(ne hai usata una)</span></div>
+          </div>
+          <div class="fmt-case">
+            <div class="fmt-case-label">2. Consumi un uso di un oggetto ricaricabile già in scheda</div>
+            <div class="fmt-case-desc">L'oggetto resta lo stesso (es. un calderone con un tot. di usi disponibili), cambia solo quanti usi ha già consumato.</div>
+            <div class="fmt-case-syntax">Scrivi: <code>USI: Nome Oggetto: +numero di usi consumati ora</code></div>
+            <div class="fmt-case-example">Esempio: <code>USI: Calderone Performante: +1</code> <span>(un uso in più consumato)</span></div>
+          </div>
+          <div class="fmt-case">
+            <div class="fmt-case-label">3. Ottieni un oggetto che potrebbe non essere ancora in scheda</div>
+            <div class="fmt-case-desc">Acquisto, creazione, premio: funziona sia se è la prima volta sia se ne possiedi già — nel secondo caso la quantità si somma automaticamente.</div>
+            <div class="fmt-case-syntax">Scrivi: <code>NUOVO: Nome Oggetto [Quantità]: Descrizione</code></div>
+            <div class="fmt-case-example">Esempio: <code>NUOVO: Pozione Ridente [2]: creata durante la lezione di Pozioni</code></div>
+          </div>
+        </div>
+        <textarea id="oggettiGlobali" placeholder="Pozione Curativa: -1&#10;USI: Calderone Performante: +1&#10;NUOVO: Pozione Ridente [2]: creata durante la lezione di Pozioni"></textarea>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="acc-header" id="conversione_toggle">
+        <span class="acc-chevron">▾</span>
+        <h2 style="margin:0; flex:1;">Conversione PP → Galeoni <span class="format-tag">opzionale</span></h2>
+      </div>
+      <div class="acc-body">
+        <div class="hint">Blocco da 10 PP → 50 Galeoni (5 G/PP) · da 50 PP → 300 Galeoni (6 G/PP) · da 100 PP → 700 Galeoni (7 G/PP). Combina liberamente più blocchi.</div>
+        <div class="row">
+          <div><label class="tight" for="convN10">Blocchi da 10 <span class="format-tag">5 G/PP</span></label><input type="number" id="convN10" value="0" min="0" step="1"></div>
+          <div><label class="tight" for="convN50">Blocchi da 50 <span class="format-tag">6 G/PP</span></label><input type="number" id="convN50" value="0" min="0" step="1"></div>
+          <div><label class="tight" for="convN100">Blocchi da 100 <span class="format-tag">7 G/PP</span></label><input type="number" id="convN100" value="0" min="0" step="1"></div>
+        </div>
+        <div id="convRiepilogo" class="role-summary" style="margin-top:10px;">Nessuna conversione impostata.</div>
+
+        <label class="tight" for="tassoBase" style="margin-top:16px;">Tasso PP base per post (senza alcuna missione) <span class="format-tag">raramente da cambiare</span></label>
+        <input type="number" id="tassoBase" value="1" step="0.1" style="max-width:160px">
+      </div>
+    </div>
+
+    <button type="button" class="big" id="calcola_btn">Calcola totali →</button>
+  </div>
+
+  <!-- ============ PAGINA: MIGLIORA VOTI ============ -->
+  <div class="page" data-page="voti">
+    <div class="collapsed">
+      <div class="acc-header" id="info_toggle_voti">
+        <span class="acc-chevron">▾</span>
+        <span style="font-weight:700; color: var(--green); font-size:13px;">ℹ️ Come funziona questa sezione</span>
+      </div>
+      <div class="acc-body info-box" style="margin-top:10px;">
+        Il costo di ogni Conoscenza dipende dal voto di partenza: <b>Troll→Desolante</b> e <b>Desolante→Scadente</b> costano 100 Galeoni (o una role di studio) e valgono per <i>tutte</i> le Conoscenze della Materia che hanno quel voto, insieme. <b>Scadente→Accettabile</b> costa 15 Galeoni a Conoscenza. <b>Accettabile→Oltre Ogni Previsione</b> costa 3 PP a Conoscenza. <b>Oltre Ogni Previsione→Eccezionale</b> costa 4 PP a Conoscenza, +1 PP ogni 10 Eccezionale già ottenute in Piano di Studi (solo se la Conoscenza è nel Piano di Studi di quest'anno).
+      </div>
+    </div>
+
+    <div class="panel">
+      <label class="tight" for="eGiaPossedute">Quante Eccezionale (E) ha già il PG in Piano di Studi, prima di questa richiesta?</label>
+      <input type="number" id="eGiaPossedute" value="0" min="0" step="1" style="max-width:160px">
+      <div id="anteprimaPrezzoE" class="role-summary" style="margin-top:10px;">Con questo valore, la prossima Conoscenza portata a Eccezionale (in Piano di Studi) costerà <b>4 PP</b>.</div>
+      <div class="hint" style="margin-top:10px;">Conta solo le E ottenute in Conoscenze del Piano di Studi. Serve per calcolare correttamente il costo crescente di Oltre Ogni Previsione→Eccezionale.</div>
+    </div>
+
+    <div class="panel">
+      <h2>Materie da migliorare <span id="materia_counter_badge" class="format-tag">0</span></h2>
+      <div id="materie_list"></div>
+      <div id="materie_empty" class="empty-state">Nessuna Materia ancora aggiunta — inizia da qui.</div>
+      <button type="button" class="secondary" id="add_materia_btn">+ Aggiungi Materia</button>
+    </div>
+
+    <button type="button" class="big" id="calcola_btn_voti">Calcola totali →</button>
+  </div>
+
+  <!-- ============ PAGINA: MIGLIORA SAPIENZE ============ -->
+  <div class="page" data-page="sapienze">
+    <div class="collapsed">
+      <div class="acc-header" id="info_toggle_sapienze">
+        <span class="acc-chevron">▾</span>
+        <span style="font-weight:700; color: var(--green); font-size:13px;">ℹ️ Come funziona questa sezione</span>
+      </div>
+      <div class="acc-body info-box" style="margin-top:10px;">
+        Ogni Sapienza ha 5 Livelli (I–V). Il costo di ogni Livello dipende dal tipo di Sapienza: le <b>Sapienze Magiche</b> hanno Conoscenze sviluppabili singolarmente (es. Sapienza Offensiva → Ad Caelum, Ardor, Bombarda Maxima...); le <b>Sapienze Fisiche e Sociali</b> hanno un unico Livello complessivo, più costoso. Per salire di più Livelli insieme, il costo è la somma del prezzo di ciascun Livello attraversato.
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Sapienze da migliorare <span id="sapienza_counter_badge" class="format-tag">0</span></h2>
+      <div id="sapienze_list"></div>
+      <div id="sapienze_empty" class="empty-state">Nessuna Sapienza ancora aggiunta — inizia da qui.</div>
+      <button type="button" class="secondary" id="add_sapienza_btn">+ Aggiungi Sapienza</button>
+    </div>
+
+    <button type="button" class="big" id="calcola_btn_sapienze">Calcola totali →</button>
+  </div>
+
+  <!-- ============ PAGINA: ACQUISTA PARAMETRI ============ -->
+  <div class="page" data-page="parametri">
+    <div class="collapsed">
+      <div class="acc-header" id="info_toggle_parametri">
+        <span class="acc-chevron">▾</span>
+        <span style="font-weight:700; color: var(--green); font-size:13px;">ℹ️ Come funziona questa sezione</span>
+      </div>
+      <div class="acc-body info-box" style="margin-top:10px;">
+        Ogni punto aggiuntivo di un Parametro Magico o Fisico costa <b>100 PP</b> per i primi 5 punti acquistati in totale (Magici e Fisici insieme), <b>150 PP</b> per i successivi 5, <b>200 PP</b> per i successivi 5, e così via — il contatore è condiviso tra tutti i Parametri, non separato per ciascuno. La Dialettica ha invece una tabella propria in Galeoni (il primo punto è gratuito, di base).
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Dialettica <span class="format-tag">opzionale</span></h2>
+      <div class="row">
+        <div style="max-width:170px;"><label class="tight">Livello attuale</label><select id="dialetticaPartenza"></select></div>
+        <div style="max-width:170px;"><label class="tight">Livello desiderato</label><select id="dialetticaFinale"></select></div>
+      </div>
+      <div id="riepilogoDialettica" class="role-summary" style="margin-top:10px;">Nessun acquisto di Dialettica impostato.</div>
+    </div>
+
+    <div class="panel">
+      <label class="tight" for="puntiParamGiaAcquistati">Quanti punti aggiuntivi di Parametri Magici/Fisici ha già acquistato in totale, prima di questa richiesta?</label>
+      <input type="number" id="puntiParamGiaAcquistati" value="0" min="0" step="1" style="max-width:160px">
+      <div id="anteprimaPrezzoParam" class="role-summary" style="margin-top:10px;">Con questo valore, il prossimo punto acquistato costerà <b>100 PP</b>.</div>
+    </div>
+
+    <div class="panel">
+      <h2>Parametri da acquistare <span id="param_counter_badge" class="format-tag">0</span></h2>
+      <div id="parametri_list"></div>
+      <div id="parametri_empty" class="empty-state">Nessun Parametro ancora aggiunto.</div>
+      <button type="button" class="secondary" id="add_param_btn">+ Aggiungi Parametro</button>
+    </div>
+
+    <button type="button" class="big" id="calcola_btn_parametri">Calcola totali →</button>
+  </div>
+
+  <!-- ============ PAGINA: ACQUISTA CONOSCENZE ============ -->
+  <div class="page" data-page="conoscenze">
+    <div class="collapsed">
+      <div class="acc-header" id="info_toggle_conoscenze">
+        <span class="acc-chevron">▾</span>
+        <span style="font-weight:700; color: var(--green); font-size:13px;">ℹ️ Come funziona questa sezione</span>
+      </div>
+      <div class="acc-body info-box" style="margin-top:10px;">
+        Compila un blocco per ogni gruppo di Conoscenze dello stesso Tipo e della stessa Categoria (es. "5 Conoscenze Avanzate di categoria Arcaiche"). Il costo è per singola Conoscenza: Generica 10 G, Scolastica V/VI anno 20 G, Scolastica VII anno 30 G, Fatture e Pozioni Fatturanti 40 G, Extra 50 G, Avanzata 100 G. Le Conoscenze create dai player hanno prezzo libero (opzione "Personalizzata"). L'output è già pronto da incollare nella scheda, oltre alla spesa in Galeoni che va nel Box A.
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Acquisti <span id="acquisto_counter_badge" class="format-tag">0</span></h2>
+      <div id="acquisti_list"></div>
+      <div id="acquisti_empty" class="empty-state">Nessun acquisto ancora aggiunto.</div>
+      <button type="button" class="secondary" id="add_acquisto_btn">+ Aggiungi blocco di acquisto</button>
+    </div>
+
+    <button type="button" class="big" id="calcola_btn_conoscenze">Calcola totali →</button>
+  </div>
+
+  <!-- ============ PAGINA: COMMERCIO MAGICO ============ -->
+  <div class="page" data-page="commercio">
+    <div class="collapsed">
+      <div class="acc-header" id="info_toggle_commercio">
+        <span class="acc-chevron">▾</span>
+        <span style="font-weight:700; color: var(--green); font-size:13px;">ℹ️ Come funziona questa sezione</span>
+      </div>
+      <div class="acc-body info-box" style="margin-top:10px;">
+        Qui i prezzi li scrivi tu, guardandoli dal negozio o dal prezzario del PNG Commerciante scelto (es. Lo Zoppo) — il tool non conosce i prezzari, si limita a sommare. Un <b>Acquisto</b> spende Galeoni e aggiunge l'oggetto in Bagaglio; una <b>Vendita</b> guadagna Galeoni e riduce la quantità di un oggetto già posseduto.
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Acquisti (da Negozio) <span id="negozio_counter_badge" class="format-tag">0</span></h2>
+      <div id="negozi_list"></div>
+      <div id="negozi_empty" class="empty-state">Nessun acquisto ancora aggiunto.</div>
+      <button type="button" class="secondary" id="add_negozio_btn">+ Aggiungi Negozio</button>
+    </div>
+
+    <div class="panel">
+      <h2>Vendite (a PNG Commerciante) <span id="commerciante_counter_badge" class="format-tag">0</span></h2>
+      <div id="commercianti_list"></div>
+      <div id="commercianti_empty" class="empty-state">Nessuna vendita ancora aggiunta.</div>
+      <button type="button" class="secondary" id="add_commerciante_btn">+ Aggiungi PNG Commerciante</button>
+    </div>
+
+    <button type="button" class="big" id="calcola_btn_commercio">Calcola totali →</button>
+  </div>
+
+  <!-- ============ PAGINA: RISULTATO ============ -->
+  <div class="page" data-page="risultato">
+    <div id="risultato_vuoto" class="panel">
+      <div class="empty-state">
+        <div style="font-size:26px;margin-bottom:8px;">🜛</div>
+        Non hai ancora calcolato nulla.<br>Compila una o più sezioni qui sopra — puoi anche richiedere più cose insieme nella stessa Lista della Spesa — e premi "Calcola totali" in una qualsiasi di esse: il risultato qui raccoglierà automaticamente tutto.
+      </div>
+    </div>
+    <div id="risultato_pieno" style="display:none; flex-direction:column; gap:18px;">
+      <div class="panel">
+        <h2>Riepilogo per Role</h2>
+        <div id="riepilogo_roles"></div>
+      </div>
+      <div class="panel">
+        <h2>Riepilogo per Materia</h2>
+        <div id="riepilogo_materie"></div>
+      </div>
+      <div class="panel">
+        <h2>Riepilogo per Sapienza</h2>
+        <div id="riepilogo_sapienze"></div>
+      </div>
+      <div class="panel">
+        <h2>Riepilogo Dialettica e Parametri</h2>
+        <div id="riepilogo_parametri"></div>
+      </div>
+      <div class="panel">
+        <h2>Riepilogo Commercio Magico</h2>
+        <div id="riepilogo_commercio"></div>
+      </div>
+      <div class="panel">
+        <h2>Box A — Elenco Variazioni <span class="format-tag">incolla nel Generatore Accrediti</span></h2>
+        <textarea id="outBoxA" class="output-box" readonly></textarea>
+      </div>
+      <div class="panel">
+        <h2>Box E — Materie Studenti <span class="format-tag">incolla nel Generatore Accrediti</span></h2>
+        <textarea id="outBoxE" class="output-box" readonly></textarea>
+      </div>
+      <div class="panel">
+        <h2>Box F — Sapienze Adulti <span class="format-tag">incolla nel Generatore Accrediti</span></h2>
+        <textarea id="outBoxF" class="output-box" readonly></textarea>
+      </div>
+      <div class="panel">
+        <h2>Box G — Inventario <span class="format-tag">incolla nel Generatore Accrediti</span></h2>
+        <textarea id="outBoxG" class="output-box" readonly></textarea>
+      </div>
+      <div class="panel">
+        <h2>Conoscenze Acquistate <span class="format-tag">incolla direttamente nella scheda, non nel Generatore</span></h2>
+        <textarea id="outConoscenze" class="output-box" readonly style="min-height:140px;"></textarea>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============ MOTORE DI CALCOLO (invariato) ============
+const TIPI_PREMIO = ['Prestigio','Popolarità','Stima Docenti','Bontà','Malvagità','Virtuoso','Sinistro','Punti Casa','Dialettica'];
+const TASSI_CONVERSIONE = { 10: 50, 50: 300, 100: 700 };
+
+function calcolaConversione(n10, n50, n100) {
+  const pp = 10 * n10 + 50 * n50 + 100 * n100;
+  const galeoni = TASSI_CONVERSIONE[10] * n10 + TASSI_CONVERSIONE[50] * n50 + TASSI_CONVERSIONE[100] * n100;
+  return { pp, galeoni };
+}
+
+function calcolaRole(role, tassoBase) {
+  const numPosts = Number(role.numPosts) || 0;
+  const missioni = role.missioni || [];
+  const nonCompletamento = missioni.filter(m => !m.completamento);
+  const completamento = missioni.filter(m => m.completamento);
+
+  let migliore = null;
+  nonCompletamento.forEach(m => {
+    if (m.ppPostRate) {
+      const cap = (m.ppPostCap !== null && m.ppPostCap !== undefined && m.ppPostCap !== '')
+        ? Math.min(Number(m.ppPostCap), numPosts) : numPosts;
+      const contributo = Number(m.ppPostRate) * cap;
+      if (!migliore || contributo > migliore.contributo) migliore = { contributo, postCoperti: cap };
+    }
+    if (m.ppFisso) {
+      const contributo = Number(m.ppFisso);
+      if (!migliore || contributo > migliore.contributo) migliore = { contributo, postCoperti: 0 };
+    }
+  });
+  const bestPP = migliore ? migliore.contributo : 0;
+  const postCoperti = migliore ? migliore.postCoperti : 0;
+  const leftoverPosts = Math.max(0, numPosts - postCoperti);
+  const leftoverPP = leftoverPosts * tassoBase;
+
+  const totali = { 'Punti Post': bestPP + leftoverPP };
+
+  TIPI_PREMIO.forEach(tipo => {
+    const valori = nonCompletamento.map(m => Number(m[tipo]) || 0).filter(v => v !== 0);
+    totali[tipo] = valori.length ? Math.max(...valori) : 0;
+  });
+
+  completamento.forEach(m => {
+    if (m.ppPostRate) {
+      const cap = (m.ppPostCap !== null && m.ppPostCap !== undefined && m.ppPostCap !== '')
+        ? Math.min(Number(m.ppPostCap), numPosts) : numPosts;
+      totali['Punti Post'] += Number(m.ppPostRate) * cap;
+    }
+    if (m.ppFisso) totali['Punti Post'] += Number(m.ppFisso);
+    TIPI_PREMIO.forEach(tipo => { totali[tipo] = (totali[tipo] || 0) + (Number(m[tipo]) || 0); });
+  });
+
+  // Galeoni spesi durante la Role (es. locande): spesa diretta, sempre sottratta
+  // per intero, non entra nel confronto "prendi solo il premio più alto". Il
+  // Coefficiente di Debito (1 se nessun debito) moltiplica solo questa spesa.
+  const galeoniSpesi = Number(role.galeoniSpesi) || 0;
+  const coeffDebito = Number(role.coeffDebito) || 1;
+  if (galeoniSpesi) totali['Galeoni'] = (totali['Galeoni'] || 0) - (galeoniSpesi * coeffDebito);
+
+  return totali;
+}
+
+function sommaIn(target, sorgente) {
+  for (const [k, v] of Object.entries(sorgente)) target[k] = (target[k] || 0) + v;
+}
+function normNum(n) {
+  const num = Object.is(Number(n), -0) ? 0 : Number(n);
+  return String(num).replace('.', ',');
+}
+function fmtRighe(totali) {
+  return Object.entries(totali)
+    .filter(([, v]) => Math.round(v * 100) !== 0)
+    .map(([k, v]) => `${v >= 0 ? '+' : ''}${normNum(v)} ${k}`);
+}
+
+// ============ CATALOGO MATERIE -> CONOSCENZE (per anno V/VI/VII) ============
+const studentKnowledgeMap = {
+  'Antiche Rune': {5:['Scritture Runiche'],6:['Benedizioni Runiche'],7:['Runista Magico']},
+  'Aritmanzia': {5:['Sigillo di Archimede'],6:['Sigillo di Pitagora'],7:['Sigillo di Euclide']},
+  'Astronomia': {5:['Magia Astrale Base'],6:['Magia Astrale Avanzata'],7:['Riti Astronomici']},
+  'Babbanologia': {5:['Cultura Babbana'],6:['Manualità Babbana'],7:['Babbano Dentro']},
+  'Cura delle Creature Magiche': {
+    5:['Bezoar','Birdengold','Drakul','Duckbill','Duriccio','Glowbug','Hanabira','Horklump','Jigglypuff','Marmite','Puffola Pigmea','Scriber','Shellusk','Vermicolo','Bundimun','Fata','Gnomo','Lumaca Carnivora','Ghoul','Jobberknoll','Nani','Lepricano','Goblin','Ninfe dei boschi','Elfo domestico','Orco','Fantasma','Asticello','Augurey','Cavallo Alato','Mooncalf','Clabbert','Chizpurfle','Diricawl','Porlock'],
+    6:['Billywig','Doxy','Pixie','Puffskein','Kneazle','Crup','Glumbumble','Moke','Plimpi','Malaclaw Maculato','Ippocampo','Knarl','Lobalug','Snaso','Sblorb','Streeler','Ashwinder','Fiammagranchio','Fwooper','Ippogrifo','Salamandra','Velenottero','Purvincolo','Dugbog','Jarvey'],
+    7:["Bolcino d'oro",'Bicorno','Kelpie','Schiopodo Sparacoda','Gigante','Ciclope','Grifone','Legilimens','Centauro','Graphorn','Kappa','Fenice','Maridi','Matagot','Thestral','Unicorno','Quintaped']
+  },
+  'Difesa Contro le Arti Oscure': {
+    5:['Finite incantatem','Expelliarmus','Rictusempra','Liberacorpus','Arania Exumai','Revelio','Proteus','Silencio','Acromantula','Gytrash','Polterigeist','Skurge','Homenum Revelio','Molliccio','Riddikulus','Marciotto','Protego'],
+    6:['Dissennatore','Expecto Patronum','Berretto Rosso','Troll','Nogtail','Veela','Avvincino','Erkling','Pogrebin','Imp'],
+    7:['Basilisco','Lupo Mannaro','Megera','Manticora','Obscurus e Obscuriale','Vampiro','Ammuntadore','Inferius e Zombie','Lethifold','Banshee']
+  },
+  'Divinazione': {
+    5:['Divinazione degli Indumenti','Divinazione del Fumo','Divinazione del Fuoco','Divinazione del Legno','Divinazione del Sale','Divinazione delle Piante Cadute','Lettura dei Fondi del Tè','Lettura delle Macchie','Lettura delle Nuvole','Tema Natale'],
+    6:['Divinazione dei Libri','Divinazione del Meteo','Divinazione del Volo degli Uccelli','Divinazione delle Gemme','Divinazione delle Piante','Lettura dei Tarocchi','Lettura della Mano','Meditazione','Uso della Sfera di Cristallo','Yoga'],
+    7:['Divinazione dei Cadaveri','Divinazione delle Ceneri','Divinazione delle Lettere','Divinazione Runica','Interpretazione dei Sogni','Lettura dei Volti','Numerologia','Ritrova la Strada Persa','Ritrovare gli Oggetti Smarriti','Uso della Tavola Ouija']
+  },
+  'Erbologia': {
+    5:['Arbusto Autofertilizzante','Bubotubero','Bulbo Balzellante','Cespuglio Farfallino','Cespuglio Spinoso','Fagiolo Corridore','Fungo Allucinogeno','Fungo Scoppiettante','Mimbulus Mimbletonia','Muschio del Sud','Puffagiolo','Pianta Stridula','Geranio Zannuto','Cavolo Carnivoro Cinese','Bacche di Balzar','Fiori Fabula','Fiori Floo','Mandragola'],
+    6:['Felci Imitanti','Moly','Pianta Fumogena','Pianta di Semi di Fuoco','Pianta Vampiro','Primula Veris','Ruta','Algabranchia','Canterose','Erba Stregata'],
+    7:['Amarantacea','Platano Picchiatore','Pugnacio','Rampicanti Capovolti',"Siepi dell'Ombra",'Tentacula Velenosa','Tranello del Diavolo','Albero di Biancaneve','Albero di Cenere','Albero della Vita']
+  },
+  'Incantesimi': {
+    5:['Everte Statim','Mobiliarbus','Lumos Solem','Immobilus','Obscuro','Alerte Ascenderai','Descendo','Ferula','Aguamenti','Incendio'],
+    6:['Relascio','Carpe Retractum','Testabolla','Colloshoo','Defodio','Elettro','Anapneo','Glacius','Ascendio','Waddiwasi'],
+    7:['Fumos','Surgito','Diffindo','Oppugno','Stupeficium','Confundus','Impedimenta','Expulso','Reinnerva','Bombarda']
+  },
+  'Pozioni': {
+    5:['Pozione Ridente','Pozione Fumogena','Pozione della Resistenza','Pozione della Fatica','Essenza di Purvincolo','Distillato del Silenzio','Estratto di Baruffio','Aguzzaingegno'],
+    6:['Distillato della Morte Vivente','Gas Strozzante','Elisir della Resistenza','Pozione Antifuoco','Pozione Antisoffocamento','Elisir di Baruffio','Pozione della Memoria','Intruglio Confondente','Elisir della Fatica','Pozione Obliviosa'],
+    7:['Pozione Esplosiva','Pozione Paralizzante','Distillato del Chiodo fisso','Pozione Stordente','Pozione Stimolante','Essenza di Oxygeni','Pozione Camaleontica','Pozione Rinvigorente','Pozione Atomica','Ricostituente alla Mandragola']
+  },
+  'Storia della Magia': {5:['Linguistica'],6:['Storiografia'],7:['Magi Biografia']},
+  'Trasfigurazione': {
+    5:['Cucurbita','Reparifarge','Duro','Vera Verto','Ignis Algerus','Engorgio','Reducio','Gommosus','Transmuto Partialis','Vocatus'],
+    6:['Raptaque','Indissolubilis','Deletrius','Resferàntes','Vestis','Glisseo','Geminio','Avis','Pluma','Mutaombra'],
+    7:['Paperante','Furitum','Lapifors','Pullus','Snufflifors','Transmuto','Formài','Mutastato','Muto','Objectis Commutatio','Animalis Commutatio','Mixtum commutatio','Animatus','Diminuendo']
+  }
+};
+const MATERIE_ORDINATE = Object.keys(studentKnowledgeMap).sort((a,b) => a.localeCompare(b, 'it'));
+
+// ============ CATALOGO SAPIENZE (Adulti) ============
+const SAPIENZE_CATALOGO = {
+  'Arcaica': { tipo: 'magica', conoscenze: ["Appare Vestigium","Avensegium","Esorcista","Spezzaincantesimi","Tracciante"] },
+  'Difensiva': { tipo: 'magica', conoscenze: ["Energia Difensiva","Protego Maxima","Protego Totalum","Protego Volantis","Repello Inimicum"] },
+  'Divinatoria': { tipo: 'magica', conoscenze: ["Visione del Passato","Proiezione Astrale","Psicometria del Futuro","Chiaroveggenza","Psicometria del Passato"] },
+  'Elementale': { tipo: 'magica', conoscenze: ["Aqua Eructo","Dominusterra","Incendio Maxima","Manipolo","Ventus Maxima"] },
+  'Erbologica': { tipo: 'magica', conoscenze: ["Erborista","Amico delle Piante","Custode delle Piante","Coltivatore di Piante","Pax"] },
+  'Magizoologica': { tipo: 'magica', conoscenze: ["Amico delle Creature","Addestratore di Creature","Custode delle Creature","Allevatore di Creature","Imposium"] },
+  'Medimagica': { tipo: 'magica', conoscenze: ["Diagnosta","Terapista","Chirurgo","Emendo","Vulnera Sanentur"] },
+  'Mentale': { tipo: 'magica', conoscenze: ["Desiderium","Dissimulo","Legilimens","Oblivion","Occlumanzia"] },
+  'Offensiva': { tipo: 'magica', conoscenze: ["Ad Caelum","Ardor","Bombarda Maxima","Confractus","Energia Offensiva"] },
+  'Oscura': { tipo: 'magica', conoscenze: ["Ardemonio","Damnum","Dolohoferio","Ritualista Oscuro","Sectumsempra"] },
+  'Pozionistica': { tipo: 'magica', conoscenze: ["Speziale","Chimico","Calderaio","Tocco Magico","Distillatore"] },
+  'Trasfigurativa': { tipo: 'magica', conoscenze: ["Commutatio","Evanesco","Evocatio","Locomotor","Verto"] },
+  'Rapidità': { tipo: 'fisica', conoscenze: [] },
+  'Prestanza': { tipo: 'fisica', conoscenze: [] },
+  'Resilienza': { tipo: 'fisica', conoscenze: [] },
+  'Vigore': { tipo: 'fisica', conoscenze: [] },
+  'Leader': { tipo: 'sociale', conoscenze: [] },
+  'Motivatore': { tipo: 'sociale', conoscenze: [] },
+  'Oppositore': { tipo: 'sociale', conoscenze: [] },
+  'Persuasore': { tipo: 'sociale', conoscenze: [] }
+};
+const ROMANI = { 0: '—', 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' };
+
+// ============ MOTORE DI CALCOLO — Migliora le tue Sapienze ============
+const PREZZI_SAPIENZE_MAGICHE = { 1:{gal:50,pp:0}, 2:{gal:0,pp:5}, 3:{gal:0,pp:10}, 4:{gal:0,pp:15}, 5:{gal:0,pp:20} };
+const PREZZI_SAPIENZE_FISICHE_SOCIALI = { 1:{gal:150,pp:0}, 2:{gal:0,pp:10}, 3:{gal:0,pp:20}, 4:{gal:0,pp:40}, 5:{gal:0,pp:80} };
+
+function costoSviluppoSapienza(livelloPartenza, livelloFinale, tipo) {
+  const tabella = tipo === 'magica' ? PREZZI_SAPIENZE_MAGICHE : PREZZI_SAPIENZE_FISICHE_SOCIALI;
+  let pp = 0, galeoni = 0;
+  for (let l = livelloPartenza + 1; l <= livelloFinale; l++) {
+    const prezzo = tabella[l];
+    if (!prezzo) continue;
+    pp += prezzo.pp; galeoni += prezzo.gal;
+  }
+  return { pp, galeoni };
+}
+
+// ============ MOTORE DI CALCOLO — Acquista Parametri e Dialettica ============
+const PARAMETRI_MAGICI_FISICI = ['Acume','Empatia','Percezione','Potenza','Tecnica','Volontà','Destrezza','Fatica','Resistenza','Salute'];
+const PREZZO_PARAMETRO_BASE = 100;
+const PREZZO_PARAMETRO_INCREMENTO = 50;
+const PREZZO_PARAMETRO_BLOCCO = 5;
+
+// Costo per acquistare `quantita` punti consecutivi di un Parametro Magico/Fisico,
+// partendo dal contatore CONDIVISO (Magici+Fisici insieme) di punti già acquistati.
+function costoPuntiParametro(quantita, contatore) {
+  let pp = 0, c = contatore;
+  for (let i = 0; i < quantita; i++) {
+    const prezzo = PREZZO_PARAMETRO_BASE + PREZZO_PARAMETRO_INCREMENTO * Math.floor(c / PREZZO_PARAMETRO_BLOCCO);
+    pp += prezzo;
+    c++;
+  }
+  return { pp, nuovoContatore: c };
+}
+
+const PREZZI_DIALETTICA = { 2: 50, 3: 100, 4: 200, 5: 400 };
+function prezzoPuntoDialettica(livello) {
+  if (livello <= 1) return 0; // il primo punto è di base, non acquistabile
+  return PREZZI_DIALETTICA[livello] !== undefined ? PREZZI_DIALETTICA[livello] : 600; // 6+ = 600 flat
+}
+function costoDialettica(partenza, finale) {
+  let gal = 0;
+  for (let l = partenza + 1; l <= finale; l++) gal += prezzoPuntoDialettica(l);
+  return gal;
+}
+
+// ============ MOTORE DI CALCOLO — Acquista Conoscenze ============
+const TIPI_CONOSCENZA = {
+  'Generica': 10,
+  'Scolastica V/VI anno': 20,
+  'Scolastica VII anno': 30,
+  'Fatture e Pozioni Fatturanti': 40,
+  'Extra': 50,
+  'Avanzata': 100
+  // 'Personalizzata' non e' qui: prezzo libero inserito dall'utente
+};
+const CATEGORIE_CONOSCENZA = {
+  'Materia Scolastica - Sesto/Settimo Anno': ['fa-brands fa-fort-awesome'],
+  'Pozioni Fatturanti': ['fa-solid fa-flask-vial'],
+  'Fatture': ['fa-solid fa-skull'],
+  'Arcaiche': ['fa-solid fa-key'],
+  'Difensive': ['fa-solid fa-shield-halved'],
+  'Elementali': ['fa-solid fa-wind'],
+  'Erbologiche': ['fa-brands fa-pagelines'],
+  'Magizoologiche': ['fa-solid fa-dragon'],
+  'Medimagiche': ['fa-solid fa-briefcase-medical'],
+  'Mentali': ['fa-solid fa-brain'],
+  'Offensive': ['fa-solid fa-bomb'],
+  'Oscure': ['fa-solid fa-book-skull'],
+  'Pozionistiche': ['fa-solid fa-flask-vial'],
+  'Trasfigurative': ['fa-solid fa-martini-glass', 'fa-solid fa-kiwi-bird'],
+  'Divinatorie': ['fa-solid fa-hand-sparkles']
+};
+function renderIconeCategoria(categoria) {
+  const icone = CATEGORIE_CONOSCENZA[categoria] || [];
+  return icone.map(cls => `<i class="${cls}"></i>`).join('');
+}
+
+function parseRigheConoscenza(testo) {
+  const righe = testo.split('\n').map(s => s.trim()).filter(Boolean);
+  const valide = [];
+  const invalide = [];
+  righe.forEach(riga => {
+    const parti = riga.split('|').map(s => s.trim());
+    if (parti.length === 2 && parti[0] && parti[1]) {
+      valide.push({ nome: parti[0], link: parti[1] });
+    } else {
+      invalide.push(riga);
+    }
+  });
+  return { valide, invalide };
+}
+
+function calcolaAcquistoConoscenze(tipo, prezzoPersonalizzato, nomi) {
+  const prezzoUnitario = tipo === 'Personalizzata' ? (Number(prezzoPersonalizzato) || 0) : (TIPI_CONOSCENZA[tipo] || 0);
+  const quantita = nomi.length;
+  const totale = prezzoUnitario * quantita;
+  return { prezzoUnitario, quantita, totale };
+}
+
+// ============ MOTORE DI CALCOLO — Migliora i tuoi Voti ============
+const VOTI_ORDINE = ['T','D','S','A','O','E'];
+const VOTI_LABEL = { T: 'Troll', D: 'Desolante', S: 'Scadente', A: 'Accettabile', O: 'Oltre Ogni Previsione', E: 'Eccezionale' };
+
+// Costo di un singolo passaggio S->A, A->O oppure O->E per UNA Conoscenza.
+// T->D e D->S non passano di qui: si pagano una volta sola per l'intera Materia.
+function costoPassaggioSingolo(daVoto, aVoto, inPianoDiStudi, contatoreE) {
+  if (daVoto === 'S' && aVoto === 'A') return { pp: 0, galeoni: 15, nuovoContatore: contatoreE };
+  if (daVoto === 'A' && aVoto === 'O') return { pp: 3, galeoni: 0, nuovoContatore: contatoreE };
+  if (daVoto === 'O' && aVoto === 'E') {
+    if (inPianoDiStudi) {
+      const pp = 4 + Math.floor(contatoreE / 10);
+      return { pp, galeoni: 0, nuovoContatore: contatoreE + 1 };
+    }
+    return { pp: 4, galeoni: 0, nuovoContatore: contatoreE };
+  }
+  return { pp: 0, galeoni: 0, nuovoContatore: contatoreE };
+}
+
+// Costo di UNA Conoscenza che sale da un voto (S/A/O) a un voto superiore (A/O/E),
+// anche su più passaggi insieme (es. S->E = S->A + A->O + O->E).
+function costoConoscenza(daVoto, aVoto, inPianoDiStudi, contatoreE) {
+  const iDa = VOTI_ORDINE.indexOf(daVoto);
+  const iA = VOTI_ORDINE.indexOf(aVoto);
+  let pp = 0, galeoni = 0, contatore = contatoreE;
+  for (let i = iDa; i < iA; i++) {
+    const stepDa = VOTI_ORDINE[i], stepA = VOTI_ORDINE[i + 1];
+    if (stepDa === 'T' || stepDa === 'D') continue;
+    const r = costoPassaggioSingolo(stepDa, stepA, inPianoDiStudi, contatore);
+    pp += r.pp; galeoni += r.galeoni; contatore = r.nuovoContatore;
+  }
+  return { pp, galeoni, contatoreFinale: contatore };
+}
+
+
+const SEZIONI = [
+  { id: 'segnala', label: 'Segnala e Riscatta Role', pronto: true },
+  { id: 'voti', label: 'Migliora Voti', pronto: true },
+  { id: 'sapienze', label: 'Migliora Sapienze', pronto: true },
+  { id: 'parametri', label: 'Acquista Dialettica e Parametri', pronto: true },
+  { id: 'conoscenze', label: 'Acquista Conoscenze', pronto: true },
+  { id: 'commercio', label: 'Commercio Magico', pronto: true },
+  { id: 'risultato', label: 'Risultato', pronto: true }
+];
+
+function apriPagina(id) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === id));
+  document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.dataset.page === id));
+}
+
+const tabBar = document.getElementById('tab_bar');
+SEZIONI.forEach(s => {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'tab-btn' + (s.id === 'segnala' ? ' active' : '');
+  btn.dataset.tab = s.id;
+  btn.innerHTML = s.label + (s.pronto ? '' : ' <span class="lock">🔒 presto</span>');
+  btn.addEventListener('click', () => {
+    if (!s.pronto) return;
+    apriPagina(s.id);
+  });
+  tabBar.appendChild(btn);
+});
+
+// placeholder per le sezioni non ancora pronte (restano visitabili in futuro)
+SEZIONI.filter(s => !s.pronto).forEach(s => {
+  const div = document.createElement('div');
+  div.className = 'page';
+  div.dataset.page = s.id;
+  div.innerHTML = `<div class="panel"><div class="placeholder-page"><div class="glyph">🔒</div><h3>${s.label}</h3>Questa sezione arriverà nei prossimi passaggi.</div></div>`;
+  document.querySelector('.container').appendChild(div);
+});
+
+// ============ ACCORDION GENERICO ============
+function abilitaAccordion(headerEl) {
+  headerEl.addEventListener('click', (e) => {
+    if (e.target.closest('button, input, textarea, select, a')) return;
+    headerEl.parentElement.classList.toggle('collapsed');
+  });
+}
+['oggetti_toggle', 'conversione_toggle', 'info_toggle_segnala', 'info_toggle_voti', 'info_toggle_sapienze', 'info_toggle_parametri', 'info_toggle_conoscenze', 'info_toggle_commercio'].forEach(id => {
+  const header = document.getElementById(id);
+  header.addEventListener('click', () => header.parentElement.classList.toggle('collapsed'));
+  header.parentElement.classList.add('collapsed'); // chiusi di default
+});
+
+// ============ COSTRUZIONE FORM DINAMICO ============
+let roleCounter = 0;
+let missioneCounter = 0;
+
+const CAMPI_PP = [
+  { key: 'ppPostRate', label: 'PP a post' },
+  { key: 'ppPostCap', label: 'Tetto post (vuoto=nessuno)' },
+  { key: 'ppFisso', label: 'PP fisso' }
+];
+const CAMPI_ALTRI = [
+  { key: 'Prestigio', label: 'Prestigio' },
+  { key: 'Popolarità', label: 'Popolarità' },
+  { key: 'Stima Docenti', label: 'Stima Docenti' },
+  { key: 'Bontà', label: 'Bontà' },
+  { key: 'Malvagità', label: 'Malvagità' },
+  { key: 'Virtuoso', label: 'Virtuoso' },
+  { key: 'Sinistro', label: 'Sinistro' },
+  { key: 'Punti Casa', label: 'Punti Casa' },
+  { key: 'Dialettica', label: 'Dialettica' }
+];
+
+function aggiornaContatoreRole() {
+  const n = document.querySelectorAll('#roles_list > .role-card').length;
+  document.getElementById('role_counter_badge').textContent = n;
+  document.getElementById('roles_empty').style.display = n ? 'none' : 'block';
+}
+
+function creaCampo(c, extraClass) {
+  const f = document.createElement('div');
+  f.className = 'field';
+  f.innerHTML = `<label>${c.label}</label><input type="number" step="0.5" class="${extraClass}" data-key="${c.key}">`;
+  return f;
+}
+
+function creaMissioneCard() {
+  missioneCounter++;
+  const mid = 'm' + missioneCounter;
+  const div = document.createElement('div');
+  div.className = 'missione-card';
+  div.dataset.missioneId = mid;
+
+  const header = document.createElement('div');
+  header.className = 'acc-header';
+  header.innerHTML = `
+    <span class="acc-chevron">▾</span>
+    <span class="missione-title-preview">Nuova missione</span>
+    <span class="missione-level-badge" style="display:none;"></span>
+    <span class="missione-comp-badge" style="display:none;">a completamento</span>
+  `;
+  const delBtn = document.createElement('button');
+  delBtn.type = 'button'; delBtn.className = 'danger'; delBtn.textContent = '✕';
+  delBtn.title = 'Rimuovi missione';
+  delBtn.addEventListener('click', (e) => { e.stopPropagation(); div.remove(); });
+  header.appendChild(delBtn);
+  div.appendChild(header);
+  abilitaAccordion(header);
+
+  const body = document.createElement('div');
+  body.className = 'acc-body';
+
+  const rigaNome = document.createElement('div');
+  rigaNome.className = 'row';
+  rigaNome.innerHTML = `
+    <div><label class="tight">Nome missione</label><input type="text" class="f-nome" placeholder="es. Il Magizoologo"></div>
+    <div style="max-width:150px"><label class="tight">Livello</label>
+      <select class="f-livello">
+        <option value="">—</option>
+        <option>Facile</option><option>Medio</option><option>Difficile</option><option>Estremo</option>
+      </select>
+    </div>
+  `;
+  body.appendChild(rigaNome);
+
+  const chk = document.createElement('div');
+  chk.className = 'checkbox-row';
+  chk.innerHTML = `<input type="checkbox" class="f-completamento" id="${mid}_comp"><label for="${mid}_comp">Missione a completamento (premio sempre sommato per intero)</label>`;
+  body.appendChild(chk);
+
+  const helpWrap = document.createElement('div');
+  helpWrap.className = 'altri-collapsed';
+  helpWrap.style.marginTop = '10px';
+  const helpToggle = document.createElement('div');
+  helpToggle.className = 'altri-toggle';
+  helpToggle.innerHTML = `
+    <span class="acc-chevron">▾</span>
+    <span>❔ Come si legge il premio in PP della missione? <span style="font-weight:400; color:var(--ink-soft);">— apri se non sai cosa mettere nei tre campi qui sotto</span></span>
+  `;
+  helpToggle.addEventListener('click', () => helpWrap.classList.toggle('altri-collapsed'));
+  helpWrap.appendChild(helpToggle);
+
+  const helpBody = document.createElement('div');
+  helpBody.className = 'altri-body fmt-guide';
+  helpBody.innerHTML = `
+    <div class="fmt-case">
+      <div class="fmt-case-label">A. Il testo della missione promette PP per ogni post scritto</div>
+      <div class="fmt-case-desc">Riconosci questo caso quando leggi qualcosa come "1,5 PP per post", eventualmente con un limite massimo di post a cui si applica.</div>
+      <div class="fmt-case-syntax">Compila: <code>PP a post</code> con il valore per ogni post, e <code>Tetto post</code> con il numero massimo di post a cui si applica (lascialo vuoto se il testo non menziona nessun limite).</div>
+      <div class="fmt-case-example">Esempio: il testo dice <i>"1,5 PP per post (fino ad un massimo di 5 post)"</i> → scrivi <code>PP a post</code> = 1,5 e <code>Tetto post</code> = 5. Se avessi scritto 7 post in quella Role, i primi 5 rendono il bonus, gli altri 2 rendono il tasso base.</div>
+    </div>
+    <div class="fmt-case">
+      <div class="fmt-case-label">B. Il testo della missione promette un valore fisso, non legato ai post</div>
+      <div class="fmt-case-desc">Riconosci questo caso quando il premio è un numero unico, che non cambia in base a quanti post scrivi (tipico delle missioni a completamento, ma non solo).</div>
+      <div class="fmt-case-syntax">Compila solo: <code>PP fisso</code> con quel valore, lasciando vuoti gli altri due campi.</div>
+      <div class="fmt-case-example">Esempio: il testo dice <i>"+10 PP da richiedere nella propria Lista della Spesa"</i> → scrivi solo <code>PP fisso</code> = 10.</div>
+    </div>
+    <div class="fmt-case">
+      <div class="fmt-case-label">Attenzione</div>
+      <div class="fmt-case-desc">Per ogni missione, compila di norma <u>uno solo</u> tra il caso A e il caso B — guarda il testo della missione per capire quale dei due usa. Non serve fare calcoli a mano: se hai più missioni nella stessa Role, il tool sceglie automaticamente da solo quale rende di più, secondo la regola del "premio più alto per tipo".</div>
+    </div>
+  `;
+  helpWrap.appendChild(helpBody);
+  body.appendChild(helpWrap);
+
+  const gridPP = document.createElement('div');
+  gridPP.className = 'grid-rewards';
+  gridPP.style.marginTop = '10px';
+  CAMPI_PP.forEach(c => gridPP.appendChild(creaCampo(c, 'f-premio')));
+  body.appendChild(gridPP);
+
+  const altriWrap = document.createElement('div');
+  altriWrap.className = 'altri-collapsed';
+  const altriToggle = document.createElement('div');
+  altriToggle.className = 'altri-toggle';
+  altriToggle.innerHTML = `
+    <span class="acc-chevron">▾</span>
+    <span>Altri punteggi <span style="font-weight:400; color:var(--ink-soft);">— clicca qui se la missione dà come premio anche Prestigio, Virtuoso, Popolarità o altro oltre ai PP</span></span>
+  `;
+  altriToggle.addEventListener('click', () => altriWrap.classList.toggle('altri-collapsed'));
+  altriWrap.appendChild(altriToggle);
+  const altriBody = document.createElement('div');
+  altriBody.className = 'altri-body grid-rewards wide';
+  CAMPI_ALTRI.forEach(c => altriBody.appendChild(creaCampo(c, 'f-premio')));
+  altriWrap.appendChild(altriBody);
+  body.appendChild(altriWrap);
+
+  div.appendChild(body);
+
+  function aggiornaPreview() {
+    const nome = div.querySelector('.f-nome').value.trim();
+    const livello = div.querySelector('.f-livello').value;
+    const comp = div.querySelector('.f-completamento').checked;
+    header.querySelector('.missione-title-preview').textContent = nome || 'Nuova missione';
+    const lvlBadge = header.querySelector('.missione-level-badge');
+    lvlBadge.style.display = livello ? 'inline-block' : 'none';
+    lvlBadge.textContent = livello;
+    header.querySelector('.missione-comp-badge').style.display = comp ? 'inline-block' : 'none';
+  }
+  div.querySelector('.f-nome').addEventListener('input', aggiornaPreview);
+  div.querySelector('.f-livello').addEventListener('change', aggiornaPreview);
+  div.querySelector('.f-completamento').addEventListener('change', aggiornaPreview);
+
+  return div;
+}
+
+function creaRoleCard() {
+  roleCounter++;
+  const rid = 'r' + roleCounter;
+  const div = document.createElement('div');
+  div.className = 'role-card';
+  div.dataset.roleId = rid;
+
+  const header = document.createElement('div');
+  header.className = 'acc-header';
+  header.innerHTML = `
+    <span class="acc-chevron">▾</span>
+    <span class="role-badge">${roleCounter}</span>
+    <span class="role-title-preview">Nuova Role</span>
+    <span class="role-meta"></span>
+    <span class="role-total-badge" style="display:none;"></span>
+  `;
+  const delBtn = document.createElement('button');
+  delBtn.type = 'button'; delBtn.className = 'danger'; delBtn.textContent = '✕';
+  delBtn.title = 'Rimuovi Role';
+  delBtn.addEventListener('click', (e) => { e.stopPropagation(); div.remove(); aggiornaContatoreRole(); });
+  header.appendChild(delBtn);
+  div.appendChild(header);
+  abilitaAccordion(header);
+
+  const body = document.createElement('div');
+  body.className = 'acc-body';
+
+  const rigaBase = document.createElement('div');
+  rigaBase.className = 'row';
+  rigaBase.innerHTML = `
+    <div><label class="tight">Titolo Role</label><input type="text" class="f-titolo" placeholder="es. Sparks Fly"></div>
+    <div><label class="tight">Link Role (opzionale)</label><input type="text" class="f-link" placeholder="?t=...#entry..."></div>
+    <div style="max-width:130px"><label class="tight">Post scritti</label><input type="number" class="f-numposts" min="0" step="1"></div>
+    <div style="max-width:150px"><label class="tight">Galeoni spesi <span class="format-tag">es. locande</span></label><input type="number" class="f-galeonispesi" min="0" step="1"></div>
+    <div class="f-coeff-debito-wrap" style="max-width:170px; display:none;"><label class="tight">Coefficiente di Debito <span class="format-tag">1 = nessun debito</span></label><input type="number" class="f-coeff-debito" min="1" step="0.1" value="1"></div>
+  `;
+  body.appendChild(rigaBase);
+
+  const noteDebito = document.createElement('div');
+  noteDebito.className = 'hint f-coeff-debito-wrap';
+  noteDebito.style.marginTop = '4px';
+  noteDebito.style.display = 'none';
+  noteDebito.innerHTML = 'Il Coefficiente di Debito (1,2–1,7) moltiplica solo i <b>Galeoni spesi</b> qui sopra. Chi ha Crescita a Debito può spendere risorse solo per Role e acquisti di Commercio Magico — non per Conoscenze o Sapienze.';
+  body.appendChild(noteDebito);
+
+  rigaBase.querySelector('.f-galeonispesi').addEventListener('input', (e) => {
+    const mostra = (parseFloat(e.target.value) || 0) !== 0;
+    div.querySelectorAll('.f-coeff-debito-wrap').forEach(el => { el.style.display = mostra ? 'block' : 'none'; });
+  });
+
+  const missioniList = document.createElement('div');
+  missioniList.className = 'missioni_list';
+  missioniList.style.marginTop = '12px';
+  body.appendChild(missioniList);
+
+  const addMissioneBtn = document.createElement('button');
+  addMissioneBtn.type = 'button'; addMissioneBtn.className = 'secondary';
+  addMissioneBtn.textContent = '+ Aggiungi missione completata';
+  addMissioneBtn.style.marginTop = '4px';
+  addMissioneBtn.addEventListener('click', () => missioniList.appendChild(creaMissioneCard()));
+  body.appendChild(addMissioneBtn);
+
+  div.appendChild(body);
+
+  function aggiornaPreview() {
+    const titolo = div.querySelector('.f-titolo').value.trim();
+    const posts = div.querySelector('.f-numposts').value;
+    header.querySelector('.role-title-preview').textContent = titolo || 'Nuova Role';
+    header.querySelector('.role-meta').textContent = posts ? `${posts} post` : '';
+  }
+  div.querySelector('.f-titolo').addEventListener('input', aggiornaPreview);
+  div.querySelector('.f-numposts').addEventListener('input', aggiornaPreview);
+
+  // aggiunge subito una prima missione, per non lasciare la Role vuota
+  missioniList.appendChild(creaMissioneCard());
+
+  return div;
+}
+
+document.getElementById('add_role_btn').addEventListener('click', () => {
+  document.getElementById('roles_list').appendChild(creaRoleCard());
+  aggiornaContatoreRole();
+});
+// prima Role all'avvio, per comodità
+document.getElementById('roles_list').appendChild(creaRoleCard());
+aggiornaContatoreRole();
+
+// ============ CONVERSIONE PP -> GALEONI: riepilogo live ============
+function aggiornaRiepilogoConversione() {
+  const n10 = parseInt(document.getElementById('convN10').value, 10) || 0;
+  const n50 = parseInt(document.getElementById('convN50').value, 10) || 0;
+  const n100 = parseInt(document.getElementById('convN100').value, 10) || 0;
+  const { pp, galeoni } = calcolaConversione(n10, n50, n100);
+  const el = document.getElementById('convRiepilogo');
+  el.textContent = pp === 0 ? 'Nessuna conversione impostata.' : `Totale conversione: -${normNum(pp)} Punti Post → +${normNum(galeoni)} Galeoni`;
+}
+['convN10','convN50','convN100'].forEach(id => document.getElementById(id).addEventListener('input', aggiornaRiepilogoConversione));
+
+// ============ COSTRUZIONE FORM DINAMICO — MIGLIORA VOTI ============
+let materiaCounter = 0;
+let conoscenzaRowCounter = 0;
+const VOTI_PARTENZA = ['S','A','O'];
+const VOTI_ARRIVO = ['A','O','E'];
+
+function aggiornaContatoreMateria() {
+  const n = document.querySelectorAll('.materia-card').length;
+  document.getElementById('materia_counter_badge').textContent = n;
+  document.getElementById('materie_empty').style.display = n ? 'none' : 'block';
+}
+
+function popolaDatalist(datalistEl, materia, anno) {
+  datalistEl.innerHTML = '';
+  if (materia === 'ALTRO' || !materia || !anno) return;
+  const nomi = (studentKnowledgeMap[materia] && studentKnowledgeMap[materia][anno]) || [];
+  nomi.forEach(n => {
+    const opt = document.createElement('option');
+    opt.value = n;
+    datalistEl.appendChild(opt);
+  });
+}
+
+function creaConoscenzaRow(datalistId) {
+  conoscenzaRowCounter++;
+  const div = document.createElement('div');
+  div.className = 'row';
+  div.style.alignItems = 'flex-end';
+  div.dataset.rowId = 'cr' + conoscenzaRowCounter;
+  div.innerHTML = `
+    <div style="flex:2;"><label class="tight">Conoscenza</label><input type="text" class="f-conoscenza" list="${datalistId}" placeholder="es. Aguamenti"></div>
+    <div style="max-width:150px;"><label class="tight">Voto di partenza</label>
+      <select class="f-voto-partenza">${VOTI_PARTENZA.map(v => `<option value="${v}">${v} — ${VOTI_LABEL[v]}</option>`).join('')}</select>
+    </div>
+    <div style="max-width:170px;"><label class="tight">Voto finale</label>
+      <select class="f-voto-arrivo">${VOTI_ARRIVO.map(v => `<option value="${v}">${v} — ${VOTI_LABEL[v]}</option>`).join('')}</select>
+    </div>
+    <div style="max-width:44px;"><button type="button" class="danger" style="width:100%;">✕</button></div>
+  `;
+  div.querySelector('button').addEventListener('click', () => div.remove());
+  return div;
+}
+
+function creaMateriaCard() {
+  materiaCounter++;
+  const mid = 'mat' + materiaCounter;
+  const datalistId = 'dl_' + mid;
+  const div = document.createElement('div');
+  div.className = 'role-card materia-card';
+  div.dataset.materiaId = mid;
+
+  const header = document.createElement('div');
+  header.className = 'acc-header';
+  header.innerHTML = `
+    <span class="acc-chevron">▾</span>
+    <span class="role-badge">${materiaCounter}</span>
+    <span class="role-title-preview">Nuova Materia</span>
+    <span class="role-meta"></span>
+    <span class="role-total-badge" style="display:none;"></span>
+  `;
+  const delBtn = document.createElement('button');
+  delBtn.type = 'button'; delBtn.className = 'danger'; delBtn.textContent = '✕';
+  delBtn.title = 'Rimuovi Materia';
+  delBtn.addEventListener('click', (e) => { e.stopPropagation(); div.remove(); aggiornaContatoreMateria(); });
+  header.appendChild(delBtn);
+  div.appendChild(header);
+  abilitaAccordion(header);
+
+  const body = document.createElement('div');
+  body.className = 'acc-body';
+
+  const datalist = document.createElement('datalist');
+  datalist.id = datalistId;
+  body.appendChild(datalist);
+
+  const rigaBase = document.createElement('div');
+  rigaBase.className = 'row';
+  rigaBase.innerHTML = `
+    <div><label class="tight">Materia</label>
+      <select class="f-materia">
+        <option value="">—</option>
+        ${MATERIE_ORDINATE.map(m => `<option value="${m}">${m}</option>`).join('')}
+        <option value="ALTRO">Altro (Conoscenza Extra o Avanzata)</option>
+      </select>
+    </div>
+    <div style="max-width:120px;"><label class="tight">Anno</label>
+      <select class="f-anno">
+        <option value="5">V</option><option value="6">VI</option><option value="7">VII</option>
+      </select>
+    </div>
+  `;
+  body.appendChild(rigaBase);
+
+  const chkPiano = document.createElement('div');
+  chkPiano.className = 'checkbox-row';
+  chkPiano.style.color = 'var(--ink-soft)';
+  chkPiano.innerHTML = `<input type="checkbox" class="f-in-piano" id="${mid}_piano" checked><label for="${mid}_piano" style="color:var(--ink-soft);">Nel Piano di Studi di quest'anno (influisce sul costo di Oltre Ogni Previsione → Eccezionale)</label>`;
+  body.appendChild(chkPiano);
+
+  // --- blocco T->D e D->S, a livello di intera Materia: scelta esclusiva a 3 opzioni ---
+  function creaPassaggioBulk(stepId, fromV, toV, titolo, descrizione) {
+    const wrap = document.createElement('div');
+    wrap.className = 'fmt-case';
+    wrap.style.marginTop = '12px';
+    const nomeRadio = `${mid}_${stepId}`;
+    wrap.innerHTML = `
+      <div class="fmt-case-label">${titolo} <span class="format-tag">100 Galeoni</span></div>
+      <div class="fmt-case-desc">${descrizione}</div>
+      <div class="radio-option"><input type="radio" name="${nomeRadio}" value="" id="${nomeRadio}_no" checked><label for="${nomeRadio}_no">Non lo faccio in questa richiesta</label></div>
+      <div class="radio-option"><input type="radio" name="${nomeRadio}" value="galeoni" id="${nomeRadio}_gal"><label for="${nomeRadio}_gal">Sì — pago 100 Galeoni</label></div>
+      <div class="radio-option"><input type="radio" name="${nomeRadio}" value="role" id="${nomeRadio}_role"><label for="${nomeRadio}_role">Sì — pagata con una role di studio (0 Galeoni)</label></div>
+    `;
+    wrap.dataset.stepFrom = fromV;
+    wrap.dataset.stepTo = toV;
+    wrap.classList.add('f-bulk-step');
+    return wrap;
+  }
+
+  const passaggioTD = creaPassaggioBulk('td', 'T', 'D', 'Passaggio Troll → Desolante',
+    'Porta insieme TUTTE le Conoscenze di questa Materia che sono ancora a Troll fino a Desolante, in un colpo solo.');
+  const passaggioDS = creaPassaggioBulk('ds', 'D', 'S', 'Passaggio Desolante → Scadente',
+    'Porta insieme TUTTE le Conoscenze di questa Materia attualmente a Desolante fino a Scadente, in un colpo solo.');
+  body.appendChild(passaggioTD);
+  body.appendChild(passaggioDS);
+
+  // --- conoscenze migliorate singolarmente ---
+  const singoleTitolo = document.createElement('h3');
+  singoleTitolo.style.cssText = "font-family:'Cormorant Garamond',serif;font-size:16px;margin:18px 0 8px;color:var(--gold-deep)";
+  singoleTitolo.textContent = 'Conoscenze migliorate singolarmente (da Scadente in su)';
+  body.appendChild(singoleTitolo);
+
+  const righeList = document.createElement('div');
+  righeList.className = 'conoscenze_list';
+  body.appendChild(righeList);
+
+  const addRigaBtn = document.createElement('button');
+  addRigaBtn.type = 'button'; addRigaBtn.className = 'secondary';
+  addRigaBtn.textContent = '+ Aggiungi Conoscenza';
+  addRigaBtn.style.marginTop = '6px';
+  addRigaBtn.addEventListener('click', () => righeList.appendChild(creaConoscenzaRow(datalistId)));
+  body.appendChild(addRigaBtn);
+
+  div.appendChild(body);
+
+  function aggiornaDatalist() {
+    popolaDatalist(datalist, div.querySelector('.f-materia').value, div.querySelector('.f-anno').value);
+  }
+  function aggiornaPreview() {
+    const materia = div.querySelector('.f-materia').value;
+    const anno = div.querySelector('.f-anno').value;
+    header.querySelector('.role-title-preview').textContent = materia === 'ALTRO' ? 'Extra / Avanzata' : (materia || 'Nuova Materia');
+    header.querySelector('.role-meta').textContent = materia && materia !== 'ALTRO' ? `Anno ${VOTI_LABEL ? '' : ''}${anno === '5' ? 'V' : anno === '6' ? 'VI' : 'VII'}` : '';
+  }
+  div.querySelector('.f-materia').addEventListener('change', () => {
+    const isAltro = div.querySelector('.f-materia').value === 'ALTRO';
+    div.querySelector('.f-in-piano').checked = !isAltro && div.querySelector('.f-in-piano').checked;
+    div.querySelector('.f-in-piano').disabled = isAltro;
+    aggiornaDatalist(); aggiornaPreview();
+  });
+  div.querySelector('.f-anno').addEventListener('change', () => { aggiornaDatalist(); aggiornaPreview(); });
+
+  // prima riga Conoscenza pronta all'uso
+  righeList.appendChild(creaConoscenzaRow(datalistId));
+
+  return div;
+}
+
+document.getElementById('add_materia_btn').addEventListener('click', () => {
+  document.getElementById('materie_list').appendChild(creaMateriaCard());
+  aggiornaContatoreMateria();
+});
+document.getElementById('materie_list').appendChild(creaMateriaCard());
+aggiornaContatoreMateria();
+
+function aggiornaAnteprimaPrezzoE() {
+  const n = parseInt(document.getElementById('eGiaPossedute').value, 10) || 0;
+  const prezzo = 4 + Math.floor(n / 10);
+  const mancanti = 10 - (n % 10);
+  document.getElementById('anteprimaPrezzoE').innerHTML =
+    `Con questo valore, la prossima Conoscenza portata a Eccezionale (in Piano di Studi) costerà <b>${prezzo} PP</b>` +
+    (mancanti < 10 ? ` — dopo altre ${mancanti} il prezzo salirà a ${prezzo + 1} PP` : '') + `.`;
+}
+document.getElementById('eGiaPossedute').addEventListener('input', aggiornaAnteprimaPrezzoE);
+aggiornaAnteprimaPrezzoE();
+
+// ============ COSTRUZIONE FORM DINAMICO — MIGLIORA SAPIENZE ============
+let sapienzaCounter = 0;
+const SAPIENZE_MAGICHE_ORDINATE = Object.keys(SAPIENZE_CATALOGO).filter(k => SAPIENZE_CATALOGO[k].tipo === 'magica').sort((a,b)=>a.localeCompare(b,'it'));
+const SAPIENZE_FISICHE_ORDINATE = Object.keys(SAPIENZE_CATALOGO).filter(k => SAPIENZE_CATALOGO[k].tipo === 'fisica').sort((a,b)=>a.localeCompare(b,'it'));
+const SAPIENZE_SOCIALI_ORDINATE = Object.keys(SAPIENZE_CATALOGO).filter(k => SAPIENZE_CATALOGO[k].tipo === 'sociale').sort((a,b)=>a.localeCompare(b,'it'));
+
+function aggiornaContatoreSapienza() {
+  const n = document.querySelectorAll('#sapienze_list > .sapienza-card').length;
+  document.getElementById('sapienza_counter_badge').textContent = n;
+  document.getElementById('sapienze_empty').style.display = n ? 'none' : 'block';
+}
+
+function selectLivello(cls, min, max) {
+  const opts = [];
+  for (let l = min; l <= max; l++) opts.push(`<option value="${l}">${l===0?'Non sviluppato':'Livello ' + ROMANI[l]}</option>`);
+  return `<select class="${cls}">${opts.join('')}</select>`;
+}
+
+function creaConoscenzaSapienzaRow(sapienzaKey) {
+  const info = SAPIENZE_CATALOGO[sapienzaKey];
+  const div = document.createElement('div');
+  div.className = 'row';
+  div.style.alignItems = 'flex-end';
+  div.innerHTML = `
+    <div style="flex:2;"><label class="tight">Conoscenza</label>
+      <select class="f-conoscenza-sap">${info.conoscenze.map(c => `<option value="${c}">${c}</option>`).join('')}</select>
+    </div>
+    <div style="max-width:150px;"><label class="tight">Livello partenza</label>${selectLivello('f-liv-partenza', 0, 4)}</div>
+    <div style="max-width:150px;"><label class="tight">Livello finale</label>${selectLivello('f-liv-finale', 1, 5)}</div>
+    <div style="max-width:44px;"><button type="button" class="danger" style="width:100%;">✕</button></div>
+  `;
+  div.querySelector('.f-liv-finale').value = '2';
+  div.querySelector('button').addEventListener('click', () => div.remove());
+  return div;
+}
+
+function creaSapienzaCard() {
+  sapienzaCounter++;
+  const sid = 'sap' + sapienzaCounter;
+  const div = document.createElement('div');
+  div.className = 'role-card sapienza-card';
+  div.dataset.sapienzaId = sid;
+
+  const header = document.createElement('div');
+  header.className = 'acc-header';
+  header.innerHTML = `
+    <span class="acc-chevron">▾</span>
+    <span class="role-badge">${sapienzaCounter}</span>
+    <span class="role-title-preview">Nuova Sapienza</span>
+    <span class="role-meta"></span>
+    <span class="role-total-badge" style="display:none;"></span>
+  `;
+  const delBtn = document.createElement('button');
+  delBtn.type = 'button'; delBtn.className = 'danger'; delBtn.textContent = '✕';
+  delBtn.title = 'Rimuovi Sapienza';
+  delBtn.addEventListener('click', (e) => { e.stopPropagation(); div.remove(); aggiornaContatoreSapienza(); });
+  header.appendChild(delBtn);
+  div.appendChild(header);
+  abilitaAccordion(header);
+
+  const body = document.createElement('div');
+  body.className = 'acc-body';
+
+  const rigaBase = document.createElement('div');
+  rigaBase.className = 'row';
+  rigaBase.innerHTML = `
+    <div><label class="tight">Sapienza</label>
+      <select class="f-sapienza">
+        <option value="">—</option>
+        <optgroup label="Sapienze Magiche">${SAPIENZE_MAGICHE_ORDINATE.map(s => `<option value="${s}">${s}</option>`).join('')}</optgroup>
+        <optgroup label="Sapienze Fisiche">${SAPIENZE_FISICHE_ORDINATE.map(s => `<option value="${s}">${s}</option>`).join('')}</optgroup>
+        <optgroup label="Sapienze Sociali">${SAPIENZE_SOCIALI_ORDINATE.map(s => `<option value="${s}">${s}</option>`).join('')}</optgroup>
+      </select>
+    </div>
+  `;
+  body.appendChild(rigaBase);
+
+  // --- modalità Sapienza Magica: Conoscenze multiple ---
+  const magicWrap = document.createElement('div');
+  magicWrap.style.display = 'none';
+  const magicTitolo = document.createElement('h3');
+  magicTitolo.style.cssText = "font-family:'Cormorant Garamond',serif;font-size:16px;margin:16px 0 8px;color:var(--gold-deep)";
+  magicTitolo.textContent = 'Conoscenze da sviluppare';
+  magicWrap.appendChild(magicTitolo);
+  const conoscenzeList = document.createElement('div');
+  conoscenzeList.className = 'conoscenze_sap_list';
+  magicWrap.appendChild(conoscenzeList);
+  const addConoscenzaBtn = document.createElement('button');
+  addConoscenzaBtn.type = 'button'; addConoscenzaBtn.className = 'secondary';
+  addConoscenzaBtn.textContent = '+ Aggiungi Conoscenza';
+  addConoscenzaBtn.style.marginTop = '6px';
+  magicWrap.appendChild(addConoscenzaBtn);
+  body.appendChild(magicWrap);
+
+  // --- modalità Sapienza Fisica/Sociale: un solo Livello complessivo ---
+  const fisicaWrap = document.createElement('div');
+  fisicaWrap.style.display = 'none';
+  fisicaWrap.style.marginTop = '14px';
+  fisicaWrap.innerHTML = `
+    <div class="row">
+      <div style="max-width:170px;"><label class="tight">Livello partenza</label>${selectLivello('f-fis-partenza', 0, 4)}</div>
+      <div style="max-width:170px;"><label class="tight">Livello finale</label>${selectLivello('f-fis-finale', 1, 5)}</div>
+    </div>
+  `;
+  body.appendChild(fisicaWrap);
+
+  div.appendChild(body);
+
+  function aggiornaModalita() {
+    const key = div.querySelector('.f-sapienza').value;
+    const info = SAPIENZE_CATALOGO[key];
+    header.querySelector('.role-title-preview').textContent = key || 'Nuova Sapienza';
+    header.querySelector('.role-meta').textContent = info ? (info.tipo === 'magica' ? 'Magica' : info.tipo === 'fisica' ? 'Fisica' : 'Sociale') : '';
+
+    if (!info) { magicWrap.style.display = 'none'; fisicaWrap.style.display = 'none'; return; }
+    if (info.tipo === 'magica') {
+      magicWrap.style.display = 'block'; fisicaWrap.style.display = 'none';
+      conoscenzeList.innerHTML = '';
+      conoscenzeList.appendChild(creaConoscenzaSapienzaRow(key));
+    } else {
+      magicWrap.style.display = 'none'; fisicaWrap.style.display = 'block';
+    }
+  }
+  div.querySelector('.f-sapienza').addEventListener('change', aggiornaModalita);
+  addConoscenzaBtn.addEventListener('click', () => {
+    const key = div.querySelector('.f-sapienza').value;
+    if (key) conoscenzeList.appendChild(creaConoscenzaSapienzaRow(key));
+  });
+
+  return div;
+}
+
+document.getElementById('add_sapienza_btn').addEventListener('click', () => {
+  document.getElementById('sapienze_list').appendChild(creaSapienzaCard());
+  aggiornaContatoreSapienza();
+});
+document.getElementById('sapienze_list').appendChild(creaSapienzaCard());
+aggiornaContatoreSapienza();
+
+// ============ COSTRUZIONE FORM DINAMICO — ACQUISTA PARAMETRI ============
+let paramRowCounter = 0;
+
+function aggiornaContatoreParam() {
+  const n = document.querySelectorAll('#parametri_list > .row').length;
+  document.getElementById('param_counter_badge').textContent = n;
+  document.getElementById('parametri_empty').style.display = n ? 'none' : 'block';
+}
+
+function creaParametroRow() {
+  paramRowCounter++;
+  const div = document.createElement('div');
+  div.className = 'row';
+  div.style.alignItems = 'flex-end';
+  div.innerHTML = `
+    <div style="flex:2;"><label class="tight">Parametro</label>
+      <select class="f-param-nome">${PARAMETRI_MAGICI_FISICI.map(p => `<option value="${p}">${p}</option>`).join('')}</select>
+    </div>
+    <div style="max-width:150px;"><label class="tight">Quanti punti acquista</label><input type="number" class="f-param-qty" min="1" step="1" value="1"></div>
+    <div style="max-width:44px;"><button type="button" class="danger" style="width:100%;">✕</button></div>
+  `;
+  div.querySelector('button').addEventListener('click', () => { div.remove(); aggiornaContatoreParam(); });
+  return div;
+}
+
+document.getElementById('add_param_btn').addEventListener('click', () => {
+  document.getElementById('parametri_list').appendChild(creaParametroRow());
+  aggiornaContatoreParam();
+});
+document.getElementById('parametri_list').appendChild(creaParametroRow());
+aggiornaContatoreParam();
+
+function aggiornaAnteprimaPrezzoParam() {
+  const n = parseInt(document.getElementById('puntiParamGiaAcquistati').value, 10) || 0;
+  const prezzo = PREZZO_PARAMETRO_BASE + PREZZO_PARAMETRO_INCREMENTO * Math.floor(n / PREZZO_PARAMETRO_BLOCCO);
+  const mancanti = PREZZO_PARAMETRO_BLOCCO - (n % PREZZO_PARAMETRO_BLOCCO);
+  document.getElementById('anteprimaPrezzoParam').innerHTML =
+    `Con questo valore, il prossimo punto acquistato costerà <b>${prezzo} PP</b>` +
+    (mancanti < PREZZO_PARAMETRO_BLOCCO ? ` — dopo altri ${mancanti} il prezzo salirà a ${prezzo + PREZZO_PARAMETRO_INCREMENTO} PP` : '') + `.`;
+}
+document.getElementById('puntiParamGiaAcquistati').addEventListener('input', aggiornaAnteprimaPrezzoParam);
+aggiornaAnteprimaPrezzoParam();
+
+// --- Dialettica ---
+function popolaSelectDialettica(sel, min, max) {
+  sel.innerHTML = '';
+  for (let l = min; l <= max; l++) {
+    const opt = document.createElement('option');
+    opt.value = l;
+    opt.textContent = l === 1 ? '1 (di base)' : String(l);
+    sel.appendChild(opt);
+  }
+}
+popolaSelectDialettica(document.getElementById('dialetticaPartenza'), 1, 8);
+popolaSelectDialettica(document.getElementById('dialetticaFinale'), 1, 8);
+document.getElementById('dialetticaFinale').value = '1';
+
+function aggiornaRiepilogoDialettica() {
+  const p = parseInt(document.getElementById('dialetticaPartenza').value, 10) || 1;
+  const f = parseInt(document.getElementById('dialetticaFinale').value, 10) || 1;
+  const el = document.getElementById('riepilogoDialettica');
+  if (f <= p) { el.textContent = 'Nessun acquisto di Dialettica impostato.'; return; }
+  const costo = costoDialettica(p, f);
+  el.textContent = `Da ${p} a ${f}: +${f - p} Dialettica, -${costo} Galeoni`;
+}
+document.getElementById('dialetticaPartenza').addEventListener('change', aggiornaRiepilogoDialettica);
+document.getElementById('dialetticaFinale').addEventListener('change', aggiornaRiepilogoDialettica);
+aggiornaRiepilogoDialettica();
+
+// ============ COSTRUZIONE FORM DINAMICO — ACQUISTA CONOSCENZE ============
+let acquistoCounter = 0;
+const CATEGORIE_ORDINATE = Object.keys(CATEGORIE_CONOSCENZA);
+
+function aggiornaContatoreAcquisto() {
+  const n = document.querySelectorAll('#acquisti_list > .acquisto-card').length;
+  document.getElementById('acquisto_counter_badge').textContent = n;
+  document.getElementById('acquisti_empty').style.display = n ? 'none' : 'block';
+}
+
+function creaAcquistoCard() {
+  acquistoCounter++;
+  const aid = 'acq' + acquistoCounter;
+  const div = document.createElement('div');
+  div.className = 'role-card acquisto-card';
+  div.dataset.acquistoId = aid;
+
+  const header = document.createElement('div');
+  header.className = 'acc-header';
+  header.innerHTML = `
+    <span class="acc-chevron">▾</span>
+    <span class="role-badge">${acquistoCounter}</span>
+    <span class="role-title-preview">Nuovo acquisto</span>
+    <span class="role-meta"></span>
+    <span class="role-total-badge" style="display:none;"></span>
+  `;
+  const delBtn = document.createElement('button');
+  delBtn.type = 'button'; delBtn.className = 'danger'; delBtn.textContent = '✕';
+  delBtn.title = 'Rimuovi acquisto';
+  delBtn.addEventListener('click', (e) => { e.stopPropagation(); div.remove(); aggiornaContatoreAcquisto(); });
+  header.appendChild(delBtn);
+  div.appendChild(header);
+  abilitaAccordion(header);
+
+  const body = document.createElement('div');
+  body.className = 'acc-body';
+
+  const rigaBase = document.createElement('div');
+  rigaBase.className = 'row';
+  rigaBase.innerHTML = `
+    <div><label class="tight">Tipo di Conoscenza</label>
+      <select class="f-tipo-con">
+        <option value="">—</option>
+        ${Object.entries(TIPI_CONOSCENZA).map(([t,p]) => `<option value="${t}">${t} (${p} G)</option>`).join('')}
+        <option value="Personalizzata">Personalizzata (creata da player, prezzo libero)</option>
+      </select>
+    </div>
+    <div><label class="tight">Categoria</label>
+      <select class="f-categoria-con">${CATEGORIE_ORDINATE.map(c => `<option value="${c}">${c}</option>`).join('')}</select>
+    </div>
+  `;
+  body.appendChild(rigaBase);
+
+  const rigaPrezzoLibero = document.createElement('div');
+  rigaPrezzoLibero.className = 'row';
+  rigaPrezzoLibero.style.display = 'none';
+  rigaPrezzoLibero.innerHTML = `<div style="max-width:220px;"><label class="tight">Prezzo per singola Conoscenza (Galeoni)</label><input type="number" class="f-prezzo-libero" min="0" step="1" value="0"></div>`;
+  body.appendChild(rigaPrezzoLibero);
+
+  const hintNomi = document.createElement('div');
+  hintNomi.className = 'hint';
+  hintNomi.style.marginTop = '10px';
+  hintNomi.innerHTML = 'Una Conoscenza per riga, nel formato <code>Nome | link</code> — <b>entrambi obbligatori</b>. Le righe senza link non verranno conteggiate.';
+  body.appendChild(hintNomi);
+
+  const textareaNomi = document.createElement('textarea');
+  textareaNomi.className = 'f-nomi-con';
+  textareaNomi.placeholder = 'Dissendium | ?t=80407094#dissendium\nFidelius | ?t=80407094#fidelius';
+  body.appendChild(textareaNomi);
+
+  const subtotale = document.createElement('div');
+  subtotale.className = 'role-summary f-subtotale-con';
+  subtotale.style.marginTop = '10px';
+  subtotale.textContent = 'Seleziona Tipo e aggiungi almeno una Conoscenza per vedere il subtotale.';
+  body.appendChild(subtotale);
+
+  div.appendChild(body);
+
+  function aggiornaSubtotale() {
+    const tipo = div.querySelector('.f-tipo-con').value;
+    const categoria = div.querySelector('.f-categoria-con').value;
+    const prezzoLibero = div.querySelector('.f-prezzo-libero').value;
+    const { valide, invalide } = parseRigheConoscenza(div.querySelector('.f-nomi-con').value);
+
+    rigaPrezzoLibero.style.display = tipo === 'Personalizzata' ? 'flex' : 'none';
+    header.querySelector('.role-title-preview').textContent = tipo ? `${tipo} — ${categoria}` : 'Nuovo acquisto';
+    header.querySelector('.role-meta').textContent = valide.length ? `${valide.length} Conoscenze` : '';
+
+    if (!tipo || !valide.length) {
+      subtotale.textContent = 'Seleziona Tipo e aggiungi almeno una Conoscenza (con nome e link) per vedere il subtotale.';
+      subtotale.style.color = '';
+      return;
+    }
+    const r = calcolaAcquistoConoscenze(tipo, prezzoLibero, valide);
+    let testo = `${r.quantita} Conoscenze × ${r.prezzoUnitario} G = -${r.totale} G`;
+    if (invalide.length) {
+      testo += ` — ⚠ ${invalide.length} riga/e ignorata/e perché senza nome o link validi`;
+    }
+    subtotale.textContent = testo;
+    subtotale.style.color = invalide.length ? 'var(--red)' : '';
+  }
+  div.querySelector('.f-tipo-con').addEventListener('change', aggiornaSubtotale);
+  div.querySelector('.f-categoria-con').addEventListener('change', aggiornaSubtotale);
+  div.querySelector('.f-prezzo-libero').addEventListener('input', aggiornaSubtotale);
+  div.querySelector('.f-nomi-con').addEventListener('input', aggiornaSubtotale);
+
+  return div;
+}
+
+document.getElementById('add_acquisto_btn').addEventListener('click', () => {
+  document.getElementById('acquisti_list').appendChild(creaAcquistoCard());
+  aggiornaContatoreAcquisto();
+});
+document.getElementById('acquisti_list').appendChild(creaAcquistoCard());
+aggiornaContatoreAcquisto();
+
+// ============ COSTRUZIONE FORM DINAMICO — COMMERCIO MAGICO ============
+let negozioCounter = 0;
+let commercianteCounter = 0;
+
+function aggiornaContatoreCommercio() {
+  const nNeg = document.querySelectorAll('#negozi_list > .negozio-card').length;
+  document.getElementById('negozio_counter_badge').textContent = nNeg;
+  document.getElementById('negozi_empty').style.display = nNeg ? 'none' : 'block';
+  const nCom = document.querySelectorAll('#commercianti_list > .commerciante-card').length;
+  document.getElementById('commerciante_counter_badge').textContent = nCom;
+  document.getElementById('commercianti_empty').style.display = nCom ? 'none' : 'block';
+}
+
+function creaRigaOggettoAcquisto() {
+  const div = document.createElement('div');
+  div.className = 'row';
+  div.style.alignItems = 'flex-end';
+  div.innerHTML = `
+    <div style="flex:2;"><label class="tight">Nome oggetto</label><input type="text" class="f-nome-ogg" placeholder="es. Abiti da tutti i giorni"></div>
+    <div style="max-width:110px;"><label class="tight">Quantità</label><input type="number" class="f-qty-ogg" min="1" step="1" value="1"></div>
+    <div style="max-width:160px;"><label class="tight">Va in <span class="format-tag">dove finisce l'oggetto</span></label>
+      <select class="f-destinazione-ogg">
+        <option value="bagaglio">Bagaglio (Oggetti)</option>
+        <option value="dispensa">Dispensa (Ingredienti/Piante/Creature)</option>
+      </select>
+    </div>
+    <div style="max-width:130px;"><label class="tight">Usi/Post max <span class="format-tag">opz.</span></label><input type="number" class="f-usi-ogg" min="0" step="1"></div>
+    <div style="max-width:140px;"><label class="tight">Prezzo (Galeoni)</label><input type="number" class="f-prezzo-ogg" min="0" step="0.5" value="0"></div>
+    <div style="max-width:120px;"><label class="tight">Totale riga</label><div class="f-totale-riga fixed-value-riga">0 G</div></div>
+    <div style="max-width:44px;"><button type="button" class="danger" style="width:100%;">✕</button></div>
+  `;
+  const rigaCheck = document.createElement('div');
+  rigaCheck.className = 'checkbox-row';
+  rigaCheck.style.color = 'var(--ink-soft)';
+  rigaCheck.innerHTML = `<input type="checkbox" class="f-prezzo-a-oggetto"><label style="color:var(--ink-soft);">Il prezzo scritto è per UN SOLO oggetto (il tool lo moltiplica per la quantità) — se lasci vuoto, il prezzo è già il totale della riga</label>`;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'oggetto-riga-wrapper';
+  wrapper.appendChild(div);
+  wrapper.appendChild(rigaCheck);
+
+  const aggiorna = () => {
+    const qty = parseFloat(div.querySelector('.f-qty-ogg').value) || 0;
+    const prezzo = parseFloat(div.querySelector('.f-prezzo-ogg').value) || 0;
+    const perOggetto = rigaCheck.querySelector('.f-prezzo-a-oggetto').checked;
+    const totale = perOggetto ? qty * prezzo : prezzo;
+    div.querySelector('.f-totale-riga').textContent = normNum(totale) + ' G';
+  };
+  div.querySelector('.f-qty-ogg').addEventListener('input', aggiorna);
+  div.querySelector('.f-prezzo-ogg').addEventListener('input', aggiorna);
+  rigaCheck.querySelector('.f-prezzo-a-oggetto').addEventListener('change', aggiorna);
+  div.querySelector('button').addEventListener('click', () => wrapper.remove());
+  return wrapper;
+}
+
+function creaRigaOggettoVendita() {
+  const div = document.createElement('div');
+  div.className = 'row';
+  div.style.alignItems = 'flex-end';
+  div.innerHTML = `
+    <div style="flex:2;"><label class="tight">Nome oggetto (già posseduto)</label><input type="text" class="f-nome-ogg" placeholder="es. Ingrediente Raro"></div>
+    <div style="max-width:110px;"><label class="tight">Quantità venduta</label><input type="number" class="f-qty-ogg" min="1" step="1" value="1"></div>
+    <div style="max-width:150px;"><label class="tight">Prezzo ricevuto (Galeoni)</label><input type="number" class="f-prezzo-ogg" min="0" step="0.5" value="0"></div>
+    <div style="max-width:120px;"><label class="tight">Totale riga</label><div class="f-totale-riga fixed-value-riga">0 G</div></div>
+    <div style="max-width:44px;"><button type="button" class="danger" style="width:100%;">✕</button></div>
+  `;
+  const rigaCheck = document.createElement('div');
+  rigaCheck.className = 'checkbox-row';
+  rigaCheck.style.color = 'var(--ink-soft)';
+  rigaCheck.innerHTML = `<input type="checkbox" class="f-prezzo-a-oggetto"><label style="color:var(--ink-soft);">Il prezzo scritto è per UN SOLO oggetto (il tool lo moltiplica per la quantità) — se lasci vuoto, il prezzo è già il totale della riga</label>`;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'oggetto-riga-wrapper';
+  wrapper.appendChild(div);
+  wrapper.appendChild(rigaCheck);
+
+  const aggiorna = () => {
+    const qty = parseFloat(div.querySelector('.f-qty-ogg').value) || 0;
+    const prezzo = parseFloat(div.querySelector('.f-prezzo-ogg').value) || 0;
+    const perOggetto = rigaCheck.querySelector('.f-prezzo-a-oggetto').checked;
+    const totale = perOggetto ? qty * prezzo : prezzo;
+    div.querySelector('.f-totale-riga').textContent = normNum(totale) + ' G';
+  };
+  div.querySelector('.f-qty-ogg').addEventListener('input', aggiorna);
+  div.querySelector('.f-prezzo-ogg').addEventListener('input', aggiorna);
+  rigaCheck.querySelector('.f-prezzo-a-oggetto').addEventListener('change', aggiorna);
+  div.querySelector('button').addEventListener('click', () => wrapper.remove());
+  return wrapper;
+}
+
+function creaCardCommercio(tipo) {
+  const isAcquisto = tipo === 'acquisto';
+  if (isAcquisto) negozioCounter++; else commercianteCounter++;
+  const cid = (isAcquisto ? 'neg' : 'com') + (isAcquisto ? negozioCounter : commercianteCounter);
+  const div = document.createElement('div');
+  div.className = `role-card ${isAcquisto ? 'negozio-card' : 'commerciante-card'}`;
+  div.dataset.cardId = cid;
+
+  const header = document.createElement('div');
+  header.className = 'acc-header';
+  header.innerHTML = `
+    <span class="acc-chevron">▾</span>
+    <span class="role-badge">${isAcquisto ? negozioCounter : commercianteCounter}</span>
+    <span class="role-title-preview">${isAcquisto ? 'Nuovo Negozio' : 'Nuovo Commerciante'}</span>
+    <span class="role-meta"></span>
+    <span class="role-total-badge" style="display:none;"></span>
+  `;
+  const delBtn = document.createElement('button');
+  delBtn.type = 'button'; delBtn.className = 'danger'; delBtn.textContent = '✕';
+  delBtn.title = 'Rimuovi';
+  delBtn.addEventListener('click', (e) => { e.stopPropagation(); div.remove(); aggiornaContatoreCommercio(); });
+  header.appendChild(delBtn);
+  div.appendChild(header);
+  abilitaAccordion(header);
+
+  const body = document.createElement('div');
+  body.className = 'acc-body';
+
+  const rigaNome = document.createElement('div');
+  rigaNome.className = 'row';
+  rigaNome.innerHTML = `<div><label class="tight">${isAcquisto ? 'Nome Negozio' : 'Nome PNG Commerciante'}</label><input type="text" class="f-nome-neg" placeholder="${isAcquisto ? 'es. Madama McClan' : 'es. Lo Zoppo'}"></div>`;
+  body.appendChild(rigaNome);
+
+  if (!isAcquisto) {
+    const rigaNote = document.createElement('div');
+    rigaNote.style.marginTop = '8px';
+    rigaNote.innerHTML = `<label class="tight">Note <span class="format-tag">opzionale · es. requisiti di eleggibilità</span></label><input type="text" class="f-note-com" placeholder="es. Punti Virtuosi 6-10: acquista esclusivamente Ingredienti, Pozioni, Piante e Creature X">`;
+    body.appendChild(rigaNote);
+  }
+
+  const righeList = document.createElement('div');
+  righeList.className = 'oggetti_commercio_list';
+  righeList.style.marginTop = '10px';
+  body.appendChild(righeList);
+
+  const addRigaBtn = document.createElement('button');
+  addRigaBtn.type = 'button'; addRigaBtn.className = 'secondary';
+  addRigaBtn.textContent = '+ Aggiungi Oggetto';
+  addRigaBtn.style.marginTop = '8px';
+  addRigaBtn.addEventListener('click', () => righeList.appendChild(isAcquisto ? creaRigaOggettoAcquisto() : creaRigaOggettoVendita()));
+  body.appendChild(addRigaBtn);
+
+  div.appendChild(body);
+
+  const inputNome = rigaNome.querySelector('.f-nome-neg');
+  inputNome.addEventListener('input', () => {
+    header.querySelector('.role-title-preview').textContent = inputNome.value.trim() || (isAcquisto ? 'Nuovo Negozio' : 'Nuovo Commerciante');
+  });
+
+  righeList.appendChild(isAcquisto ? creaRigaOggettoAcquisto() : creaRigaOggettoVendita());
+
+  return div;
+}
+
+document.getElementById('add_negozio_btn').addEventListener('click', () => {
+  document.getElementById('negozi_list').appendChild(creaCardCommercio('acquisto'));
+  aggiornaContatoreCommercio();
+});
+document.getElementById('add_commerciante_btn').addEventListener('click', () => {
+  document.getElementById('commercianti_list').appendChild(creaCardCommercio('vendita'));
+  aggiornaContatoreCommercio();
+});
+document.getElementById('negozi_list').appendChild(creaCardCommercio('acquisto'));
+document.getElementById('commercianti_list').appendChild(creaCardCommercio('vendita'));
+aggiornaContatoreCommercio();
+
+// ============ LETTURA DEL FORM E CALCOLO ============
+function leggiRoleDalDOM(roleEl) {
+  const numPosts = parseFloat(roleEl.querySelector('.f-numposts').value) || 0;
+  const titolo = roleEl.querySelector('.f-titolo').value.trim();
+  const galeoniSpesi = parseFloat(roleEl.querySelector('.f-galeonispesi').value) || 0;
+  const coeffDebito = parseFloat(roleEl.querySelector('.f-coeff-debito').value) || 1;
+  const missioni = [...roleEl.querySelectorAll('.missione-card')].map(mEl => {
+    const m = {
+      nome: mEl.querySelector('.f-nome').value.trim(),
+      completamento: mEl.querySelector('.f-completamento').checked
+    };
+    mEl.querySelectorAll('.f-premio').forEach(inp => {
+      const key = inp.dataset.key;
+      const val = inp.value;
+      if (key === 'ppPostCap') { m.ppPostCap = val === '' ? null : parseFloat(val); }
+      else { m[key] = val === '' ? 0 : parseFloat(val); }
+    });
+    return m;
+  });
+  return { titolo, numPosts, galeoniSpesi, coeffDebito, missioni };
+}
+
+function leggiMateriaDalDOM(matEl) {
+  const materia = matEl.querySelector('.f-materia').value;
+  const anno = matEl.querySelector('.f-anno').value;
+  const inPiano = matEl.querySelector('.f-in-piano').checked && materia !== 'ALTRO';
+
+  const stepCards = [...matEl.querySelectorAll('.f-bulk-step')];
+  const valoreScelto = (stepCard) => {
+    const scelto = stepCard.querySelector('input[type=radio]:checked');
+    return scelto ? scelto.value : '';
+  };
+  const stepTD = stepCards.find(s => s.dataset.stepFrom === 'T');
+  const stepDS = stepCards.find(s => s.dataset.stepFrom === 'D');
+  const valTD = stepTD ? valoreScelto(stepTD) : '';
+  const valDS = stepDS ? valoreScelto(stepDS) : '';
+
+  const bulkTD = valTD !== '';
+  const bulkTDRole = valTD === 'role';
+  const bulkDS = valDS !== '';
+  const bulkDSRole = valDS === 'role';
+
+  const righe = [...matEl.querySelectorAll('.conoscenze_list > .row')].map(r => ({
+    conoscenza: r.querySelector('.f-conoscenza').value.trim(),
+    votoPartenza: r.querySelector('.f-voto-partenza').value,
+    votoArrivo: r.querySelector('.f-voto-arrivo').value
+  })).filter(r => r.conoscenza);
+  return { materia, anno, inPiano, bulkTD, bulkTDRole, bulkDS, bulkDSRole, righe };
+}
+
+// Calcola il costo di UNA Materia; contatoreE è lo stato del contatore globale
+// "E già in Piano di Studi", che viene letto e restituito aggiornato affinché
+// la Materia successiva prosegua da dove questa ha lasciato.
+function calcolaMateria(mat, contatoreE) {
+  const totali = {};
+  const boxELines = [];
+  let contatore = contatoreE;
+
+  if (mat.bulkTD) {
+    if (!mat.bulkTDRole) totali['Galeoni'] = (totali['Galeoni'] || 0) - 100;
+    if (mat.materia && mat.materia !== 'ALTRO') boxELines.push(`TUTTE: ${mat.materia}: T > D`);
+  }
+  if (mat.bulkDS) {
+    if (!mat.bulkDSRole) totali['Galeoni'] = (totali['Galeoni'] || 0) - 100;
+    if (mat.materia && mat.materia !== 'ALTRO') boxELines.push(`TUTTE: ${mat.materia}: D > S`);
+  }
+
+  mat.righe.forEach(r => {
+    const costo = costoConoscenza(r.votoPartenza, r.votoArrivo, mat.inPiano, contatore);
+    if (costo.pp) totali['Punti Post'] = (totali['Punti Post'] || 0) - costo.pp;
+    if (costo.galeoni) totali['Galeoni'] = (totali['Galeoni'] || 0) - costo.galeoni;
+    contatore = costo.contatoreFinale;
+    boxELines.push(`${r.conoscenza}: ${r.votoArrivo}`);
+  });
+
+  return { totali, boxELines, contatoreFinale: contatore };
+}
+
+function leggiSapienzaDalDOM(sapEl) {
+  const key = sapEl.querySelector('.f-sapienza').value;
+  const info = key ? SAPIENZE_CATALOGO[key] : null;
+  if (!info) return null;
+
+  if (info.tipo === 'magica') {
+    const righe = [...sapEl.querySelectorAll('.conoscenze_sap_list > .row')].map(r => ({
+      conoscenza: r.querySelector('.f-conoscenza-sap').value,
+      livelloPartenza: parseInt(r.querySelector('.f-liv-partenza').value, 10),
+      livelloFinale: parseInt(r.querySelector('.f-liv-finale').value, 10)
+    }));
+    return { sapienza: key, tipo: 'magica', righe };
+  }
+  const livelloPartenza = parseInt(sapEl.querySelector('.f-fis-partenza').value, 10);
+  const livelloFinale = parseInt(sapEl.querySelector('.f-fis-finale').value, 10);
+  return { sapienza: key, tipo: info.tipo, livelloPartenza, livelloFinale };
+}
+
+function calcolaSapienza(sap) {
+  const totali = {};
+  const boxFLines = [];
+
+  if (sap.tipo === 'magica') {
+    sap.righe.forEach(r => {
+      if (r.livelloFinale <= r.livelloPartenza) return;
+      const costo = costoSviluppoSapienza(r.livelloPartenza, r.livelloFinale, 'magica');
+      if (costo.pp) totali['Punti Post'] = (totali['Punti Post'] || 0) - costo.pp;
+      if (costo.galeoni) totali['Galeoni'] = (totali['Galeoni'] || 0) - costo.galeoni;
+      boxFLines.push(`${r.conoscenza}: ${r.livelloFinale}`);
+    });
+  } else {
+    if (sap.livelloFinale > sap.livelloPartenza) {
+      const costo = costoSviluppoSapienza(sap.livelloPartenza, sap.livelloFinale, sap.tipo);
+      if (costo.pp) totali['Punti Post'] = (totali['Punti Post'] || 0) - costo.pp;
+      if (costo.galeoni) totali['Galeoni'] = (totali['Galeoni'] || 0) - costo.galeoni;
+      boxFLines.push(`${sap.sapienza}: ${sap.livelloFinale}`);
+    }
+  }
+
+  return { totali, boxFLines };
+}
+
+function calcolaTutto() {
+  const tassoBase = parseFloat(document.getElementById('tassoBase').value) || 0;
+  const totaleGenerale = {};
+
+  // --- Role (Segnala e Riscatta) ---
+  const roleEls = [...document.querySelectorAll('#roles_list > .role-card')];
+  const riepilogoRoleDiv = document.getElementById('riepilogo_roles');
+  riepilogoRoleDiv.innerHTML = '';
+  roleEls.forEach((roleEl, idx) => {
+    const role = leggiRoleDalDOM(roleEl);
+    const totaliRole = calcolaRole(role, tassoBase);
+    sommaIn(totaleGenerale, totaliRole);
+
+    const righeTesto = fmtRighe(totaliRole).join(', ');
+    const box = document.createElement('div');
+    box.className = 'role-summary';
+    box.textContent = `Role ${idx + 1}${role.titolo ? ' — ' + role.titolo : ''} (${role.numPosts} post): ${righeTesto || 'nessun premio'}`;
+    riepilogoRoleDiv.appendChild(box);
+
+    const totalBadge = roleEl.querySelector('.role-total-badge');
+    totalBadge.style.display = 'inline-block';
+    totalBadge.textContent = righeTesto || '—';
+  });
+  if (!roleEls.length) riepilogoRoleDiv.innerHTML = '<div class="empty-state">Nessuna Role compilata.</div>';
+
+  // --- Materie (Migliora Voti) ---
+  let contatoreE = parseInt(document.getElementById('eGiaPossedute').value, 10) || 0;
+  const materiaEls = [...document.querySelectorAll('#materie_list > .materia-card')];
+  const riepilogoMaterieDiv = document.getElementById('riepilogo_materie');
+  riepilogoMaterieDiv.innerHTML = '';
+  const tutteBoxELines = [];
+  materiaEls.forEach((matEl, idx) => {
+    const mat = leggiMateriaDalDOM(matEl);
+    if (!mat.materia) return;
+    const risultato = calcolaMateria(mat, contatoreE);
+    contatoreE = risultato.contatoreFinale;
+    sommaIn(totaleGenerale, risultato.totali);
+    tutteBoxELines.push(...risultato.boxELines);
+
+    const righeTesto = fmtRighe(risultato.totali).join(', ');
+    const box = document.createElement('div');
+    box.className = 'role-summary';
+    const nomeMostrato = mat.materia === 'ALTRO' ? 'Extra / Avanzata' : mat.materia;
+    box.textContent = `Materia ${idx + 1} — ${nomeMostrato}: ${righeTesto || 'nessuna spesa'}`;
+    riepilogoMaterieDiv.appendChild(box);
+
+    const totalBadge = matEl.querySelector('.role-total-badge');
+    totalBadge.style.display = 'inline-block';
+    totalBadge.textContent = righeTesto || '—';
+  });
+  if (!materiaEls.length) riepilogoMaterieDiv.innerHTML = '<div class="empty-state">Nessuna Materia compilata.</div>';
+
+  // --- Sapienze (Migliora Sapienze) ---
+  const sapienzaEls = [...document.querySelectorAll('#sapienze_list > .sapienza-card')];
+  const riepilogoSapienzeDiv = document.getElementById('riepilogo_sapienze');
+  riepilogoSapienzeDiv.innerHTML = '';
+  const tutteBoxFLines = [];
+  sapienzaEls.forEach((sapEl, idx) => {
+    const sap = leggiSapienzaDalDOM(sapEl);
+    if (!sap) return;
+    const risultato = calcolaSapienza(sap);
+    sommaIn(totaleGenerale, risultato.totali);
+    tutteBoxFLines.push(...risultato.boxFLines);
+
+    const righeTesto = fmtRighe(risultato.totali).join(', ');
+    const box = document.createElement('div');
+    box.className = 'role-summary';
+    box.textContent = `Sapienza ${idx + 1} — ${sap.sapienza}: ${righeTesto || 'nessuna spesa'}`;
+    riepilogoSapienzeDiv.appendChild(box);
+
+    const totalBadge = sapEl.querySelector('.role-total-badge');
+    totalBadge.style.display = 'inline-block';
+    totalBadge.textContent = righeTesto || '—';
+  });
+  if (!sapienzaEls.length) riepilogoSapienzeDiv.innerHTML = '<div class="empty-state">Nessuna Sapienza compilata.</div>';
+
+  // --- Acquista Parametri e Dialettica ---
+  let contatoreParam = parseInt(document.getElementById('puntiParamGiaAcquistati').value, 10) || 0;
+  const paramRows = [...document.querySelectorAll('#parametri_list > .row')];
+  const riepilogoParametriDiv = document.getElementById('riepilogo_parametri');
+  riepilogoParametriDiv.innerHTML = '';
+  const righeRiepilogoParam = [];
+  paramRows.forEach(r => {
+    const nome = r.querySelector('.f-param-nome').value;
+    const qty = parseInt(r.querySelector('.f-param-qty').value, 10) || 0;
+    if (!nome || qty <= 0) return;
+    const costo = costoPuntiParametro(qty, contatoreParam);
+    contatoreParam = costo.nuovoContatore;
+    totaleGenerale[nome] = (totaleGenerale[nome] || 0) + qty;
+    totaleGenerale['Punti Post'] = (totaleGenerale['Punti Post'] || 0) - costo.pp;
+    righeRiepilogoParam.push(`+${qty} ${nome} (-${costo.pp} PP)`);
+  });
+
+  const dialPartenza = parseInt(document.getElementById('dialetticaPartenza').value, 10) || 1;
+  const dialFinale = parseInt(document.getElementById('dialetticaFinale').value, 10) || 1;
+  if (dialFinale > dialPartenza) {
+    const costoGal = costoDialettica(dialPartenza, dialFinale);
+    totaleGenerale['Dialettica'] = (totaleGenerale['Dialettica'] || 0) + (dialFinale - dialPartenza);
+    totaleGenerale['Galeoni'] = (totaleGenerale['Galeoni'] || 0) - costoGal;
+    righeRiepilogoParam.push(`+${dialFinale - dialPartenza} Dialettica (-${costoGal} Galeoni)`);
+  }
+  riepilogoParametriDiv.innerHTML = righeRiepilogoParam.length
+    ? righeRiepilogoParam.map(r => `<div class="role-summary">${r}</div>`).join('')
+    : '<div class="empty-state">Nessun Parametro o Dialettica acquistato.</div>';
+
+  // --- Acquista Conoscenze ---
+  const acquistoEls = [...document.querySelectorAll('#acquisti_list > .acquisto-card')];
+  const righeOutputConoscenze = [];
+  let totaleGaleoniConoscenze = 0;
+  let righeScartateTotali = 0;
+  acquistoEls.forEach(acqEl => {
+    const tipo = acqEl.querySelector('.f-tipo-con').value;
+    const categoria = acqEl.querySelector('.f-categoria-con').value;
+    const prezzoLibero = acqEl.querySelector('.f-prezzo-libero').value;
+    const { valide, invalide } = parseRigheConoscenza(acqEl.querySelector('.f-nomi-con').value);
+    righeScartateTotali += invalide.length;
+    if (!tipo || !valide.length) return;
+
+    const r = calcolaAcquistoConoscenze(tipo, prezzoLibero, valide);
+    totaleGaleoniConoscenze += r.totale;
+
+    righeOutputConoscenze.push(`Tipo di conoscenza: ${tipo}${tipo !== 'Personalizzata' ? ' (' + r.prezzoUnitario + ' G)' : ' (' + r.prezzoUnitario + ' G, prezzo libero)'}`);
+    righeOutputConoscenze.push(`Categoria:`);
+    righeOutputConoscenze.push(`<details><summary> <u>${renderIconeCategoria(categoria)} ${categoria}</u></summary>`);
+    valide.forEach(({ nome, link }) => righeOutputConoscenze.push(`[URL=${link}]${nome}[/URL]`));
+    righeOutputConoscenze.push(`</details>`);
+    righeOutputConoscenze.push(`Totale: -${r.totale} G`);
+    righeOutputConoscenze.push('');
+  });
+  if (totaleGaleoniConoscenze) {
+    totaleGenerale['Galeoni'] = (totaleGenerale['Galeoni'] || 0) - totaleGaleoniConoscenze;
+    righeOutputConoscenze.push(`TOTALE GALEONI SPESI: -${totaleGaleoniConoscenze} G`);
+  }
+  if (righeScartateTotali) {
+    righeOutputConoscenze.push('');
+    righeOutputConoscenze.push(`⚠ ${righeScartateTotali} riga/e scartata/e in totale perché senza nome o link validi (formato richiesto: Nome | link).`);
+  }
+  document.getElementById('outConoscenze').value = righeOutputConoscenze.length ? righeOutputConoscenze.join('\n') : '(nessun acquisto)';
+
+  // --- Commercio Magico ---
+  const negozioEls = [...document.querySelectorAll('#negozi_list > .negozio-card')];
+  const commercianteEls = [...document.querySelectorAll('#commercianti_list > .commerciante-card')];
+  const riepilogoCommercioDiv = document.getElementById('riepilogo_commercio');
+  riepilogoCommercioDiv.innerHTML = '';
+  const righeBoxGCommercio = [];
+
+  negozioEls.forEach((negEl, idx) => {
+    const nome = negEl.querySelector('.f-nome-neg').value.trim();
+    const righeOggetti = [...negEl.querySelectorAll('.oggetti_commercio_list > .oggetto-riga-wrapper')];
+    let subtotale = 0;
+    let quantiInDispensa = 0;
+    righeOggetti.forEach(r => {
+      const nomeOgg = r.querySelector('.f-nome-ogg').value.trim();
+      const qty = parseInt(r.querySelector('.f-qty-ogg').value, 10) || 0;
+      const usi = r.querySelector('.f-usi-ogg').value;
+      const destinazione = r.querySelector('.f-destinazione-ogg').value;
+      const prezzo = parseFloat(r.querySelector('.f-prezzo-ogg').value) || 0;
+      const perOggetto = r.querySelector('.f-prezzo-a-oggetto').checked;
+      if (!nomeOgg || qty <= 0) return;
+      subtotale += perOggetto ? qty * prezzo : prezzo;
+      if (destinazione === 'dispensa') {
+        quantiInDispensa++;
+        return; // la Dispensa non è gestita dal Box G del Generatore Accrediti
+      }
+      const desc = usi ? `(0/${usi} usi)` : '';
+      righeBoxGCommercio.push(`NUOVO: ${nomeOgg} [${qty}]: ${desc}`.replace(/:\s*$/, ''));
+    });
+    if (subtotale) totaleGenerale['Galeoni'] = (totaleGenerale['Galeoni'] || 0) - subtotale;
+
+    const box = document.createElement('div');
+    box.className = 'role-summary';
+    box.textContent = `Negozio ${idx + 1}${nome ? ' — ' + nome : ''}: ${subtotale ? '-' + normNum(subtotale) + ' Galeoni' : 'nessun acquisto'}` +
+      (quantiInDispensa ? ` (${quantiInDispensa} in Dispensa, non nel Box G)` : '');
+    riepilogoCommercioDiv.appendChild(box);
+    const badge = negEl.querySelector('.role-total-badge');
+    badge.style.display = 'inline-block';
+    badge.textContent = subtotale ? `-${normNum(subtotale)} G` : '—';
+  });
+
+  commercianteEls.forEach((comEl, idx) => {
+    const nome = comEl.querySelector('.f-nome-neg').value.trim();
+    const righeOggetti = [...comEl.querySelectorAll('.oggetti_commercio_list > .oggetto-riga-wrapper')];
+    let subtotale = 0;
+    righeOggetti.forEach(r => {
+      const nomeOgg = r.querySelector('.f-nome-ogg').value.trim();
+      const qty = parseInt(r.querySelector('.f-qty-ogg').value, 10) || 0;
+      const prezzo = parseFloat(r.querySelector('.f-prezzo-ogg').value) || 0;
+      const perOggetto = r.querySelector('.f-prezzo-a-oggetto').checked;
+      if (!nomeOgg || qty <= 0) return;
+      subtotale += perOggetto ? qty * prezzo : prezzo;
+      righeBoxGCommercio.push(`${nomeOgg}: -${qty}`);
+    });
+    if (subtotale) totaleGenerale['Galeoni'] = (totaleGenerale['Galeoni'] || 0) + subtotale;
+
+    const box = document.createElement('div');
+    box.className = 'role-summary';
+    box.textContent = `Commerciante ${idx + 1}${nome ? ' — ' + nome : ''}: ${subtotale ? '+' + normNum(subtotale) + ' Galeoni' : 'nessuna vendita'}`;
+    riepilogoCommercioDiv.appendChild(box);
+    const badge = comEl.querySelector('.role-total-badge');
+    badge.style.display = 'inline-block';
+    badge.textContent = subtotale ? `+${normNum(subtotale)} G` : '—';
+  });
+  if (!negozioEls.length && !commercianteEls.length) riepilogoCommercioDiv.innerHTML = '<div class="empty-state">Nessuna transazione compilata.</div>';
+
+  // --- Conversione PP -> Galeoni ---
+  const n10 = parseInt(document.getElementById('convN10').value, 10) || 0;
+  const n50 = parseInt(document.getElementById('convN50').value, 10) || 0;
+  const n100 = parseInt(document.getElementById('convN100').value, 10) || 0;
+  const conversione = calcolaConversione(n10, n50, n100);
+  if (conversione.pp) {
+    totaleGenerale['Punti Post'] = (totaleGenerale['Punti Post'] || 0) - conversione.pp;
+    totaleGenerale['Galeoni'] = (totaleGenerale['Galeoni'] || 0) + conversione.galeoni;
+  }
+
+  document.getElementById('outBoxA').value = fmtRighe(totaleGenerale).join('\n') || '(nessuna variazione)';
+  document.getElementById('outBoxE').value = tutteBoxELines.join(', ') || '(nessuna)';
+  document.getElementById('outBoxF').value = tutteBoxFLines.join(', ') || '(nessuna)';
+  const righeBoxGManuali = document.getElementById('oggettiGlobali').value.trim();
+  const tutteRigheBoxG = [...righeBoxGCommercio, ...(righeBoxGManuali && righeBoxGManuali !== '(nessuno)' ? righeBoxGManuali.split('\n') : [])];
+  document.getElementById('outBoxG').value = tutteRigheBoxG.length ? tutteRigheBoxG.join('\n') : '(nessuno)';
+
+  document.getElementById('risultato_vuoto').style.display = 'none';
+  document.getElementById('risultato_pieno').style.display = 'flex';
+  apriPagina('risultato');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.getElementById('calcola_btn').addEventListener('click', calcolaTutto);
+document.getElementById('calcola_btn_voti').addEventListener('click', calcolaTutto);
+document.getElementById('calcola_btn_sapienze').addEventListener('click', calcolaTutto);
+document.getElementById('calcola_btn_parametri').addEventListener('click', calcolaTutto);
+document.getElementById('calcola_btn_conoscenze').addEventListener('click', calcolaTutto);
+document.getElementById('calcola_btn_commercio').addEventListener('click', calcolaTutto);
+</script>
+</body>
+</html>
