@@ -201,6 +201,14 @@
     </div>
 
     <div class="panel">
+      <h2>Missioni completate senza una Role <span id="missione_standalone_counter_badge" class="format-tag">0</span></h2>
+      <div class="hint">Usa questa sezione per le missioni a completamento svolte OFFGame o non legate a una Role precisa (es. "ruola con 5 PG diversi", "spendi 500 Galeoni in un negozio"). Il premio si somma sempre per intero — qui non c'è competizione con altre missioni.</div>
+      <div id="missioni_standalone_list"></div>
+      <div id="missioni_standalone_empty" class="empty-state">Nessuna missione di questo tipo ancora aggiunta.</div>
+      <button type="button" class="secondary" id="add_missione_standalone_btn">+ Aggiungi missione senza Role</button>
+    </div>
+
+    <div class="panel">
       <div class="acc-header" id="oggetti_toggle">
         <span class="acc-chevron">▾</span>
         <h2 style="margin:0; flex:1;">Oggetti consumati <span class="format-tag">tutte le Role · opzionale</span></h2>
@@ -411,6 +419,10 @@
       <div class="panel">
         <h2>Riepilogo per Role</h2>
         <div id="riepilogo_roles"></div>
+      </div>
+      <div class="panel">
+        <h2>Riepilogo Missioni senza Role</h2>
+        <div id="riepilogo_missioni_standalone"></div>
       </div>
       <div class="panel">
         <h2>Riepilogo per Materia</h2>
@@ -1027,6 +1039,127 @@ document.getElementById('add_role_btn').addEventListener('click', () => {
 // prima Role all'avvio, per comodità
 document.getElementById('roles_list').appendChild(creaRoleCard());
 aggiornaContatoreRole();
+
+// ============ COSTRUZIONE FORM DINAMICO — MISSIONI SENZA ROLE ============
+let missioneStandaloneCounter = 0;
+
+function aggiornaContatoreMissioneStandalone() {
+  const n = document.querySelectorAll('#missioni_standalone_list > .missione-standalone-card').length;
+  document.getElementById('missione_standalone_counter_badge').textContent = n;
+  document.getElementById('missioni_standalone_empty').style.display = n ? 'none' : 'block';
+}
+
+function creaMissioneStandaloneCard() {
+  missioneStandaloneCounter++;
+  const mid = 'ms' + missioneStandaloneCounter;
+  const div = document.createElement('div');
+  div.className = 'role-card missione-standalone-card';
+  div.dataset.missioneId = mid;
+
+  const header = document.createElement('div');
+  header.className = 'acc-header';
+  header.innerHTML = `
+    <span class="acc-chevron">▾</span>
+    <span class="role-badge">${missioneStandaloneCounter}</span>
+    <span class="role-title-preview">Nuova missione</span>
+    <span class="role-meta"></span>
+    <span class="role-total-badge" style="display:none;"></span>
+  `;
+  const delBtn = document.createElement('button');
+  delBtn.type = 'button'; delBtn.className = 'danger'; delBtn.textContent = '✕';
+  delBtn.title = 'Rimuovi missione';
+  delBtn.addEventListener('click', (e) => { e.stopPropagation(); div.remove(); aggiornaContatoreMissioneStandalone(); });
+  header.appendChild(delBtn);
+  div.appendChild(header);
+  abilitaAccordion(header);
+
+  const body = document.createElement('div');
+  body.className = 'acc-body';
+
+  const rigaNome = document.createElement('div');
+  rigaNome.className = 'row';
+  rigaNome.innerHTML = `
+    <div><label class="tight">Nome missione</label><input type="text" class="f-nome" placeholder="es. Gli Amiconi"></div>
+    <div><label class="tight">Link (opzionale) <span class="format-tag">prova/riferimento del completamento</span></label><input type="text" class="f-link" placeholder="?t=...#entry..."></div>
+    <div style="max-width:150px"><label class="tight">Livello</label>
+      <select class="f-livello">
+        <option value="">—</option>
+        <option>Facile</option><option>Medio</option><option>Difficile</option><option>Estremo</option>
+      </select>
+    </div>
+  `;
+  body.appendChild(rigaNome);
+
+  function creaDomanda(numero, titolo, nomeGruppo, opzioni, onChange) {
+    const wrap = document.createElement('div');
+    wrap.className = 'fmt-case';
+    wrap.style.marginTop = '12px';
+    const label = document.createElement('div');
+    label.className = 'fmt-case-label';
+    label.textContent = `${numero}. ${titolo}`;
+    wrap.appendChild(label);
+    opzioni.forEach((op, i) => {
+      const id = `${mid}_${nomeGruppo}_${i}`;
+      const row = document.createElement('div');
+      row.className = 'radio-option';
+      row.innerHTML = `<input type="radio" name="${mid}_${nomeGruppo}" value="${op.value}" id="${id}" class="f-${nomeGruppo}-radio" ${i === 0 ? 'checked' : ''}>
+        <label for="${id}"><b>${op.label}</b>${op.desc ? ` — ${op.desc}` : ''}</label>`;
+      wrap.appendChild(row);
+    });
+    wrap.addEventListener('change', (e) => { if (e.target.name === `${mid}_${nomeGruppo}`) onChange(e.target.value); });
+    return wrap;
+  }
+
+  const campoPPfisso = creaCampo({ key: 'ppFisso', label: 'PP fisso' }, 'f-premio');
+  const wrapPPfisso = document.createElement('div');
+  wrapPPfisso.style.cssText = 'margin-top:10px; display:none; max-width:220px;';
+  wrapPPfisso.appendChild(campoPPfisso);
+
+  const domandaPP = creaDomanda(1, 'Questa missione dà Punti Post?', 'formatopp', [
+    { value: 'no', label: 'No' },
+    { value: 'si', label: 'Sì', desc: 'un valore fisso, es. "+15 PP"' }
+  ], (val) => {
+    wrapPPfisso.style.display = val === 'si' ? 'block' : 'none';
+    if (val !== 'si') campoPPfisso.querySelector('input').value = '';
+  });
+  body.appendChild(domandaPP);
+  body.appendChild(wrapPPfisso);
+
+  const altriBody = document.createElement('div');
+  altriBody.className = 'grid-rewards wide';
+  altriBody.style.cssText = 'margin-top:10px; display:none;';
+  CAMPI_ALTRI.forEach(c => altriBody.appendChild(creaCampo(c, 'f-premio')));
+
+  const domandaAltri = creaDomanda(2, 'Dà anche altri premi, oltre ai PP?', 'altripremi', [
+    { value: 'no', label: 'No' },
+    { value: 'si', label: 'Sì', desc: 'es. Prestigio, Bontà, Malvagità, Popolarità...' }
+  ], (val) => {
+    altriBody.style.display = val === 'si' ? 'grid' : 'none';
+    if (val !== 'si') altriBody.querySelectorAll('input').forEach(i => i.value = '');
+  });
+  body.appendChild(domandaAltri);
+  body.appendChild(altriBody);
+
+  div.appendChild(body);
+
+  function aggiornaPreview() {
+    const nome = div.querySelector('.f-nome').value.trim();
+    const livello = div.querySelector('.f-livello').value;
+    header.querySelector('.role-title-preview').textContent = nome || 'Nuova missione';
+    const lvlBadge = header.querySelector('.missione-level-badge');
+    header.querySelector('.role-meta').textContent = livello || '';
+  }
+  div.querySelector('.f-nome').addEventListener('input', aggiornaPreview);
+  div.querySelector('.f-livello').addEventListener('change', aggiornaPreview);
+
+  return div;
+}
+
+document.getElementById('add_missione_standalone_btn').addEventListener('click', () => {
+  document.getElementById('missioni_standalone_list').appendChild(creaMissioneStandaloneCard());
+  aggiornaContatoreMissioneStandalone();
+});
+aggiornaContatoreMissioneStandalone();
 
 // ============ CONVERSIONE PP -> GALEONI: riepilogo live ============
 function aggiornaRiepilogoConversione() {
@@ -1748,20 +1881,20 @@ function descriviPremiMissione(m) {
 function descriviRole(role, idx, totaliRole) {
   const righe = [];
   const titoloLink = role.link ? `[URL=${role.link}]${role.titolo || 'Role senza titolo'}[/URL]` : (role.titolo || 'Role senza titolo');
-  righe.push(`${idx + 1}) ${titoloLink} — ${role.numPosts} post scritti`);
+  righe.push(`<b>Role ${idx + 1}:</b> ${titoloLink} — ${role.numPosts} post scritti`);
   const missioniValide = role.missioni.filter(m => m.nome);
   if (missioniValide.length) {
-    righe.push(`[b]Missioni FH/FW completate:[/b]`);
+    righe.push(`<b>Missioni FH/FW completate:</b>`);
     missioniValide.forEach(m => {
       righe.push(`- ${m.nome}${m.completamento ? ' (missione a completamento)' : ''}: ${descriviPremiMissione(m)}`);
     });
   }
   if (role.galeoniSpesi) {
-    righe.push(`[b]Galeoni spesi durante la Role:[/b] ${normNum(role.galeoniSpesi)}` +
+    righe.push(`<b>Galeoni spesi durante la Role:</b> ${normNum(role.galeoniSpesi)}` +
       (role.coeffDebito && role.coeffDebito !== 1 ? ` (Coefficiente di Debito ×${normNum(role.coeffDebito)})` : ''));
   }
   const righeTotale = fmtRighe(totaliRole).join(', ');
-  righe.push(`[b]Totale da questa Role:[/b] ${righeTotale || 'nessuna variazione'}`);
+  righe.push(`<b>Totale da questa Role:</b> ${righeTotale || 'nessuna variazione'}`);
   return righe.join('\n');
 }
 
@@ -1769,18 +1902,18 @@ function descriviMateria(mat, totaliMat) {
   const righe = [];
   const nomeMostrato = mat.materia === 'ALTRO' ? 'Extra / Avanzata' : mat.materia;
   const etichettaAnno = mat.materia !== 'ALTRO' ? ` (anno ${mat.anno === '5' ? 'V' : mat.anno === '6' ? 'VI' : 'VII'})` : '';
-  righe.push(`[u]${nomeMostrato}${etichettaAnno}[/u]`);
+  righe.push(`<b><u>${nomeMostrato}${etichettaAnno}</u></b>`);
   if (mat.bulkTD) righe.push(`- Tutte le Conoscenze da Troll a Desolante` + (mat.bulkTDRole ? ' (pagata con una role di studio)' : ' (100 Galeoni)'));
   if (mat.bulkDS) righe.push(`- Tutte le Conoscenze da Desolante a Scadente` + (mat.bulkDSRole ? ' (pagata con una role di studio)' : ' (100 Galeoni)'));
   mat.righe.forEach(r => righe.push(`- ${r.conoscenza}: da ${r.votoPartenza} a ${r.votoArrivo}`));
   const righeTotale = fmtRighe(totaliMat).join(', ');
-  righe.push(`[b]Totale:[/b] ${righeTotale || 'nessuna variazione'}`);
+  righe.push(`<b>Totale:</b> ${righeTotale || 'nessuna variazione'}`);
   return righe.join('\n');
 }
 
 function descriviSapienza(sap, totaliSap) {
   const righe = [];
-  righe.push(`[u]Sapienza ${sap.sapienza}[/u]`);
+  righe.push(`<b><u>Sapienza ${sap.sapienza}</u></b>`);
   if (sap.tipo === 'magica') {
     sap.righe.forEach(r => {
       if (r.livelloFinale <= r.livelloPartenza) return;
@@ -1790,7 +1923,7 @@ function descriviSapienza(sap, totaliSap) {
     righe.push(`- Livello ${ROMANI[sap.livelloPartenza] || sap.livelloPartenza} → ${ROMANI[sap.livelloFinale]}`);
   }
   const righeTotale = fmtRighe(totaliSap).join(', ');
-  righe.push(`[b]Totale:[/b] ${righeTotale || 'nessuna variazione'}`);
+  righe.push(`<b>Totale:</b> ${righeTotale || 'nessuna variazione'}`);
   return righe.join('\n');
 }
 
@@ -1799,10 +1932,10 @@ function costruisciRecapFinale(totaleGenerale) {
   const gal = totaleGenerale['Galeoni'] || 0;
   const altri = Object.entries(totaleGenerale).filter(([k, v]) => k !== 'Punti Post' && k !== 'Galeoni' && Math.round((v || 0) * 100) !== 0);
   const righe = [];
-  righe.push(`[size=10][font=medievalsharp][b][color=maroon]COMPLESSIVO ACCREDITO[/color][/b][/font][/size]`);
-  righe.push(`[b]Complessivo PP spesi e guadagnati:[/b] ${pp ? (pp >= 0 ? '+' : '') + normNum(pp) + ' PP' : '//'}`);
-  righe.push(`[b]Complessivo Galeoni spesi e guadagnati:[/b] ${gal ? (gal >= 0 ? '+' : '') + normNum(gal) + ' G' : '//'}`);
-  righe.push(`[b]Altri punti/altro guadagnati o persi:[/b] ${altri.length ? altri.map(([k, v]) => `${v >= 0 ? '+' : ''}${normNum(v)} ${k}`).join(', ') : '//'}`);
+  righe.push(`[size=10][font=medievalsharp]<b>[color=maroon]COMPLESSIVO ACCREDITO[/color]</b>[/font][/size]`);
+  righe.push(`<b>Complessivo PP spesi e guadagnati:</b> ${pp ? (pp >= 0 ? '+' : '') + normNum(pp) + ' PP' : '//'}`);
+  righe.push(`<b>Complessivo Galeoni spesi e guadagnati:</b> ${gal ? (gal >= 0 ? '+' : '') + normNum(gal) + ' G' : '//'}`);
+  righe.push(`<b>Altri punti/altro guadagnati o persi:</b> ${altri.length ? altri.map(([k, v]) => `${v >= 0 ? '+' : ''}${normNum(v)} ${k}`).join(', ') : '//'}`);
   return righe.join('\n');
 }
 
@@ -1814,21 +1947,21 @@ function costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tut
   const righe = [];
   righe.push(`<details><summary><b>📎 Dati per l'Accredito — click per aprire (non modificare, copiare così come sono nel Generatore Accrediti)</b></summary>`);
   righe.push('');
-  righe.push(`[b]BOX A — Elenco Variazioni:[/b]`);
+  righe.push(`<b>BOX A — Elenco Variazioni:</b>`);
   righe.push(fmtRighe(totaleGenerale).join('\n') || '(nessuna variazione)');
   if (tutteBoxELines.length) {
     righe.push('');
-    righe.push(`[b]BOX E — Materie Studenti:[/b]`);
+    righe.push(`<b>BOX E — Materie Studenti:</b>`);
     righe.push(tutteBoxELines.join(', '));
   }
   if (tutteBoxFLines.length) {
     righe.push('');
-    righe.push(`[b]BOX F — Sapienze Adulti:[/b]`);
+    righe.push(`<b>BOX F — Sapienze Adulti:</b>`);
     righe.push(tutteBoxFLines.join(', '));
   }
   if (tutteRigheBoxG.length) {
     righe.push('');
-    righe.push(`[b]BOX G — Inventario:[/b]`);
+    righe.push(`<b>BOX G — Inventario:</b>`);
     righe.push(tutteRigheBoxG.join('\n'));
   }
   righe.push('</details>');
@@ -1837,15 +1970,47 @@ function costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tut
 
 function assemblaPostForum(sezioni) {
   const blocchi = [];
-  if (sezioni.segnala.length) blocchi.push(`[size=13][color=sienna][font=medievalsharp][b]Segnala e riscatta role e converti PP in Galeoni[/b][/font][/color][/size]\n` + sezioni.segnala.join('\n\n'));
-  if (sezioni.voti.length) blocchi.push(`[size=13][color=cadetblue][font=medievalsharp][b]Migliora i tuoi Voti[/b][/font][/color][/size]\n` + sezioni.voti.join('\n\n'));
-  if (sezioni.sapienze.length) blocchi.push(`[size=13][color=cadetblue][font=medievalsharp][b]Migliora le tue Sapienze[/b][/font][/color][/size]\n` + sezioni.sapienze.join('\n\n'));
-  if (sezioni.parametri.length) blocchi.push(`[size=13][color=coral][font=medievalsharp][b]Acquista Parametri Magici, Fisici e Dialettica[/b][/font][/color][/size]\n` + sezioni.parametri.join('\n'));
-  if (sezioni.conoscenze) blocchi.push(`[size=13][color=darkblue][font=medievalsharp][b]Acquista Conoscenze[/b][/font][/color][/size]\n` + sezioni.conoscenze);
-  if (sezioni.commercio.length) blocchi.push(`[size=13][color=seagreen][font=medievalsharp][b]Commercio Magico[/b][/font][/color][/size]\n` + sezioni.commercio.join('\n'));
+  if (sezioni.segnala.length) blocchi.push(`[size=13][color=sienna][font=medievalsharp]<b>Segnala e riscatta role e converti PP in Galeoni</b>[/font][/color][/size]\n` + sezioni.segnala.join('\n<hr>\n'));
+  if (sezioni.voti.length) blocchi.push(`[size=13][color=cadetblue][font=medievalsharp]<b>Migliora i tuoi Voti</b>[/font][/color][/size]\n` + sezioni.voti.join('\n<hr>\n'));
+  if (sezioni.sapienze.length) blocchi.push(`[size=13][color=cadetblue][font=medievalsharp]<b>Migliora le tue Sapienze</b>[/font][/color][/size]\n` + sezioni.sapienze.join('\n<hr>\n'));
+  if (sezioni.parametri.length) blocchi.push(`[size=13][color=coral][font=medievalsharp]<b>Acquista Parametri Magici, Fisici e Dialettica</b>[/font][/color][/size]\n` + sezioni.parametri.join('\n'));
+  if (sezioni.conoscenze) blocchi.push(`[size=13][color=darkblue][font=medievalsharp]<b>Acquista Conoscenze</b>[/font][/color][/size]\n` + sezioni.conoscenze);
+  if (sezioni.commercio.length) blocchi.push(`[size=13][color=seagreen][font=medievalsharp]<b>Commercio Magico</b>[/font][/color][/size]\n` + sezioni.commercio.join('\n<hr>\n'));
   if (!blocchi.length) return '';
   blocchi.push(sezioni.recap);
   return blocchi.join('\n<hr>\n');
+}
+
+function leggiMissioneStandaloneDalDOM(mEl) {
+  const nome = mEl.querySelector('.f-nome').value.trim();
+  const link = mEl.querySelector('.f-link').value.trim();
+  const livello = mEl.querySelector('.f-livello').value;
+  const m = { nome, link, livello };
+  mEl.querySelectorAll('.f-premio').forEach(inp => {
+    const key = inp.dataset.key;
+    const val = inp.value;
+    m[key] = val === '' ? 0 : parseFloat(val);
+  });
+  return m;
+}
+
+function calcolaMissioneStandalone(m) {
+  const totali = {};
+  if (m.ppFisso) totali['Punti Post'] = (totali['Punti Post'] || 0) + Number(m.ppFisso);
+  CAMPI_ALTRI.forEach(c => {
+    const v = Number(m[c.key]) || 0;
+    if (v) totali[c.key] = (totali[c.key] || 0) + v;
+  });
+  return totali;
+}
+
+function descriviMissioneStandalone(m, totali) {
+  const righe = [];
+  const titoloLink = m.link ? `[URL=${m.link}]${m.nome || 'Missione senza nome'}[/URL]` : (m.nome || 'Missione senza nome');
+  righe.push(`- ${titoloLink}${m.livello ? ` (Livello ${m.livello})` : ''}`);
+  const righeTotale = fmtRighe(totali).join(', ');
+  righe.push(`  <b>Premio:</b> ${righeTotale || 'nessun premio dichiarato'}`);
+  return righe.join('\n');
 }
 
 function leggiRoleDalDOM(roleEl) {
@@ -1994,6 +2159,33 @@ function calcolaTutto() {
     totalBadge.textContent = righeTesto || '—';
   });
   if (!roleEls.length) riepilogoRoleDiv.innerHTML = '<div class="empty-state">Nessuna Role compilata.</div>';
+
+  // --- Missioni completate senza una Role (offgame / a completamento) ---
+  const missioniStandaloneEls = [...document.querySelectorAll('#missioni_standalone_list > .missione-standalone-card')];
+  const riepilogoStandaloneDiv = document.getElementById('riepilogo_missioni_standalone');
+  riepilogoStandaloneDiv.innerHTML = '';
+  const righeNarrativaStandalone = [];
+  missioniStandaloneEls.forEach((mEl, idx) => {
+    const m = leggiMissioneStandaloneDalDOM(mEl);
+    if (!m.nome) return;
+    const totaliM = calcolaMissioneStandalone(m);
+    sommaIn(totaleGenerale, totaliM);
+    righeNarrativaStandalone.push(descriviMissioneStandalone(m, totaliM));
+
+    const righeTesto = fmtRighe(totaliM).join(', ');
+    const box = document.createElement('div');
+    box.className = 'role-summary';
+    box.textContent = `Missione ${idx + 1} — ${m.nome}: ${righeTesto || 'nessun premio'}`;
+    riepilogoStandaloneDiv.appendChild(box);
+
+    const totalBadge = mEl.querySelector('.role-total-badge');
+    totalBadge.style.display = 'inline-block';
+    totalBadge.textContent = righeTesto || '—';
+  });
+  if (!missioniStandaloneEls.length) riepilogoStandaloneDiv.innerHTML = '<div class="empty-state">Nessuna missione di questo tipo compilata.</div>';
+  if (righeNarrativaStandalone.length) {
+    sezioniPost.segnala.push(['<u>Missioni completate senza una Role (offgame / a completamento):</u>', ...righeNarrativaStandalone].join('\n'));
+  }
 
   // --- Materie (Migliora Voti) ---
   let contatoreE = parseInt(document.getElementById('eGiaPossedute').value, 10) || 0;
@@ -2147,7 +2339,7 @@ function calcolaTutto() {
     });
     if (subtotale) totaleGenerale['Galeoni'] = (totaleGenerale['Galeoni'] || 0) - subtotale;
     if (nome || righeNarrativa.length) {
-      sezioniPost.commercio.push([`[b]Negozio scelto:[/b] ${nome || '—'}`, `[b]Lista acquisti:[/b]`, ...righeNarrativa, `[b]Totale:[/b] -${normNum(subtotale)} G`].join('\n'));
+      sezioniPost.commercio.push([`<b>Negozio scelto:</b> ${nome || '—'}`, `<b>Lista acquisti:</b>`, ...righeNarrativa, `<b>Totale:</b> -${normNum(subtotale)} G`].join('\n'));
     }
 
     const box = document.createElement('div');
@@ -2180,9 +2372,9 @@ function calcolaTutto() {
     });
     if (subtotale) totaleGenerale['Galeoni'] = (totaleGenerale['Galeoni'] || 0) + subtotale;
     if (nome || righeNarrativa.length) {
-      const bloccoCom = [`[b]PNG Commerciante scelto:[/b] ${nome || '—'}`];
-      if (note) bloccoCom.push(`[b]Note:[/b] ${note}`);
-      bloccoCom.push(`[b]Lista vendite:[/b]`, ...righeNarrativa, `[b]Totale:[/b] +${normNum(subtotale)} G`);
+      const bloccoCom = [`<b>PNG Commerciante scelto:</b> ${nome || '—'}`];
+      if (note) bloccoCom.push(`<b>Note:</b> ${note}`);
+      bloccoCom.push(`<b>Lista vendite:</b>`, ...righeNarrativa, `<b>Totale:</b> +${normNum(subtotale)} G`);
       sezioniPost.commercio.push(bloccoCom.join('\n'));
     }
 
