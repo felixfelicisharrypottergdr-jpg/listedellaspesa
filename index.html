@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -609,6 +611,182 @@ const SAPIENZE_CATALOGO = {
   'Oppositore': { tipo: 'sociale', conoscenze: [] },
   'Persuasore': { tipo: 'sociale', conoscenze: [] }
 };
+// ============ CATALOGO MISSIONI FantaHogwarts / FantaWiz ============
+const MISSIONI_FH_RAW = [
+  {"nome": "L'Artista", "anchor": "artista", "categoria": "Caotica", "illegale": true, "scolastico": true, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 1.0, "Stima Docenti": -1.0}, "parametri": {}, "nota": "Punti Casa"}},{"nome": "Medio", "requisiti": "2 Malvagità", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0, "Stima Docenti": -2.0}, "parametri": {}, "nota": "Punti Casa"}},{"nome": "Difficile", "requisiti": "5 Malvagità", "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 3.0, "Stima Docenti": -3.0}, "parametri": {}, "nota": "Punti Casa Punizione"}},{"nome": "Estremo", "requisiti": "8 Malvagità", "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 4.0, "Stima Docenti": -4.0}, "parametri": {}, "nota": "Punti Casa Punizione"}}]},
+  {"nome": "Il Bullo", "anchor": "bullo", "categoria": "Caotica", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Malvagità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": "2 Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Malvagità": 1.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": "5 Malvagità", "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Malvagità": 3.0}, "parametri": {}, "scelta": [], "nota": "\\ Popolarità come da Livelli"}, "seScoperto":null}]},
+  {"nome": "Il Burlone", "anchor": "burlone", "categoria": "Caotica", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 1.0, "Malvagità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Stima Docenti": -1.0}, "parametri": {}, "nota": null}},{"nome": "Difficile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0, "Malvagità": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Stima Docenti": -2.0}, "parametri": {}, "nota": null}}]},
+  {"nome": "L'Ebbro", "anchor": "ebbro", "categoria": "Caotica", "illegale": true, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 1.0, "Stima Docenti": -1.0}, "parametri": {}, "nota": "Punti Casa Punizione"}},{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0, "Stima Docenti": -2.0}, "parametri": {}, "nota": "Punti Casa Punizione"}},{"nome": "Difficile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 2.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 3.0, "Stima Docenti": -3.0}, "parametri": {}, "nota": "Punti Casa Punizione"}}]},
+  {"nome": "L'Eretico", "anchor": "eretico", "categoria": "Caotica", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": "3 Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Malvagità": 0.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": "8 Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Malvagità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": "5 Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Malvagità": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 3.0}, "parametri": {}, "nota": "Stima Punti Casa Punizione"}},{"nome": "Estremo", "requisiti": "15 Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 10.0, "altri": {"Malvagità": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 5.0, "Stima Docenti": -5.0}, "parametri": {}, "nota": "Punti Casa Punizione"}}]},
+  {"nome": "Il Ficcanaso", "anchor": "ficcanaso", "categoria": "Caotica", "illegale": false, "scolastico": true, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": "1 Malvagità", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 1.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": "3 Malvagità", "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Estremo", "requisiti": "5 Malvagità", "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Fuorilegge", "anchor": "fuorilegge", "categoria": "Caotica", "illegale": false, "scolastico": true, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 1.0, "Malvagità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0, "Stima Docenti": -2.0}, "parametri": {}, "nota": null}},{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Malvagità": 1.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": "5 Malvagità", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 3.0, "Stima Docenti": -3.0}, "parametri": {}, "nota": null}},{"nome": "Estremo", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 15.0, "Stima Docenti": -15.0, "Malvagità": 10.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Imprenditore", "anchor": "imprenditore", "categoria": "Caotica", "illegale": true, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Stima Docenti": -1.0}, "parametri": {}, "nota": null}},{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 1.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 1.0, "Stima Docenti": -1.5}, "parametri": {}, "nota": null}},{"nome": "Difficile", "requisiti": "2 Malvagità", "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0, "Stima Docenti": -2.0}, "parametri": {}, "nota": null}}]},
+  {"nome": "Il Ladruncolo", "anchor": "ladruncolo", "categoria": "Caotica", "illegale": true, "scolastico": true, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0, "Stima Docenti": -2.0}, "parametri": {}, "nota": null}},{"nome": "Medio", "requisiti": "2 Malvagità", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 2.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.5, "Stima Docenti": -2.5}, "parametri": {}, "nota": null}},{"nome": "Difficile", "requisiti": "3 Malvagità", "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 3.0, "Stima Docenti": -3.0}, "parametri": {}, "nota": "Punti Casa Punizione"}},{"nome": "Estremo", "requisiti": "5 Malvagità", "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 4.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 4.0, "Stima Docenti": -4.0}, "parametri": {}, "nota": null}}]},
+  {"nome": "Il Malvagio", "anchor": "malvagio", "categoria": "Caotica", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Malvagità": 1.0}, "parametri": {}, "scelta": [], "nota": "ogni 5 post del PG"}, "seScoperto":null},{"nome": "Medio", "requisiti": "3 Malvagità", "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Malvagità": 2.0}, "parametri": {}, "scelta": [], "nota": "\\"}, "seScoperto":null},{"nome": "Difficile", "requisiti": "5 Malvagità", "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 10.0, "altri": {"Malvagità": 3.0}, "parametri": {}, "scelta": [], "nota": "\\"}, "seScoperto":null}]},
+  {"nome": "\"Il PG voleva solo mutilare o ferire gravemente\"", "anchor": "mutilare", "categoria": "Caotica", "illegale": true, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 1.0, "Stima Docenti": -1.0}, "parametri": {}, "nota": null}},{"nome": "Medio", "requisiti": "3 Malvagità", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0, "Stima Docenti": -2.0}, "parametri": {}, "nota": null}},{"nome": "Difficile", "requisiti": "5 Malvagità", "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 3.0, "Stima Docenti": -3.0}, "parametri": {}, "nota": null}},{"nome": "Estremo", "requisiti": "5 Malvagità", "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 4.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 4.0, "Stima Docenti": -4.0}, "parametri": {}, "nota": null}}]},
+  {"nome": "Il Prestante", "anchor": "prestante", "categoria": "Caotica", "illegale": true, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": "3 Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Malvagità": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0, "Stima Docenti": -2.0}, "parametri": {}, "nota": null}}]},
+  {"nome": "Il Ribelle", "anchor": "ribelle", "categoria": "Caotica", "illegale": true, "scolastico": false, "completamento": false, "livelli":[{"nome": "Estremo", "requisiti": null, "complessa": true, "premio": {"ppPostRate": 3.0, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": "Denuncia alle autorità Premi stabiliti dal Narratore in base alle circostanze"}, "seScoperto":null}]},
+  {"nome": "Il Seduttore", "anchor": "seduttore", "categoria": "Caotica", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Popolarità": 1.0, "Malvagità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": "3 Malvagità 5 Stima dei Docenti", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Malvagità": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": "5 Malvagità 12 Stima dei Docenti", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 4.0, "altri": {"Malvagità": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Estremo", "requisiti": "15 Malvagità 23 Stima dei Docenti", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Malvagità": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Lo Sleale", "anchor": "sleale", "categoria": "Caotica", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Medio", "requisiti": "2 Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Malvagità": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0, "Stima Docenti": -2.0}, "parametri": {}, "nota": null}}]},
+  {"nome": "Lo Spione", "anchor": "spione", "categoria": "Caotica", "illegale": false, "scolastico": true, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 1.0, "Stima Docenti": -1.0}, "parametri": {}, "nota": null}},{"nome": "Medio", "requisiti": "1 Malvagità", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0, "Stima Docenti": -2.0}, "parametri": {}, "nota": null}},{"nome": "Difficile", "requisiti": "2 Malvagità", "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 2.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 3.0, "Stima Docenti": -3.0}, "parametri": {}, "nota": null}},{"nome": "Estremo", "requisiti": "5 Malvagità", "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 4.0, "Stima Docenti": -4.0}, "parametri": {}, "nota": null}}]},
+  {"nome": "Il Temerario", "anchor": "temerario", "categoria": "Caotica", "illegale": false, "scolastico": true, "completamento": false, "livelli":[{"nome": "Difficile", "requisiti": "3 Malvagità", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 3.0, "Stima Docenti": -3.0}, "parametri": {}, "nota": null}},{"nome": "Estremo", "requisiti": "4 Malvagità", "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 4.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 4.0, "Stima Docenti": -4.0}, "parametri": {}, "nota": null}}]},
+  {"nome": "A.A.A. Cercasi", "anchor": "aaa", "categoria": "Neutrale", "illegale": false, "scolastico": true, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Gli Amiconi", "anchor": "amiconi", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": true, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 10.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 15.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Estremo", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 20.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Arbitrino", "anchor": "arbitrino", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": true, "premio": {"ppPostRate": 3.0, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0, "Stima Docenti": 2.0}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": "di arbitraggio masterazione"}, "seScoperto":null},{"nome": "Facile [font=medievalsharp][color=darkred]Caotico[/color][/font]", "requisiti": null, "complessa": true, "premio": {"ppPostRate": 3.0, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 3.0, "Stima Docenti": -3.0, "Malvagità": 3.0}, "parametri": {}, "scelta": [], "nota": "di arbitraggio masterazione"}, "seScoperto":null},{"nome": "Medio [font=medievalsharp][color=darkred]Caotico[/color][/font]", "requisiti": null, "complessa": true, "premio": {"ppPostRate": 3.0, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 4.0, "Stima Docenti": -4.0, "Malvagità": 4.0}, "parametri": {}, "scelta": [], "nota": "di arbitraggio masterazione"}, "seScoperto":null}]},
+  {"nome": "L'Aspirante Acumen", "anchor": "aspiacumen", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": "1 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": "2 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Stima Docenti": 1.0}, "parametri": {}, "scelta": [{"valore": 1.5, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": "3 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Stima Docenti": 2.0}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Estremo", "requisiti": "5 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 10.0, "altri": {"Stima Docenti": 3.0}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Aspirante Animus", "anchor": "aspianimus", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": "1 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": "2 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Stima Docenti": 1.0}, "parametri": {}, "scelta": [{"valore": 1.5, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": "3 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Stima Docenti": 2.0}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Estremo", "requisiti": "5 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 10.0, "altri": {"Stima Docenti": 3.0}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Medio [font=medievalsharp][color=darkred]Caotico[/color][/font]", "requisiti": "5 Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 3.0, "Stima Docenti": -3.0}, "parametri": {}, "nota": null}}]},
+  {"nome": "L'Aspirante Ars", "anchor": "aspiars", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": "1 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": "2 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Stima Docenti": 1.0}, "parametri": {}, "scelta": [{"valore": 1.5, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": "3 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Stima Docenti": 2.0}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Estremo", "requisiti": "5 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 10.0, "altri": {"Stima Docenti": 3.0}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Aspirante Numen", "anchor": "aspinumen", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": "1 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": "2 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Stima Docenti": 1.0}, "parametri": {}, "scelta": [{"valore": 1.5, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": "3 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Stima Docenti": 2.0}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Estremo", "requisiti": "5 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 10.0, "altri": {"Stima Docenti": 3.0}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Aspirante Sensus", "anchor": "aspisensus", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": "1 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": "2 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Stima Docenti": 1.0}, "parametri": {}, "scelta": [{"valore": 1.5, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": "3 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Stima Docenti": 2.0}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Estremo", "requisiti": "5 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 10.0, "altri": {"Stima Docenti": 3.0}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Aspirante Voluntas", "anchor": "aspivoluntas", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": "1 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": "2 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Stima Docenti": 1.0}, "parametri": {}, "scelta": [{"valore": 1.5, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": "3 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Stima Docenti": 2.0}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Estremo", "requisiti": "5 Bontà o Malvagità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 10.0, "altri": {"Stima Docenti": 3.0}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Attivista", "anchor": "attivista", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": "6 Popolarità", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 3.0}, "parametri": {}, "scelta": [{"valore": 3.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null},{"nome": "Estremo [font=medievalsharp][color=darkred]Caotico[/color][/font]", "requisiti": "Malus", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 6.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Bugiardo vs Intuitivo", "anchor": "bugiardo", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": "da segnalare in Role Concluse"}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {}, "parametri": {}, "scelta": [{"valore": 1.5, "opzioni": ["Bontà", "Malvagità"]}], "nota": "da segnalare in Role Concluse"}, "seScoperto":null}]},
+  {"nome": "Il Convalescente", "anchor": "convalescente", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 0.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Popolarità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Curiosone", "anchor": "curiosone", "categoria": "Neutrale", "illegale": false, "scolastico": true, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Popolarità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Epistolarino", "anchor": "epistolarino", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Esploratore", "anchor": "esploratore", "categoria": "Neutrale", "illegale": false, "scolastico": true, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Esploratore Fortunato", "anchor": "fortunato", "categoria": "Neutrale", "illegale": false, "scolastico": true, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Gli Estroversi", "anchor": "estroversi", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Popolarità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 10.0, "altri": {"Popolarità": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Estremo", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 15.0, "altri": {"Popolarità": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Giocatore", "anchor": "giocatore", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Incontri ravvicinati del VII tipo", "anchor": "incontri", "categoria": "Neutrale", "illegale": false, "scolastico": true, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 1.5, "altri": {"Popolarità": 0.5}, "parametri": {}, "scelta": [], "nota": "per ogni post in cui il PNG viene mosso attivamente se viene mosso dallo stesso PG per almeno 5 post"}, "seScoperto":null}]},
+  {"nome": "L'Influencer", "anchor": "influencer", "categoria": "Neutrale", "illegale": false, "scolastico": true, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Popolarità": 0.5, "Stima Docenti": 0.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 1.0, "Stima Docenti": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Intervistato", "anchor": "intervistato", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0, "Stima Docenti": -1.0}, "parametri": {}, "scelta": [], "nota": "1 a seconda del contenuto se viene citato nome e cognome se viene citato nome e cognome"}, "seScoperto":null}]},
+  {"nome": "I Lumamici", "anchor": "lumamici", "categoria": "Neutrale", "illegale": false, "scolastico": true, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": "23 Popolarità o 23 Stima", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 3.0, "Stima Docenti": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile [font=medievalsharp][color=darkred]Caotico[/color][/font]", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 3.0}, "parametri": {}, "nota": null}}]},
+  {"nome": "Il Nottempista in Vacanza", "anchor": "nottempista", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Osservatore", "anchor": "osservatore", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Popolarità": 0.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Pettegolo", "anchor": "pettegolo", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 1.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Quidditch Addicted", "anchor": "quidditch", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": "PG Giocatore di Quidditch della propria Casa", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 0.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Popolarità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Popolarità": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Estremo", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Popolarità": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Reporter", "anchor": "reporter", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Popolarità": 1.0}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": "da chiedere nella propria Lista della Spesa se l'articolo non è anonimo"}, "seScoperto":null},{"nome": "Facile [font=medievalsharp][color=darkred]Caotico[/color][/font]", "requisiti": "3 Malvagità", "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Popolarità": 1.5, "Malvagità": 1.5}, "parametri": {}, "scelta": [], "nota": "da chiedere nella propria Lista della Spesa se l'articolo non è anonimo"}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Popolarità": 2.0}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": "da chiedere nella propria Lista della Spesa se l'articolo non è anonimo"}, "seScoperto":null},{"nome": "Difficile", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Popolarità": 2.0}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": "da chiedere nella propria Lista della Spesa ( 2 PP extra se a seguito di intervista) al PG Reporter se l'articolo non è anonimo al ai PG dell'articolo se viene nominato"}, "seScoperto":null},{"nome": "Difficile [font=medievalsharp][color=darkred]Caotico[/color][/font]", "requisiti": "5 Malvagità", "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Popolarità": 2.5, "Malvagità": 2.0}, "parametri": {}, "scelta": [], "nota": "da chiedere nella propria Lista della Spesa ( 2 PP extra se a seguito di intervista) al PG Reporter se l'articolo non è anonimo al ai PG dell'articolo se viene nominato"}, "seScoperto":null}]},
+  {"nome": "Il Secchione", "anchor": "secchione", "categoria": "Neutrale", "illegale": false, "scolastico": true, "completamento": true, "livelli":[{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Estremo", "requisiti": "T.O.M.O.", "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Prestigio": 1.0, "Stima Docenti": 2.0}, "parametri": {}, "scelta": [], "nota": "dei Docenti per il nuovo anno scolastico (o per l'inizio della carriera da PG Adulto)"}, "seScoperto":null}]},
+  {"nome": "Il Segugio", "anchor": "segugio", "categoria": "Neutrale", "illegale": false, "scolastico": true, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il So-Tutto-Sull'-Argomento", "anchor": "sotutto", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Lo Spendaccione", "anchor": "spendaccione", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": true, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Lo Spiato", "anchor": "spiato", "categoria": "Neutrale", "illegale": false, "scolastico": true, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Gli Studiosi", "anchor": "studiosi", "categoria": "Neutrale", "illegale": false, "scolastico": true, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": "Troll, Desolante o Scadente nella Conoscenza da migliorare", "complessa": true, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Stima Docenti": 1.5, "Punti Casa": 30.0}, "parametri": {}, "scelta": [], "nota": "per il PG che chiede ripetizioni dei Docenti"}, "seScoperto":null},{"nome": "Difficile", "requisiti": "Accettabile, Oltre Ogni Previsione o Eccezionale nella Conoscenza del Ripetente da migliorare", "complessa": true, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Stima Docenti": 2.0, "Punti Casa": 40.0}, "parametri": {}, "scelta": [], "nota": "per il PG che dà ripetizioni dei Docenti"}, "seScoperto":null}]},
+  {"nome": "Il Terzo Occhio Wannabe", "anchor": "terzoocchio", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "Voto superiore al PG Consultante", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 1.0}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Tifoso", "anchor": "tifoso", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio [font=medievalsharp]Legale[/font]", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio [font=medievalsharp][color=darkred]Caotico[/color][/font]", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Venditore (Studente)", "anchor": "venditore", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": true, "livelli":[{"nome": "Facile", "requisiti": "Guadagno 100 G vendite Legali", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Malvagità", "Bontà"]}], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": "Guadagno 50 G vendite Illegali", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Malvagità": 1.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Viaggiatore", "anchor": "viaggiatore", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Amico delle Creature", "anchor": "amicocre", "categoria": "Legale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Stima Docenti": 1.0, "Bontà": 1.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Amico delle Piante", "anchor": "amicopi", "categoria": "Legale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Stima Docenti": 1.0, "Bontà": 1.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Babbanologo", "anchor": "babbanologo", "categoria": "Legale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0, "Stima Docenti": 2.0, "Bontà": 3.0}, "parametri": {}, "scelta": [], "nota": "se viene citato il nome del PG Babbanologo"}, "seScoperto":null}]},
+  {"nome": "Il Buono", "anchor": "buono", "categoria": "Legale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Bontà": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Confidente", "anchor": "confidente", "categoria": "Legale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Detective", "anchor": "detective", "categoria": "Legale", "illegale": false, "scolastico": true, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Bontà": 2.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.5}, "parametri": {}, "nota": null}}]},
+  {"nome": "L'Eroe", "anchor": "eroe", "categoria": "Legale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "5 Bontà", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Popolarità": 2.0, "Stima Docenti": 2.0, "Bontà": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Generoso", "anchor": "generoso", "categoria": "Legale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 4.0, "altri": {"Bontà": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Informatore", "anchor": "informatore", "categoria": "Legale", "illegale": false, "scolastico": true, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Popolarità": 2.0, "Stima Docenti": 2.0, "Bontà": 2.0, "Punti Casa": 50.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Facile [font=medievalsharp][color=darkred]Caotico[/color][/font]", "requisiti": "3 Malvagità 12 Stima", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Popolarità": 2.0, "Stima Docenti": 2.0, "Malvagità": 2.0, "Punti Casa": 50.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 1.0, "Stima Docenti": -5.0}, "parametri": {}, "nota": "Punti Casa Punizione"}}]},
+  {"nome": "L'Intrufolato", "anchor": "intrufolato", "categoria": "Legale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "5 Bontà", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 10.0, "altri": {"Bontà": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 3.0, "Stima Docenti": 2.0}, "parametri": {}, "nota": null}}]},
+  {"nome": "Il Mammo", "anchor": "mammo", "categoria": "Legale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Stima Docenti": 1.0, "Bontà": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Paladino", "anchor": "paladino", "categoria": "Legale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Popolarità": 2.0, "Bontà": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Prudente", "anchor": "prudente", "categoria": "Legale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Bontà": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Soccorritore", "anchor": "soccorritore", "categoria": "Legale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Bontà": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Lo Zelante", "anchor": "zelante", "categoria": "Legale", "illegale": false, "scolastico": true, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "10 Bontà", "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Prestigio": 5.0, "Stima Docenti": 2.0, "Bontà": 3.0}, "parametri": {}, "scelta": [], "nota": "1 5 Virtuosi per il nuovo anno scolastico o se il PG è al VII anno"}, "seScoperto":null}]},
+];
+
+const MISSIONI_FW_RAW = [
+  {"nome": "L'Adulatore", "anchor": "adulatore", "categoria": "Sinistra", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Popolarità": 0.5, "Sinistro": 0.5}, "parametri": {}, "scelta": [], "nota": "PG Adulatore: ; ; PG Lodato: Prestigio da formula in Livelli; 1 Popolarità"}, "seScoperto":null},{"nome": "Medio", "requisiti": "2 Sinistri PG Giornalista", "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Popolarità": 2.0, "Sinistro": 1.0}, "parametri": {}, "scelta": [], "nota": "PG Adulatore Giornalista: ; PG Lodato: Prestigio da formula in Livelli;"}, "seScoperto":null}]},
+  {"nome": "L'Alleato Imprevisto", "anchor": "alleato", "categoria": "Sinistra", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 1.5, "altri": {"Sinistro": 0.5}, "parametri": {}, "scelta": [], "nota": "per ogni post con PNG"}, "seScoperto":null}]},
+  {"nome": "Il Bracconiere", "anchor": "bracconiere", "categoria": "Sinistra", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Prestigio": -15.0, "Popolarità": 1.0, "Sinistro": 1.0}, "parametri": {}, "scelta": [], "nota": "Denuncia PG Magizoologi:"}, "seScoperto":null},{"nome": "Medio", "requisiti": "2 Sinistri", "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Prestigio": -15.0, "Sinistro": 2.0}, "parametri": {}, "scelta": [], "nota": "Denuncia PG Magizoologi:"}, "seScoperto":null},{"nome": "Difficile", "requisiti": "5 Sinistri", "complessa": true, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Prestigio": -20.0, "Sinistro": 5.0}, "parametri": {}, "scelta": [], "nota": "Denuncia PG Magizoologi:"}, "seScoperto":null},{"nome": "Estremo", "requisiti": "10 Sinistri", "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 15.0, "altri": {"Sinistro": 7.0}, "parametri": {"Empatia": 3.0}, "scelta": [], "nota": "PG Magizoologi: 5 Empatia permanente"}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Prestigio": -30.0}, "parametri": {}, "nota": "Denuncia PG Magizoologi:"}}]},
+  {"nome": "Il Carismatico", "anchor": "carismatico", "categoria": "Sinistra", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Popolarità": 0.5, "Sinistro": 0.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": "5 Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Sinistro": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": "10 Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Sinistro": 1.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Estremo", "requisiti": "15 Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 7.0, "altri": {"Sinistro": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Cliente Sinistro", "anchor": "clientesinistro", "categoria": "Sinistra", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 0.5}, "parametri": {}, "scelta": [], "nota": "(per un massimo di 5 post)"}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Sinistro": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Popolarità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Commerciante Sinistro", "anchor": "commerciantesinistro", "categoria": "Sinistra", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Sinistro": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Sinistro": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": "3 Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 10.0, "altri": {"Sinistro": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Corruttore", "anchor": "corruttore", "categoria": "Sinistra", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": "Se scoperti", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": "Se scoperti", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": "Se scoperti", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Curiosone", "anchor": "curiosone", "categoria": "Sinistra", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 0.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 0.5}, "parametri": {}, "nota": null}},{"nome": "Medio", "requisiti": "1 Sinistro", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 1.0}, "parametri": {}, "nota": null}},{"nome": "Difficile", "requisiti": "3 Sinistri", "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0}, "parametri": {}, "nota": null}},{"nome": "Estremo", "requisiti": "4 Sinistri", "complessa": false, "premio": {"ppPostRate": 2.5, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 4.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 4.0}, "parametri": {}, "nota": null}}]},
+  {"nome": "Il Diffamatore", "anchor": "diffamatore", "categoria": "Sinistra", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": "Se Scoperto", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": "Se Scoperto", "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 2.0}, "parametri": {}, "scelta": [], "nota": "PG Giornalista"}, "seScoperto":null}]},
+  {"nome": "Il Distillatore Fuorilegge", "anchor": "distillatore", "categoria": "Sinistra", "illegale": true, "scolastico": false, "completamento": false, "livelli":[{"nome": "Medio", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Prestigio": -15.0, "Popolarità": 1.0, "Sinistro": 1.0}, "parametri": {}, "scelta": [], "nota": "Denuncia PG Pozionisti:"}, "seScoperto":null}]},
+  {"nome": "Il Distruttore", "anchor": "distruttore", "categoria": "Sinistra", "illegale": true, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": "Se Scoperto", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": "Se Scoperto", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": "Se Scoperto", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 4.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Evasore Fiscale", "anchor": "evasore", "categoria": "Sinistra", "illegale": true, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": "Se Scoperto", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 5.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Giocatore d'Azzardo", "anchor": "giocatoreazzardo", "categoria": "Sinistra", "illegale": true, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Sinistro": 0.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "nota": "Denuncia"}},{"nome": "Medio", "requisiti": "2 Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Sinistro": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "nota": "Denuncia"}},{"nome": "Difficile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Sinistro": 1.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "nota": "Denuncia"}},{"nome": "Estremo", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 7.0, "altri": {"Sinistro": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Indiscreto", "anchor": "indiscreto", "categoria": "Sinistra", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 0.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 0.5}, "parametri": {}, "nota": null}},{"nome": "Medio", "requisiti": "0,5 Sinistro", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 1.0}, "parametri": {}, "nota": null}},{"nome": "Difficile", "requisiti": "3 Sinistri", "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 1.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 1.5}, "parametri": {}, "nota": null}},{"nome": "Estremo", "requisiti": "4 Sinistri", "complessa": false, "premio": {"ppPostRate": 2.5, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0}, "parametri": {}, "nota": null}}]},
+  {"nome": "L'Infido", "anchor": "infido", "categoria": "Sinistra", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "2 Sinistro", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Sinistro": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0}, "parametri": {}, "nota": null}}]},
+  {"nome": "L'Intrepido", "anchor": "intrepido", "categoria": "Sinistra", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 0.5}, "parametri": {}, "scelta": [], "nota": "in cui viene mosso il PNG"}, "seScoperto":null},{"nome": "Medio", "requisiti": "2 Sinistri", "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 1.0}, "parametri": {}, "scelta": [], "nota": "(per un massimo di 5 post)"}, "seScoperto":null},{"nome": "Difficile", "requisiti": "4 Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Sinistro": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Ladro", "anchor": "ladro", "categoria": "Sinistra", "illegale": true, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facille", "requisiti": "Se Scoperto", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": "Se Scoperto", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": "5 Sinistri", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 3.0}, "parametri": {}, "nota": "Denuncia"}},{"nome": "Estremo", "requisiti": "10 Sinistri", "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 5.0}, "parametri": {}, "nota": "Denuncia"}}]},
+  {"nome": "Il Libero Coltivatore", "anchor": "liberocolt", "categoria": "Sinistra", "illegale": true, "scolastico": false, "completamento": false, "livelli":[{"nome": "Medio", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Prestigio": -15.0, "Popolarità": 1.0, "Sinistro": 1.0}, "parametri": {}, "scelta": [], "nota": "Denuncia PG Erbologi:"}, "seScoperto":null}]},
+  {"nome": "Il Mercenario", "anchor": "mercenario", "categoria": "Sinistra", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Vario", "requisiti": "A seconda della Missione", "complessa": true, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": "Galeoni dal PG PNG Richiedente Premi previsti dalla Missione svolta"}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Prestigio": -20.0, "Popolarità": 10.0}, "parametri": {}, "nota": "Conseguenze previste dalla Missione"}}]},
+  {"nome": "L'Oscuro", "anchor": "oscuro", "categoria": "Sinistra", "illegale": true, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 1.0, "altri": {"Sinistro": 0.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "nota": null}},{"nome": "Medio", "requisiti": "3 Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Sinistro": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "nota": "Denuncia"}},{"nome": "Difficile", "requisiti": "5 Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Sinistro": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Prestigio": -10.0}, "parametri": {}, "nota": "Denuncia"}},{"nome": "Estremo", "requisiti": "20 Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 15.0, "altri": {"Sinistro": 10.0}, "parametri": {"Empatia": 10.0}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 20.0}, "parametri": {}, "nota": "Prestigio = 0 Arresto"}}]},
+  {"nome": "\"Il PG voleva decisamente mutilare o ferire gravemente\"", "anchor": "decisamente", "categoria": "Sinistra", "illegale": true, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Sinistro": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 1.0}, "parametri": {}, "nota": null}},{"nome": "Medio", "requisiti": "2 Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Sinistro": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0}, "parametri": {}, "nota": "Denuncia"}},{"nome": "Difficile", "requisiti": "4 Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 10.0, "altri": {"Sinistro": 4.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 4.0}, "parametri": {}, "nota": "Denuncia"}},{"nome": "Estremo", "requisiti": "10 Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 15.0, "altri": {"Sinistro": 10.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Prestigio": -10.0, "Popolarità": 5.0}, "parametri": {}, "nota": "Denuncia"}},{"nome": "Proibitivo", "requisiti": "15 Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 20.0, "altri": {"Sinistro": 15.0}, "parametri": {"Empatia": 5.0}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 20.0}, "parametri": {}, "nota": "Prestigio = 0 Arresto"}}]},
+  {"nome": "Il Randagio", "anchor": "randagio", "categoria": "Sinistra", "illegale": true, "scolastico": false, "completamento": true, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Prestigio": -30.0, "Popolarità": 10.0, "Sinistro": 1.5}, "parametri": {}, "scelta": [], "nota": "Denuncia"}, "seScoperto":null}]},
+  {"nome": "Il Rapinatore", "anchor": "rapinatore", "categoria": "Sinistra", "illegale": true, "scolastico": false, "completamento": false, "livelli":[{"nome": "Estremo", "requisiti": "Se fermato", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 5.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Rivoltoso", "anchor": "rivoltoso", "categoria": "Sinistra", "illegale": true, "scolastico": false, "completamento": false, "livelli":[{"nome": "Vario", "requisiti": "Premi", "complessa": true, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": "Sinistri Altri premi stabiliti dal Narratore in base alle circostanze td> Denuncia Altre conseguenze stabilite dal Narratore in base alle circostanze"}, "seScoperto":null}]},
+  {"nome": "Lo Scienziato", "anchor": "scienziato", "categoria": "Sinistra", "illegale": true, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Sinistro": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "nota": "Denuncia"}},{"nome": "Medio", "requisiti": "3 Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Sinistro": 1.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "nota": "Denuncia"}},{"nome": "Difficile", "requisiti": "5 Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Sinistro": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0}, "parametri": {}, "nota": "Denuncia"}}]},
+  {"nome": "Lo Scippatore", "anchor": "scippatore", "categoria": "Sinistra", "illegale": true, "scolastico": false, "completamento": false, "livelli":[{"nome": "Difficile", "requisiti": "5 Sinistri", "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Prestigio": -20.0, "Popolarità": 3.0}, "parametri": {}, "nota": "Denuncia"}}]},
+  {"nome": "Il Tossico", "anchor": "tossico", "categoria": "Sinistra", "illegale": true, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": 3, "ppFisso": null, "altri": {"Sinistro": 0.5}, "parametri": {}, "scelta": [], "nota": "()"}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 1.0}, "parametri": {}, "nota": "Denuncia"}},{"nome": "Medio", "requisiti": null, "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": 3, "ppFisso": null, "altri": {"Sinistro": 1.0}, "parametri": {}, "scelta": [], "nota": "()"}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 1.5}, "parametri": {}, "nota": "Denuncia"}},{"nome": "Difficile", "requisiti": null, "complessa": true, "premio": {"ppPostRate": 2.0, "ppPostCap": 3, "ppFisso": null, "altri": {"Sinistro": 1.5}, "parametri": {}, "scelta": [], "nota": "()"}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0}, "parametri": {}, "nota": "Denuncia"}}]},
+  {"nome": "Il Viandante", "anchor": "viandante", "categoria": "Sinistra", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 1.0}, "parametri": {}, "scelta": [], "nota": "(per un massimo di 5 post)"}, "seScoperto":null},{"nome": "Medio", "requisiti": "2 Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Popolarità": 1.0, "Sinistro": 1.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": "5 Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Popolarità": 1.5, "Sinistro": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Estremo", "requisiti": "15 Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 10.0, "altri": {"Popolarità": 2.0, "Sinistro": 2.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Accumulatore", "anchor": "accumulatore", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": true, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Accusato", "anchor": "accusato", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": true, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 3.0}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": "della role del Processo"}, "seScoperto":null}]},
+  {"nome": "L'Accusatore", "anchor": "accusatore", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": true, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 3.0}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": "della role del Processo"}, "seScoperto":null}]},
+  {"nome": "L'Acumen", "anchor": "acumen", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[]},
+  {"nome": "L'Ammalato", "anchor": "ammalato", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": true, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0}, "parametri": {}, "scelta": [], "nota": "( se la role è ambientata al San Mungo)"}, "seScoperto":null}]},
+  {"nome": "L'Animus", "anchor": "animus", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": "PG Animus o Magizoologo o Erbologo", "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": 5, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [{"valore": 0.5, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": "()"}, "seScoperto":null}]},
+  {"nome": "L'Arbitro", "anchor": "arbitro", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": true, "premio": {"ppPostRate": 3.0, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 4.0, "Sinistro": 3.0}, "parametri": {}, "scelta": [], "nota": "di arbitraggio masterazione"}, "seScoperto":null}]},
+  {"nome": "L'Ars", "anchor": "ars", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": "Ars o Pozionisti o Medimaghi", "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": 5, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [{"valore": 0.5, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": "()"}, "seScoperto":null}]},
+  {"nome": "L'Artigiano", "anchor": "artigiano", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "Ricette degli Oggetti", "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Associato", "anchor": "associato", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 1.5, "altri": {}, "parametri": {}, "scelta": [], "nota": "per ogni post con PNG"}, "seScoperto":null}]},
+  {"nome": "L'Auror", "anchor": "auror", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "PG Auror PG Numen anche non Auror", "complessa": true, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Prestigio": 2.0}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": "(fino a un massimo di 5) (solo se completata con successo)"}, "seScoperto":null}]},
+  {"nome": "L'Avventuriero", "anchor": "avventuriero", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": true, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Bugiardo vs Intuitivo", "anchor": "bugiardo", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "Requisiti", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {}, "parametri": {}, "scelta": [{"valore": 0.5, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Cercasi Freelance", "anchor": "cercasi", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {}, "parametri": {}, "scelta": [{"valore": 0.5, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Cliente Neutrale", "anchor": "clienteneutrale", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Popolarità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "I Compari", "anchor": "compari", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 20.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Cronista", "anchor": "cronista", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Deludente", "anchor": "deludente", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 10.0, "altri": {"Popolarità": 2.0}, "parametri": {}, "scelta": [{"valore": 3.0, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Difensore", "anchor": "difensore", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "PG Difensore", "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": 5, "ppFisso": null, "altri": {"Prestigio": 1.0}, "parametri": {}, "scelta": [{"valore": 0.5, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": "()"}, "seScoperto":null}]},
+  {"nome": "Il Diplomatico", "anchor": "diplomatico", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "PG Diplomatici PG Non Diplomatici", "complessa": true, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Prestigio": 2.0}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": "(fino a un massimo di 5) (solo se completata con successo e solo per i PG Diplomatici)"}, "seScoperto":null}]},
+  {"nome": "Il Divinatore", "anchor": "divinatore", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "PG Divinatore", "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": 5, "ppFisso": null, "altri": {"Prestigio": 1.0}, "parametri": {}, "scelta": [{"valore": 0.5, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": "()"}, "seScoperto":null}]},
+  {"nome": "L'Epistolare", "anchor": "epistolare", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Erbologo", "anchor": "erbologo", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "PG Erbologo", "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": 5, "ppFisso": null, "altri": {"Prestigio": 1.0}, "parametri": {}, "scelta": [{"valore": 0.5, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": "()"}, "seScoperto":null}]},
+  {"nome": "L'Escursionista", "anchor": "escursionista", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": true, "livelli":[{"nome": "Unico", "requisiti": "5 Virtuosi o Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 7.0, "altri": {"Popolarità": 1.5}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Esotico", "anchor": "esotico", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Freelance", "anchor": "freelance", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "PG Cameriere, Difensore, Divinatore, Erbologo, Locandiere, Magizoolgo, Negoziante, Pozionista, Spezzaincantesimi", "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": 5, "ppFisso": null, "altri": {"Prestigio": 1.0}, "parametri": {}, "scelta": [], "nota": "()"}, "seScoperto":null}]},
+  {"nome": "Il Giocatore Incallito", "anchor": "giocatoreincallito", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "3 Virtuosi o Sinistri", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Popolarità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Giornalista", "anchor": "giornalista", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "PG Giornalista", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Prestigio": 2.0, "Popolarità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "La Guida", "anchor": "guida", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "PG Notevole o Veterano", "complessa": true, "premio": {"ppPostRate": 2.0, "ppPostCap": 5, "ppFisso": null, "altri": {"Prestigio": 1.0}, "parametri": {}, "scelta": [], "nota": "()"}, "seScoperto":null}]},
+  {"nome": "L'Insegnante", "anchor": "insegnante", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "5 Virtuoso o Sinistro", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Intervistato", "anchor": "intervistato", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Prestigio": -1.0, "Popolarità": 1.0}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Sinistro", "Virtuoso"]}], "nota": "se viene detto qualcosa di positivo o negativo riguardo il suo lavoro"}, "seScoperto":null}]},
+  {"nome": "L'Intracciabile", "anchor": "intracciabile", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "PG Intracciabile", "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": 5, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [{"valore": 0.5, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": "()"}, "seScoperto":null}]},
+  {"nome": "Locandiere e Cameriere", "anchor": "locandiere", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "PG Locandiere o Cameriere", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Magizoologo", "anchor": "magizoologo", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "PG Magizoologo", "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": 5, "ppFisso": null, "altri": {"Prestigio": 1.0}, "parametri": {}, "scelta": [{"valore": 0.5, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": "()"}, "seScoperto":null}]},
+  {"nome": "Il Medimago", "anchor": "medimago", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "PG Medimago PG Ars anche non Medimago", "complessa": true, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Prestigio": 2.0}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": "(fino a un massimo di 5)"}, "seScoperto":null}]},
+  {"nome": "Il Negoziante", "anchor": "negoziante", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "PG Negoziante", "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": 5, "ppFisso": null, "altri": {"Prestigio": 1.0, "Popolarità": 0.5}, "parametri": {}, "scelta": [{"valore": 0.5, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": "() ogni 3 role nel suo Negozio"}, "seScoperto":null}]},
+  {"nome": "Il Nostalgico", "anchor": "nostalgico", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Nottempista", "anchor": "nottempista", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Novellino", "anchor": "novellino", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "PG Neo o Esperto Lavoratore", "complessa": false, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Prestigio": 0.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Numen", "anchor": "numen", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[]},
+  {"nome": "Il Pedinato", "anchor": "pedinato", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Politico", "anchor": "politico", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "20 Popolarità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 7.0, "altri": {"Popolarità": 1.0}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Popolare", "anchor": "popolare", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "10 Popolarità", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 10.0, "altri": {"Popolarità": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Pozionista", "anchor": "pozionista", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "PG Pozionista", "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": 5, "ppFisso": null, "altri": {"Prestigio": 1.0}, "parametri": {}, "scelta": [{"valore": 0.5, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": "()"}, "seScoperto":null}]},
+  {"nome": "Il Prestigioso", "anchor": "prestigioso", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": true, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 10.0, "altri": {"Virtuoso": 3.0}, "parametri": {}, "scelta": [], "nota": "5 Popolairtà Sinistri 400 Galeoni"}, "seScoperto":null}]},
+  {"nome": "Il Protestatore", "anchor": "protestatore", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 1.0}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Quidditcher", "anchor": "quidditcher", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Popolarità": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Sensus", "anchor": "sensus", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": "PG Sensus o Divinatore", "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": 5, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [{"valore": 0.5, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": "()"}, "seScoperto":null}]},
+  {"nome": "Lo Spezzaincantesimi", "anchor": "spezzaincantesimi", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "PG Spezzaincantesimi PG Acumen anche non Spezzaincantesimi", "complessa": true, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Prestigio": 2.0}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": "(fino a un massimo di 5) (solo per i PG che la completano con successo)"}, "seScoperto":null}]},
+  {"nome": "Il Supporter", "anchor": "supporter", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Sinistro": 0.5}, "parametri": {}, "scelta": [], "nota": "alla fine della partita"}, "seScoperto":null}]},
+  {"nome": "Il Terzo Occhio", "anchor": "terzoocchio", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "PG Non Divinatore di Mestiere", "complessa": false, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 1.0}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Virtuoso", "Sinistro"]}], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Venditore (Adulto)", "anchor": "venditore", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": true, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Sinistro": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Viaggiatore", "anchor": "viaggiatore", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": true, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": "A discrezione del Narratore: \\ Punti Sinistri o Virtuosi \\ Popolarità e Prestigio in base alla circostanza \\ Varie ed eventuali"}, "seScoperto":null}]},
+  {"nome": "Il Visitatore", "anchor": "visitatore", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": 3, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": "()"}, "seScoperto":null}]},
+  {"nome": "Il Voluntas", "anchor": "voluntas", "categoria": "Neutrale", "illegale": false, "scolastico": false, "completamento": false, "livelli":[]},
+  {"nome": "L'Adulto Confidente", "anchor": "adultoconfidente", "categoria": "Virtuosa", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 1.0, "altri": {"Virtuoso": 0.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Virtuoso": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio [font=medievalsharp][color=darkred]Sinistro[/color][/font]", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Sinistro": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": null, "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Virtuoso": 5.0}, "parametri": {}, "scelta": [], "nota": "della role di investimento"}, "seScoperto":null},{"nome": "Difficile [font=medievalsharp][color=darkred]Sinistro[/color][/font]", "requisiti": "5 Sinistro", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 10.0, "altri": {"Sinistro": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Adulto Soccorritore", "anchor": "adultosoccorritore", "categoria": "Virtuosa", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Virtuoso": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Altruista", "anchor": "altruista", "categoria": "Virtuosa", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "3 Virtuosi", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 4.0, "altri": {"Virtuoso": 1.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Amico Fedele", "anchor": "amicofedele", "categoria": "Virtuosa", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 1.5, "altri": {"Virtuoso": 0.5}, "parametri": {}, "scelta": [], "nota": "per ogni post con PNG"}, "seScoperto":null}]},
+  {"nome": "Il Babbanofilo", "anchor": "babbanofilo", "categoria": "Virtuosa", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0, "Virtuoso": 2.0}, "parametri": {}, "scelta": [], "nota": "se viene citato il nome del PG Babbanofilo"}, "seScoperto":null}]},
+  {"nome": "Il Cauto", "anchor": "cauto", "categoria": "Virtuosa", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Virtuoso": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Cliente Virtuoso", "anchor": "clientevirtuoso", "categoria": "Virtuosa", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": true, "premio": {"ppPostRate": 1.5, "ppPostCap": null, "ppFisso": null, "altri": {"Virtuoso": 0.5}, "parametri": {}, "scelta": [], "nota": "(per un massimo di 5 post)"}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Virtuoso": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Popolarità": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Commerciante Virtuoso", "anchor": "commerciantevirtuoso", "categoria": "Virtuosa", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Facile", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Virtuoso": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Virtuoso": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Contribuente", "anchor": "contribuente", "categoria": "Virtuosa", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Virtuoso": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Coraggioso", "anchor": "coraggioso", "categoria": "Virtuosa", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "5 Virtuosi", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Virtuoso": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Cuore Grande", "anchor": "cuoregrande", "categoria": "Virtuosa", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "Non PG Magizoologo/Animus", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Virtuoso": 0.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "L'Imparziale", "anchor": "imparziale", "categoria": "Virtuosa", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "2 Virtuosi PG Giornalista", "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Popolarità": 2.0, "Virtuoso": 1.0}, "parametri": {}, "scelta": [], "nota": "PG Imparziale Giornalista: ; PG Lodato: Prestigio da formula in Livelli;"}, "seScoperto":null}]},
+  {"nome": "L'Infiltrato", "anchor": "infiltrato", "categoria": "Virtuosa", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "5 Virtuosi", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 6.0, "altri": {"Virtuoso": 3.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 3.0}, "parametri": {}, "nota": null}}]},
+  {"nome": "L'Investigatore", "anchor": "investigatore", "categoria": "Virtuosa", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "2 Virtuosi", "complessa": false, "premio": {"ppPostRate": 2.5, "ppPostCap": null, "ppFisso": null, "altri": {"Virtuoso": 2.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":{"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {"Popolarità": 2.0}, "parametri": {}, "nota": null}}]},
+  {"nome": "Il Mammo Adulto", "anchor": "mammoadulto", "categoria": "Virtuosa", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": null, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Virtuoso": 0.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Il Protettore", "anchor": "protettore", "categoria": "Virtuosa", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "1 Virtuoso", "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Popolarità": 1.0, "Virtuoso": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+  {"nome": "Lo Scomodo", "anchor": "scomodo", "categoria": "Virtuosa", "illegale": false, "scolastico": false, "completamento": false, "livelli":[{"nome": "Unico", "requisiti": "2 Virtuosi PG Giornalista", "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 5.0, "altri": {"Popolarità": 2.0, "Sinistro": 2.0}, "parametri": {}, "scelta": [], "nota": "PG Scomodo Giornalista: ; PG Diffamato: Prestigio da formula in Livelli;"}, "seScoperto":null}]},
+];
+
 const ROMANI = { 0: '—', 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V' };
 
 // ============ MOTORE DI CALCOLO — Migliora le tue Sapienze ============
@@ -628,6 +806,9 @@ function costoSviluppoSapienza(livelloPartenza, livelloFinale, tipo) {
 
 // ============ MOTORE DI CALCOLO — Acquista Parametri e Dialettica ============
 const PARAMETRI_MAGICI_FISICI = ['Acume','Empatia','Percezione','Potenza','Tecnica','Volontà','Destrezza','Fatica','Resistenza','Salute'];
+// I Parametri permanenti dati come premio missione seguono la stessa regola
+// "premio piu' alto per tipo, tranne a completamento" gia' usata per Prestigio/Bontà/ecc.
+TIPI_PREMIO.push(...PARAMETRI_MAGICI_FISICI);
 const PREZZO_PARAMETRO_BASE = 100;
 const PREZZO_PARAMETRO_INCREMENTO = 50;
 const PREZZO_PARAMETRO_BLOCCO = 5;
@@ -824,6 +1005,169 @@ function creaCampo(c, extraClass) {
   return f;
 }
 
+// ============ SELETTORE CATALOGO MISSIONI FH/FW (riutilizzabile) ============
+const CATEGORIE_PER_FONTE = { FH: ['Caotica', 'Neutrale', 'Legale'], FW: ['Sinistra', 'Neutrale', 'Virtuosa'] };
+const NOME_FONTE = { FH: 'FantaHogwarts', FW: 'FantaWiz' };
+
+function catalogoDiFonte(fonte) {
+  return fonte === 'FH' ? MISSIONI_FH_RAW : MISSIONI_FW_RAW;
+}
+
+// onCambiamento(dati|null) viene richiamato ogni volta che la selezione cambia.
+// dati = { nome, completamento, illegale, premio: {ppPostRate, ppPostCap, ppFisso, altri, parametri} }
+function creaSelettoreCatalogoMissione(onCambiamento) {
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `
+    <div class="row">
+      <div style="max-width:170px;"><label class="tight">Fonte</label>
+        <select class="cat-fonte"><option value="">—</option><option value="FH">FantaHogwarts</option><option value="FW">FantaWiz</option></select>
+      </div>
+      <div style="max-width:170px;"><label class="tight">Categoria</label><select class="cat-categoria" disabled><option value="">—</option></select></div>
+      <div style="flex:2;"><label class="tight">Missione</label><select class="cat-missione" disabled><option value="">—</option></select></div>
+      <div style="max-width:170px;"><label class="tight">Livello</label><select class="cat-livello" disabled><option value="">—</option></select></div>
+    </div>
+    <div class="cat-dettaglio"></div>
+  `;
+  const fonteSel = wrap.querySelector('.cat-fonte');
+  const catSel = wrap.querySelector('.cat-categoria');
+  const missSel = wrap.querySelector('.cat-missione');
+  const livSel = wrap.querySelector('.cat-livello');
+  const dettaglio = wrap.querySelector('.cat-dettaglio');
+
+  function popolaSelect(sel, opzioni, abilitato) {
+    sel.innerHTML = '<option value="">—</option>' + opzioni.map(o => `<option value="${o}">${o}</option>`).join('');
+    sel.disabled = !abilitato;
+  }
+  function reset(daLivello) {
+    if (!daLivello) { popolaSelect(missSel, [], false); popolaSelect(livSel, [], false); }
+    dettaglio.innerHTML = '';
+    onCambiamento(null);
+  }
+
+  fonteSel.addEventListener('change', () => {
+    const fonte = fonteSel.value;
+    if (!fonte) { popolaSelect(catSel, [], false); reset(false); return; }
+    popolaSelect(catSel, CATEGORIE_PER_FONTE[fonte], true);
+    reset(false);
+  });
+
+  catSel.addEventListener('change', () => {
+    const fonte = fonteSel.value, cat = catSel.value;
+    if (!cat) { reset(false); return; }
+    const nomi = catalogoDiFonte(fonte).filter(m => m.categoria === cat).map(m => m.nome).sort((a, b) => a.localeCompare(b, 'it'));
+    popolaSelect(missSel, nomi, true);
+    popolaSelect(livSel, [], false);
+    dettaglio.innerHTML = '';
+    onCambiamento(null);
+  });
+
+  missSel.addEventListener('change', () => {
+    const missione = catalogoDiFonte(fonteSel.value).find(m => m.nome === missSel.value);
+    if (!missione) { popolaSelect(livSel, [], false); dettaglio.innerHTML = ''; onCambiamento(null); return; }
+    popolaSelect(livSel, missione.livelli.map(l => l.nome), true);
+    dettaglio.innerHTML = '';
+    onCambiamento(null);
+  });
+
+  livSel.addEventListener('change', () => {
+    const missione = catalogoDiFonte(fonteSel.value).find(m => m.nome === missSel.value);
+    const liv = missione ? missione.livelli.find(l => l.nome === livSel.value) : null;
+    if (!liv) { dettaglio.innerHTML = ''; onCambiamento(null); return; }
+    renderDettaglio(missione, liv);
+  });
+
+  function renderDettaglio(missione, liv) {
+    dettaglio.innerHTML = '';
+
+    if (liv.requisiti) {
+      const req = document.createElement('div');
+      req.className = 'hint';
+      req.style.marginTop = '10px';
+      req.innerHTML = `📋 <b>Requisiti</b> (verificali tu, il tool non li controlla): ${liv.requisiti}`;
+      dettaglio.appendChild(req);
+    }
+
+    let scopertoInput = null;
+    if (liv.seScoperto) {
+      const box = document.createElement('div');
+      box.className = 'fmt-case';
+      box.style.marginTop = '10px';
+      const gname = 'catscoperto_' + Math.random().toString(36).slice(2);
+      box.innerHTML = `
+        <div class="fmt-case-label">Sei stato scoperto mentre la facevi?</div>
+        <div class="radio-option"><input type="radio" name="${gname}" value="no" class="cat-scoperto-radio" checked><label>No</label></div>
+        <div class="radio-option"><input type="radio" name="${gname}" value="si" class="cat-scoperto-radio"><label>Sì — aggiungi anche il premio "se scoperto"</label></div>`;
+      dettaglio.appendChild(box);
+      scopertoInput = box;
+      box.addEventListener('change', emetti);
+    }
+
+    let sceltaInput = null;
+    if (liv.premio.scelta && liv.premio.scelta.length) {
+      const sc = liv.premio.scelta[0];
+      const box = document.createElement('div');
+      box.className = 'fmt-case';
+      box.style.marginTop = '10px';
+      const gname = 'catscelta_' + Math.random().toString(36).slice(2);
+      box.innerHTML = `
+        <div class="fmt-case-label">Il premio ti fa scegliere: quale preferisci?</div>
+        <div class="radio-option"><input type="radio" name="${gname}" value="0" class="cat-scelta-radio" checked><label>${sc.valore >= 0 ? '+' : ''}${sc.valore} ${sc.opzioni[0]}</label></div>
+        <div class="radio-option"><input type="radio" name="${gname}" value="1" class="cat-scelta-radio"><label>${sc.valore >= 0 ? '+' : ''}${sc.valore} ${sc.opzioni[1]}</label></div>`;
+      dettaglio.appendChild(box);
+      sceltaInput = box;
+      box.addEventListener('change', emetti);
+    }
+
+    if (liv.premio.nota) {
+      const nota = document.createElement('div');
+      nota.className = 'hint';
+      nota.style.cssText = 'margin-top:10px; border-left-color:var(--red); background:var(--red-soft); color:#5C2020;';
+      nota.innerHTML = `⚠️ <b>Parte del premio non è tradotta automaticamente in numeri</b> — testo originale: <i>"${liv.premio.nota}"</i>. Aggiungi tu questa parte nei campi "Altri premi" qui sotto, in base a quanto ti è stato comunicato.`;
+      dettaglio.appendChild(nota);
+    }
+
+    const riepilogo = document.createElement('div');
+    riepilogo.className = 'role-summary';
+    riepilogo.style.marginTop = '10px';
+    dettaglio.appendChild(riepilogo);
+
+    function emetti() {
+      const premio = {
+        ppPostRate: liv.premio.ppPostRate, ppPostCap: liv.premio.ppPostCap, ppFisso: liv.premio.ppFisso,
+        altri: { ...liv.premio.altri }, parametri: { ...liv.premio.parametri }
+      };
+      if (scopertoInput && scopertoInput.querySelector('.cat-scoperto-radio:checked').value === 'si') {
+        if (liv.seScoperto.ppPostRate) premio.ppPostRate = (premio.ppPostRate || 0) + liv.seScoperto.ppPostRate;
+        if (liv.seScoperto.ppFisso) premio.ppFisso = (premio.ppFisso || 0) + liv.seScoperto.ppFisso;
+        for (const [k, v] of Object.entries(liv.seScoperto.altri || {})) premio.altri[k] = (premio.altri[k] || 0) + v;
+        for (const [k, v] of Object.entries(liv.seScoperto.parametri || {})) premio.parametri[k] = (premio.parametri[k] || 0) + v;
+      }
+      if (sceltaInput) {
+        const sc = liv.premio.scelta[0];
+        const idx = parseInt(sceltaInput.querySelector('.cat-scelta-radio:checked').value, 10);
+        const statScelta = sc.opzioni[idx];
+        premio.altri[statScelta] = (premio.altri[statScelta] || 0) + sc.valore;
+      }
+      const pezzi = [];
+      if (premio.ppPostRate) pezzi.push(`${normNum(premio.ppPostRate)} PP/post${premio.ppPostCap ? ' (tetto ' + premio.ppPostCap + ')' : ''}`);
+      if (premio.ppFisso) pezzi.push(`${premio.ppFisso >= 0 ? '+' : ''}${normNum(premio.ppFisso)} PP fissi`);
+      Object.entries(premio.altri).forEach(([k, v]) => { if (v) pezzi.push(`${v >= 0 ? '+' : ''}${normNum(v)} ${k}`); });
+      Object.entries(premio.parametri).forEach(([k, v]) => { if (v) pezzi.push(`${v >= 0 ? '+' : ''}${normNum(v)} ${k} (permanente)`); });
+      riepilogo.textContent = `Premio calcolato: ${pezzi.join(', ') || 'nessuno (solo la parte manuale sopra, se presente)'}`;
+
+      onCambiamento({
+        nome: `${missione.nome} (${liv.nome}${fonteSel.value ? ' — ' + NOME_FONTE[fonteSel.value] : ''})`,
+        completamento: missione.completamento,
+        illegale: missione.illegale,
+        premio
+      });
+    }
+    emetti();
+  }
+
+  return wrap;
+}
+
 function creaMissioneCard() {
   missioneCounter++;
   const mid = 'm' + missioneCounter;
@@ -850,19 +1194,6 @@ function creaMissioneCard() {
   const body = document.createElement('div');
   body.className = 'acc-body';
 
-  const rigaNome = document.createElement('div');
-  rigaNome.className = 'row';
-  rigaNome.innerHTML = `
-    <div><label class="tight">Nome missione</label><input type="text" class="f-nome" placeholder="es. Il Magizoologo"></div>
-    <div style="max-width:150px"><label class="tight">Livello</label>
-      <select class="f-livello">
-        <option value="">—</option>
-        <option>Facile</option><option>Medio</option><option>Difficile</option><option>Estremo</option>
-      </select>
-    </div>
-  `;
-  body.appendChild(rigaNome);
-
   // --- helper per costruire una domanda a scelta radio ---
   function creaDomanda(numero, titolo, nomeGruppo, opzioni, onChange) {
     const wrap = document.createElement('div');
@@ -870,7 +1201,7 @@ function creaMissioneCard() {
     wrap.style.marginTop = '12px';
     const label = document.createElement('div');
     label.className = 'fmt-case-label';
-    label.textContent = `${numero}. ${titolo}`;
+    label.textContent = numero ? `${numero}. ${titolo}` : titolo;
     wrap.appendChild(label);
     opzioni.forEach((op, i) => {
       const id = `${mid}_${nomeGruppo}_${i}`;
@@ -886,14 +1217,69 @@ function creaMissioneCard() {
     return wrap;
   }
 
-  // --- Domanda 1: a completamento? ---
+  // --- Sorgente: dal catalogo (default) o scritta a mano ---
+  const domandaSorgente = creaDomanda(null, 'Come vuoi compilare questa missione?', 'sorgente', [
+    { value: 'catalogo', label: '📚 La scelgo dal catalogo FH/FW', desc: 'consigliato: premi già compilati automaticamente' },
+    { value: 'manuale', label: '✏️ La scrivo a mano', desc: 'usa questa se la missione non è ancora a catalogo o è stata modificata di recente' }
+  ], (val) => {
+    catalogoWrap.style.display = val === 'catalogo' ? 'block' : 'none';
+    manualeWrap.style.display = val === 'manuale' ? 'block' : 'none';
+    if (val === 'catalogo') { resetCampiCondivisi(); }
+  });
+  body.appendChild(domandaSorgente);
+
+  // ============ CAMPI CONDIVISI (letti da leggiRoleDalDOM, alimentati da entrambe le modalità) ============
+  const inputNomeNascosto = document.createElement('input');
+  inputNomeNascosto.type = 'hidden'; inputNomeNascosto.className = 'f-nome';
+  body.appendChild(inputNomeNascosto);
+
+  function resetCampiCondivisi() {
+    div.querySelectorAll('.f-premio').forEach(i => i.value = '');
+    div.querySelector('.f-completamento-radio[value="no"]').checked = true;
+  }
+
+  // ============ MODALITÀ CATALOGO ============
+  const catalogoWrap = document.createElement('div');
+  catalogoWrap.style.marginTop = '10px';
+  const selettoreCatalogo = creaSelettoreCatalogoMissione((dati) => {
+    if (!dati) { resetCampiCondivisi(); inputNomeNascosto.value = ''; aggiornaPreview(); return; }
+    inputNomeNascosto.value = dati.nome;
+    div.querySelector(`.f-completamento-radio[value="${dati.completamento ? 'si' : 'no'}"]`).checked = true;
+    const setVal = (key, val) => { const el = div.querySelector(`.f-premio[data-key="${key}"]`); if (el) el.value = (val === null || val === undefined || val === 0) ? '' : val; };
+    setVal('ppPostRate', dati.premio.ppPostRate);
+    setVal('ppPostCap', dati.premio.ppPostCap);
+    setVal('ppFisso', dati.premio.ppFisso);
+    CAMPI_ALTRI.forEach(c => setVal(c.key, dati.premio.altri[c.key] || 0));
+    PARAMETRI_MAGICI_FISICI.forEach(p => setVal(p, dati.premio.parametri[p] || 0));
+    aggiornaPreview();
+  });
+  catalogoWrap.appendChild(selettoreCatalogo);
+  body.appendChild(catalogoWrap);
+
+  // ============ MODALITÀ MANUALE (flusso originale a 3 domande) ============
+  const manualeWrap = document.createElement('div');
+  manualeWrap.style.cssText = 'margin-top:10px; display:none;';
+
+  const rigaNome = document.createElement('div');
+  rigaNome.className = 'row';
+  rigaNome.innerHTML = `
+    <div><label class="tight">Nome missione</label><input type="text" class="f-nome-manuale" placeholder="es. Il Magizoologo"></div>
+    <div style="max-width:150px"><label class="tight">Livello</label>
+      <select class="f-livello">
+        <option value="">—</option>
+        <option>Facile</option><option>Medio</option><option>Difficile</option><option>Estremo</option>
+      </select>
+    </div>
+  `;
+  manualeWrap.appendChild(rigaNome);
+  rigaNome.querySelector('.f-nome-manuale').addEventListener('input', (e) => { inputNomeNascosto.value = e.target.value.trim(); aggiornaPreview(); });
+
   const domandaComp = creaDomanda(1, 'Questa missione è "a completamento"?', 'completamento', [
     { value: 'no', label: 'No', desc: 'è una missione normale: se hai più missioni nella stessa Role, vale solo il premio più alto tra quelle non a completamento' },
     { value: 'si', label: 'Sì', desc: 'il premio si somma sempre per intero, indipendentemente dalle altre missioni' }
   ], () => aggiornaPreview());
-  body.appendChild(domandaComp);
+  manualeWrap.appendChild(domandaComp);
 
-  // --- Domanda 2: formato del premio in PP ---
   const gridPPa = creaCampo({ key: 'ppPostRate', label: 'PP a post' }, 'f-premio');
   const gridPPtetto = creaCampo({ key: 'ppPostCap', label: 'Tetto post', placeholder: 'vuoto = nessun limite' }, 'f-premio');
   const campoPPfisso = creaCampo({ key: 'ppFisso', label: 'PP fisso' }, 'f-premio');
@@ -915,11 +1301,10 @@ function creaMissioneCard() {
     if (val !== 'post') { gridPPa.querySelector('input').value = ''; gridPPtetto.querySelector('input').value = ''; }
     if (val !== 'fisso') { campoPPfisso.querySelector('input').value = ''; }
   });
-  body.appendChild(domandaPP);
-  body.appendChild(wrapPPaPost);
-  body.appendChild(wrapPPfisso);
+  manualeWrap.appendChild(domandaPP);
+  manualeWrap.appendChild(wrapPPaPost);
+  manualeWrap.appendChild(wrapPPfisso);
 
-  // --- Domanda 3: altri premi oltre ai PP? ---
   const altriBody = document.createElement('div');
   altriBody.className = 'grid-rewards wide';
   altriBody.style.cssText = 'margin-top:10px; display:none;';
@@ -932,23 +1317,35 @@ function creaMissioneCard() {
     altriBody.style.display = val === 'si' ? 'grid' : 'none';
     if (val !== 'si') altriBody.querySelectorAll('input').forEach(i => i.value = '');
   });
-  body.appendChild(domandaAltri);
-  body.appendChild(altriBody);
+  manualeWrap.appendChild(domandaAltri);
+  manualeWrap.appendChild(altriBody);
 
+  const parametriBody = document.createElement('div');
+  parametriBody.className = 'grid-rewards wide';
+  parametriBody.style.cssText = 'margin-top:10px; display:none;';
+  PARAMETRI_MAGICI_FISICI.forEach(p => parametriBody.appendChild(creaCampo({ key: p, label: p }, 'f-premio')));
+
+  const domandaParametri = creaDomanda(4, 'Dà come premio un Parametro Magico/Fisico permanente? (raro)', 'parampremio', [
+    { value: 'no', label: 'No' },
+    { value: 'si', label: 'Sì', desc: 'es. "+5 Empatia permanente" — aumento diretto e gratuito del Parametro' }
+  ], (val) => {
+    parametriBody.style.display = val === 'si' ? 'grid' : 'none';
+    if (val !== 'si') parametriBody.querySelectorAll('input').forEach(i => i.value = '');
+  });
+  manualeWrap.appendChild(domandaParametri);
+  manualeWrap.appendChild(parametriBody);
+
+  body.appendChild(manualeWrap);
+
+  // il completamento va sempre letto dallo stesso gruppo radio, anche se il div e' nascosto in modalita' catalogo
   div.appendChild(body);
 
   function aggiornaPreview() {
-    const nome = div.querySelector('.f-nome').value.trim();
-    const livello = div.querySelector('.f-livello').value;
+    const nome = inputNomeNascosto.value.trim();
     const comp = div.querySelector('.f-completamento-radio:checked')?.value === 'si';
     header.querySelector('.missione-title-preview').textContent = nome || 'Nuova missione';
-    const lvlBadge = header.querySelector('.missione-level-badge');
-    lvlBadge.style.display = livello ? 'inline-block' : 'none';
-    lvlBadge.textContent = livello;
     header.querySelector('.missione-comp-badge').style.display = comp ? 'inline-block' : 'none';
   }
-  div.querySelector('.f-nome').addEventListener('input', aggiornaPreview);
-  div.querySelector('.f-livello').addEventListener('change', aggiornaPreview);
 
   return div;
 }
@@ -1076,27 +1473,13 @@ function creaMissioneStandaloneCard() {
   const body = document.createElement('div');
   body.className = 'acc-body';
 
-  const rigaNome = document.createElement('div');
-  rigaNome.className = 'row';
-  rigaNome.innerHTML = `
-    <div><label class="tight">Nome missione</label><input type="text" class="f-nome" placeholder="es. Gli Amiconi"></div>
-    <div><label class="tight">Link (opzionale) <span class="format-tag">prova/riferimento del completamento</span></label><input type="text" class="f-link" placeholder="?t=...#entry..."></div>
-    <div style="max-width:150px"><label class="tight">Livello</label>
-      <select class="f-livello">
-        <option value="">—</option>
-        <option>Facile</option><option>Medio</option><option>Difficile</option><option>Estremo</option>
-      </select>
-    </div>
-  `;
-  body.appendChild(rigaNome);
-
   function creaDomanda(numero, titolo, nomeGruppo, opzioni, onChange) {
     const wrap = document.createElement('div');
     wrap.className = 'fmt-case';
     wrap.style.marginTop = '12px';
     const label = document.createElement('div');
     label.className = 'fmt-case-label';
-    label.textContent = `${numero}. ${titolo}`;
+    label.textContent = numero ? `${numero}. ${titolo}` : titolo;
     wrap.appendChild(label);
     opzioni.forEach((op, i) => {
       const id = `${mid}_${nomeGruppo}_${i}`;
@@ -1110,6 +1493,62 @@ function creaMissioneStandaloneCard() {
     return wrap;
   }
 
+  // --- Link, sempre visibile in entrambe le modalità ---
+  const rigaLink = document.createElement('div');
+  rigaLink.className = 'row';
+  rigaLink.innerHTML = `<div><label class="tight">Link (opzionale) <span class="format-tag">prova/riferimento del completamento</span></label><input type="text" class="f-link" placeholder="?t=...#entry..."></div>`;
+  body.appendChild(rigaLink);
+
+  // --- Sorgente: dal catalogo (default) o scritta a mano ---
+  const domandaSorgente = creaDomanda(null, 'Come vuoi compilare questa missione?', 'sorgente', [
+    { value: 'catalogo', label: '📚 La scelgo dal catalogo FH/FW', desc: 'consigliato: premi già compilati automaticamente' },
+    { value: 'manuale', label: '✏️ La scrivo a mano', desc: 'usa questa se la missione non è ancora a catalogo o è stata modificata di recente' }
+  ], (val) => {
+    catalogoWrap.style.display = val === 'catalogo' ? 'block' : 'none';
+    manualeWrap.style.display = val === 'manuale' ? 'block' : 'none';
+    if (val === 'catalogo') resetCampiCondivisi();
+  });
+  body.appendChild(domandaSorgente);
+
+  // ============ CAMPI CONDIVISI ============
+  const inputNomeNascosto = document.createElement('input');
+  inputNomeNascosto.type = 'hidden'; inputNomeNascosto.className = 'f-nome';
+  body.appendChild(inputNomeNascosto);
+
+  function resetCampiCondivisi() {
+    div.querySelectorAll('.f-premio').forEach(i => i.value = '');
+  }
+
+  // ============ MODALITÀ CATALOGO ============
+  const catalogoWrap = document.createElement('div');
+  catalogoWrap.style.marginTop = '10px';
+  const avvisoPostRate = document.createElement('div');
+  avvisoPostRate.className = 'hint';
+  avvisoPostRate.style.cssText = 'margin-top:10px; display:none; border-left-color:var(--red); background:var(--red-soft); color:#5C2020;';
+  avvisoPostRate.innerHTML = `⚠️ <b>Questa missione dà PP per post scritto</b>, ma qui non c'è una Role a cui collegarli — questo tipo di premio non verrà calcolato. Se l'hai completata durante una Role, usa invece la sezione "Segnala e Riscatta Role".`;
+  const selettoreCatalogo = creaSelettoreCatalogoMissione((dati) => {
+    if (!dati) { resetCampiCondivisi(); inputNomeNascosto.value = ''; avvisoPostRate.style.display = 'none'; aggiornaPreview(); return; }
+    inputNomeNascosto.value = dati.nome;
+    avvisoPostRate.style.display = dati.premio.ppPostRate ? 'block' : 'none';
+    const setVal = (key, val) => { const el = div.querySelector(`.f-premio[data-key="${key}"]`); if (el) el.value = (val === null || val === undefined || val === 0) ? '' : val; };
+    setVal('ppFisso', dati.premio.ppFisso);
+    CAMPI_ALTRI.forEach(c => setVal(c.key, dati.premio.altri[c.key] || 0));
+    PARAMETRI_MAGICI_FISICI.forEach(p => setVal(p, dati.premio.parametri[p] || 0));
+    aggiornaPreview();
+  });
+  catalogoWrap.appendChild(selettoreCatalogo);
+  catalogoWrap.appendChild(avvisoPostRate);
+  body.appendChild(catalogoWrap);
+
+  // ============ MODALITÀ MANUALE ============
+  const manualeWrap = document.createElement('div');
+  manualeWrap.style.cssText = 'margin-top:10px; display:none;';
+
+  const rigaNomeManuale = document.createElement('div');
+  rigaNomeManuale.innerHTML = `<label class="tight">Nome missione</label><input type="text" class="f-nome-manuale" placeholder="es. Gli Amiconi">`;
+  manualeWrap.appendChild(rigaNomeManuale);
+  rigaNomeManuale.querySelector('.f-nome-manuale').addEventListener('input', (e) => { inputNomeNascosto.value = e.target.value.trim(); aggiornaPreview(); });
+
   const campoPPfisso = creaCampo({ key: 'ppFisso', label: 'PP fisso' }, 'f-premio');
   const wrapPPfisso = document.createElement('div');
   wrapPPfisso.style.cssText = 'margin-top:10px; display:none; max-width:220px;';
@@ -1122,8 +1561,8 @@ function creaMissioneStandaloneCard() {
     wrapPPfisso.style.display = val === 'si' ? 'block' : 'none';
     if (val !== 'si') campoPPfisso.querySelector('input').value = '';
   });
-  body.appendChild(domandaPP);
-  body.appendChild(wrapPPfisso);
+  manualeWrap.appendChild(domandaPP);
+  manualeWrap.appendChild(wrapPPfisso);
 
   const altriBody = document.createElement('div');
   altriBody.className = 'grid-rewards wide';
@@ -1137,20 +1576,32 @@ function creaMissioneStandaloneCard() {
     altriBody.style.display = val === 'si' ? 'grid' : 'none';
     if (val !== 'si') altriBody.querySelectorAll('input').forEach(i => i.value = '');
   });
-  body.appendChild(domandaAltri);
-  body.appendChild(altriBody);
+  manualeWrap.appendChild(domandaAltri);
+  manualeWrap.appendChild(altriBody);
+
+  const parametriBody = document.createElement('div');
+  parametriBody.className = 'grid-rewards wide';
+  parametriBody.style.cssText = 'margin-top:10px; display:none;';
+  PARAMETRI_MAGICI_FISICI.forEach(p => parametriBody.appendChild(creaCampo({ key: p, label: p }, 'f-premio')));
+
+  const domandaParametri = creaDomanda(3, 'Dà come premio un Parametro Magico/Fisico permanente? (raro)', 'parampremio', [
+    { value: 'no', label: 'No' },
+    { value: 'si', label: 'Sì', desc: 'es. "+5 Empatia permanente" — aumento diretto e gratuito del Parametro' }
+  ], (val) => {
+    parametriBody.style.display = val === 'si' ? 'grid' : 'none';
+    if (val !== 'si') parametriBody.querySelectorAll('input').forEach(i => i.value = '');
+  });
+  manualeWrap.appendChild(domandaParametri);
+  manualeWrap.appendChild(parametriBody);
+
+  body.appendChild(manualeWrap);
 
   div.appendChild(body);
 
   function aggiornaPreview() {
-    const nome = div.querySelector('.f-nome').value.trim();
-    const livello = div.querySelector('.f-livello').value;
+    const nome = inputNomeNascosto.value.trim();
     header.querySelector('.role-title-preview').textContent = nome || 'Nuova missione';
-    const lvlBadge = header.querySelector('.missione-level-badge');
-    header.querySelector('.role-meta').textContent = livello || '';
   }
-  div.querySelector('.f-nome').addEventListener('input', aggiornaPreview);
-  div.querySelector('.f-livello').addEventListener('change', aggiornaPreview);
 
   return div;
 }
@@ -1875,6 +2326,10 @@ function descriviPremiMissione(m) {
     const v = m[c.key];
     if (v) parti.push(`${v >= 0 ? '+' : ''}${normNum(v)} ${c.label}`);
   });
+  PARAMETRI_MAGICI_FISICI.forEach(p => {
+    const v = m[p];
+    if (v) parti.push(`${v >= 0 ? '+' : ''}${normNum(v)} ${p} (permanente)`);
+  });
   return parti.length ? parti.join(', ') : 'nessun premio dichiarato';
 }
 
@@ -1984,8 +2439,7 @@ function assemblaPostForum(sezioni) {
 function leggiMissioneStandaloneDalDOM(mEl) {
   const nome = mEl.querySelector('.f-nome').value.trim();
   const link = mEl.querySelector('.f-link').value.trim();
-  const livello = mEl.querySelector('.f-livello').value;
-  const m = { nome, link, livello };
+  const m = { nome, link };
   mEl.querySelectorAll('.f-premio').forEach(inp => {
     const key = inp.dataset.key;
     const val = inp.value;
@@ -2001,13 +2455,17 @@ function calcolaMissioneStandalone(m) {
     const v = Number(m[c.key]) || 0;
     if (v) totali[c.key] = (totali[c.key] || 0) + v;
   });
+  PARAMETRI_MAGICI_FISICI.forEach(p => {
+    const v = Number(m[p]) || 0;
+    if (v) totali[p] = (totali[p] || 0) + v;
+  });
   return totali;
 }
 
 function descriviMissioneStandalone(m, totali) {
   const righe = [];
   const titoloLink = m.link ? `[URL=${m.link}]${m.nome || 'Missione senza nome'}[/URL]` : (m.nome || 'Missione senza nome');
-  righe.push(`- ${titoloLink}${m.livello ? ` (Livello ${m.livello})` : ''}`);
+  righe.push(`- ${titoloLink}`);
   const righeTotale = fmtRighe(totali).join(', ');
   righe.push(`  <b>Premio:</b> ${righeTotale || 'nessun premio dichiarato'}`);
   return righe.join('\n');
