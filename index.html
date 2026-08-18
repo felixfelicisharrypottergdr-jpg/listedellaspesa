@@ -202,7 +202,7 @@
 
     <div class="panel">
       <h2>Missioni completate senza una Role <span id="missione_standalone_counter_badge" class="format-tag">0</span></h2>
-      <div class="hint">Usa questa sezione per le missioni a completamento svolte OFFGame o non legate a una Role precisa (es. "raggiungi 10 E in una materia", "spendi 500 Galeoni in un negozio"). Il premio si somma sempre per intero — qui non c'è competizione con altre missioni.</div>
+      <div class="hint">Usa questa sezione per le missioni a completamento svolte OFFGame o non legate a una Role precisa (es. "ruola con 5 PG diversi", "spendi 500 Galeoni in un negozio"). Il premio si somma sempre per intero — qui non c'è competizione con altre missioni.</div>
       <div id="missioni_standalone_list"></div>
       <div id="missioni_standalone_empty" class="empty-state">Nessuna missione di questo tipo ancora aggiunta.</div>
       <button type="button" class="secondary" id="add_missione_standalone_btn">+ Aggiungi missione senza Role</button>
@@ -1003,6 +1003,52 @@ function creaCampo(c, extraClass) {
   return f;
 }
 
+// ============ BLOCCO "PROVE A SUPPORTO" (riutilizzabile) ============
+// Per missioni che richiedono di dimostrare qualcosa (es. tot Role in un luogo,
+// tot PG diversi, tot Role con lo stesso PG): una riga Nome+Link per ogni prova.
+// Nell'output il NOME stesso diventa il link (non un semplice "x"), cosi' il
+// player e' obbligato a inserire un link reale e verificabile.
+function creaRigaProva() {
+  const div = document.createElement('div');
+  div.className = 'row';
+  div.style.alignItems = 'flex-end';
+  div.innerHTML = `
+    <div style="flex:2;"><label class="tight">Nome (PG o Role)</label><input type="text" class="f-prova-nome" placeholder="es. Aster"></div>
+    <div style="flex:2;"><label class="tight">Link</label><input type="text" class="f-prova-link" placeholder="?t=...#entry..."></div>
+    <div style="max-width:44px;"><button type="button" class="danger" style="width:100%;">✕</button></div>
+  `;
+  div.querySelector('button').addEventListener('click', () => div.remove());
+  return div;
+}
+
+function creaBloccoProve() {
+  const wrap = document.createElement('div');
+  wrap.style.marginTop = '12px';
+  const hint = document.createElement('div');
+  hint.className = 'hint';
+  hint.innerHTML = "📎 <b>Prove a supporto</b> <span class='format-tag'>facoltativo — non blocca il calcolo se lo lasci vuoto</span><br>Compilalo solo se QUESTA missione richiede di dimostrare qualcosa (es. tot Role in un luogo, tot PG diversi con cui ti sei ruolato, tot Role con lo stesso PG) — la maggior parte delle missioni non lo richiede affatto. Una riga per ogni prova: nell'output il nome comparirà come link cliccabile.";
+  wrap.appendChild(hint);
+  const list = document.createElement('div');
+  list.className = 'prove_list';
+  wrap.appendChild(list);
+  const addBtn = document.createElement('button');
+  addBtn.type = 'button'; addBtn.className = 'secondary';
+  addBtn.textContent = '+ Aggiungi prova';
+  addBtn.style.marginTop = '6px';
+  addBtn.addEventListener('click', () => list.appendChild(creaRigaProva()));
+  wrap.appendChild(addBtn);
+  return wrap;
+}
+function leggiProveDalDOM(mEl) {
+  return [...mEl.querySelectorAll('.prove_list > .row')].map(r => ({
+    nome: r.querySelector('.f-prova-nome').value.trim(),
+    link: r.querySelector('.f-prova-link').value.trim()
+  })).filter(p => p.nome && p.link);
+}
+function fmtProve(prove) {
+  return (prove && prove.length) ? ` (${prove.map(p => `[URL=${p.link}]${p.nome}[/URL]`).join(', ')})` : '';
+}
+
 // ============ SELETTORE CATALOGO MISSIONI FH/FW (riutilizzabile) ============
 const CATEGORIE_PER_FONTE = { FH: ['Caotica', 'Neutrale', 'Legale'], FW: ['Sinistra', 'Neutrale', 'Virtuosa'] };
 const NOME_FONTE = { FH: 'FantaHogwarts', FW: 'FantaWiz' };
@@ -1342,6 +1388,9 @@ function creaMissioneCard() {
 
   body.appendChild(manualeWrap);
 
+  // --- Prove a supporto: sempre disponibile, indipendentemente da come e' stata compilata la missione ---
+  body.appendChild(creaBloccoProve());
+
   // il completamento va sempre letto dallo stesso gruppo radio, anche se il div e' nascosto in modalita' catalogo
   div.appendChild(body);
 
@@ -1385,7 +1434,7 @@ function creaRoleCard() {
   const rigaBase = document.createElement('div');
   rigaBase.className = 'row';
   rigaBase.innerHTML = `
-    <div><label class="tight">Titolo Role</label><input type="text" class="f-titolo" placeholder="es. Studio matto in Biblioteca"></div>
+    <div><label class="tight">Titolo Role</label><input type="text" class="f-titolo" placeholder="es. Sparks Fly"></div>
     <div><label class="tight">Link Role</label><input type="text" class="f-link" placeholder="?t=...#entry..."></div>
     <div style="max-width:130px"><label class="tight">Post scritti</label><input type="number" class="f-numposts" min="0" step="1"></div>
     <div style="max-width:150px"><label class="tight">Galeoni spesi</label><input type="number" class="f-galeonispesi" min="0" step="1" placeholder="es. locande"></div>
@@ -1600,6 +1649,9 @@ function creaMissioneStandaloneCard() {
   manualeWrap.appendChild(parametriBody);
 
   body.appendChild(manualeWrap);
+
+  // --- Prove a supporto: sempre disponibile, indipendentemente da come e' stata compilata la missione ---
+  body.appendChild(creaBloccoProve());
 
   div.appendChild(body);
 
@@ -2346,7 +2398,7 @@ function descriviRole(role, idx, totaliRole) {
   if (missioniValide.length) {
     righe.push(`<b>Missioni FH/FW completate:</b>`);
     missioniValide.forEach(m => {
-      righe.push(`- ${m.nome}${m.completamento ? ' (missione a completamento)' : ''}: ${descriviPremiMissione(m)}`);
+      righe.push(`- ${m.nome}${fmtProve(m.prove)}${m.completamento ? ' (missione a completamento)' : ''}: ${descriviPremiMissione(m)}`);
     });
   }
   if (role.galeoniSpesi) {
@@ -2450,6 +2502,7 @@ function leggiMissioneStandaloneDalDOM(mEl) {
     const val = inp.value;
     m[key] = val === '' ? 0 : parseFloat(val);
   });
+  m.prove = leggiProveDalDOM(mEl);
   return m;
 }
 
@@ -2470,7 +2523,7 @@ function calcolaMissioneStandalone(m) {
 function descriviMissioneStandalone(m, totali) {
   const righe = [];
   const titoloLink = m.link ? `[URL=${m.link}]${m.nome || 'Missione senza nome'}[/URL]` : (m.nome || 'Missione senza nome');
-  righe.push(`- ${titoloLink}`);
+  righe.push(`- ${titoloLink}${fmtProve(m.prove)}`);
   const righeTotale = fmtRighe(totali).join(', ');
   righe.push(`  <b>Premio:</b> ${righeTotale || 'nessun premio dichiarato'}`);
   return righe.join('\n');
@@ -2493,6 +2546,7 @@ function leggiRoleDalDOM(roleEl) {
       if (key === 'ppPostCap') { m.ppPostCap = val === '' ? null : parseFloat(val); }
       else { m[key] = val === '' ? 0 : parseFloat(val); }
     });
+    m.prove = leggiProveDalDOM(mEl);
     return m;
   });
   return { titolo, link, numPosts, galeoniSpesi, coeffDebito, missioni };
