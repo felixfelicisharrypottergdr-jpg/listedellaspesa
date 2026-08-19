@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -177,6 +179,12 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="panel" style="border: 2px solid var(--gold);">
+    <label class="tight" for="nomePG">Nome del PG <span class="format-tag">obbligatorio · compare nel titolo del post</span></label>
+    <input type="text" id="nomePG" placeholder="es. Mary Sue">
+    <div class="hint" style="margin-top:8px;">Il post generato inizierà con "Lista della Spesa di [Nome]" — evita di doverlo scrivere (o cancellare per sbaglio) a mano.</div>
   </div>
 
   <div class="tab-bar" id="tab_bar"></div>
@@ -1434,7 +1442,7 @@ function creaRoleCard() {
   const rigaBase = document.createElement('div');
   rigaBase.className = 'row';
   rigaBase.innerHTML = `
-    <div><label class="tight">Titolo Role</label><input type="text" class="f-titolo" placeholder="es. Sparks Fly"></div>
+    <div><label class="tight">Titolo Role</label><input type="text" class="f-titolo" placeholder="es. Studio matto in Biblioteca"></div>
     <div><label class="tight">Link Role</label><input type="text" class="f-link" placeholder="?t=...#entry..."></div>
     <div style="max-width:130px"><label class="tight">Post scritti</label><input type="number" class="f-numposts" min="0" step="1"></div>
     <div style="max-width:150px"><label class="tight">Galeoni spesi</label><input type="number" class="f-galeonispesi" min="0" step="1" placeholder="es. locande"></div>
@@ -2480,7 +2488,7 @@ function costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tut
   return righe.join('\n');
 }
 
-function assemblaPostForum(sezioni) {
+function assemblaPostForum(sezioni, nomePG) {
   const blocchi = [];
   if (sezioni.segnala.length) blocchi.push(`[size=13][color=sienna][font=medievalsharp]<b>Segnala e riscatta role e converti PP in Galeoni</b>[/font][/color][/size]\n` + sezioni.segnala.join('\n<hr>\n'));
   if (sezioni.voti.length) blocchi.push(`[size=13][color=cadetblue][font=medievalsharp]<b>Migliora i tuoi Voti</b>[/font][/color][/size]\n` + sezioni.voti.join('\n<hr>\n'));
@@ -2490,7 +2498,8 @@ function assemblaPostForum(sezioni) {
   if (sezioni.commercio.length) blocchi.push(`[size=13][color=seagreen][font=medievalsharp]<b>Commercio Magico</b>[/font][/color][/size]\n` + sezioni.commercio.join('\n<hr>\n'));
   if (!blocchi.length) return '';
   blocchi.push(sezioni.recap);
-  return blocchi.join('\n<hr>\n');
+  const titolo = `[size=13][color=darkred][font=medievalsharp]<b>Lista della Spesa di ${nomePG || 'PG'}</b>[/font][/color][/size]`;
+  return titolo + '\n<hr>\n' + blocchi.join('\n<hr>\n');
 }
 
 function leggiMissioneStandaloneDalDOM(mEl) {
@@ -2923,7 +2932,8 @@ function calcolaTutto() {
   document.getElementById('outBoxG').value = tutteRigheBoxG.length ? tutteRigheBoxG.join('\n') : '(nessuno)';
 
   sezioniPost.recap = costruisciRecapFinale(totaleGenerale);
-  const postNarrativo = assemblaPostForum(sezioniPost);
+  const nomePG = document.getElementById('nomePG').value.trim();
+  const postNarrativo = assemblaPostForum(sezioniPost, nomePG);
   const bloccoDati = postNarrativo ? costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG) : '';
   document.getElementById('outPostForum').value = postNarrativo
     ? postNarrativo + '\n<hr>\n' + bloccoDati
