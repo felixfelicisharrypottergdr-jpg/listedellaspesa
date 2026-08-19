@@ -174,8 +174,8 @@
           <div class="fmt-case-desc">Il pulsante è presente in fondo a ogni sezione, ma non importa da quale lo premi: il calcolo raccoglie automaticamente tutto quello che hai scritto in TUTTE le sezioni compilate, non solo in quella in cui ti trovi.</div>
         </div>
         <div class="fmt-case">
-          <div class="fmt-case-label">4. Copia il risultato dove serve</div>
-          <div class="fmt-case-desc">Si apre la pagina "Risultato" con un riepilogo per ogni sezione compilata, più i Box pronti da incollare: Box A, E, F, G vanno nel <b>Generatore Accrediti</b>; il blocco "Conoscenze Acquistate" (se presente) va incollato direttamente nella <b>scheda del PG</b>, non nel Generatore.</div>
+          <div class="fmt-case-label">4. Pubblica il risultato così com'è</div>
+          <div class="fmt-case-desc">Copia il riquadro <b>"📋 Lista della Spesa da pubblicare sul Forum"</b> nella pagina "Risultato" e incollalo, tale e quale, nel topic della tua Lista della Spesa — <b>incluso il riquadro richiudibile "📎 Dati per l'Accredito"</b> in fondo, che non è decorativo: è la parte che lo Staff userà davvero. Non modificarlo a meno che non ti serva aggiungere qualcosa che il tool non ti ha permesso di scrivere (es. un link di prova non previsto). Questo è il testo da cui lo Staff inserirà nella tua scheda tutti i premi che hai richiesto: se qualcosa qui è impreciso o mancante, lo sarà anche quello che ti verrà accreditato — vale la pena ricontrollarlo con attenzione prima di pubblicarlo.</div>
         </div>
       </div>
     </div>
@@ -214,6 +214,13 @@
       <div id="missioni_standalone_list"></div>
       <div id="missioni_standalone_empty" class="empty-state">Nessuna missione di questo tipo ancora aggiunta.</div>
       <button type="button" class="secondary" id="add_missione_standalone_btn">+ Aggiungi missione senza Role</button>
+    </div>
+
+    <div class="panel">
+      <h2>Galeoni Extra <span class="format-tag">solo se hai marcato una spesa come Evento/luogo a pagamento</span></h2>
+      <div class="hint">I 100 Galeoni Extra si ricevono una tantum alla creazione del PG e si usano solo per partecipare a Eventi o ruolare in luoghi a pagamento (es. locande). Una volta esauriti, le stesse spese iniziano ad attingere dai Galeoni normali. Serve solo se in una Role qui sotto hai risposto "Sì" alla domanda su Galeoni Extra.</div>
+      <label class="tight" for="galeoniExtraRimanenti">Quanti Galeoni Extra ha ancora il PG, prima di questa richiesta? <span class="format-tag">controllalo sulla Scheda Valori</span></label>
+      <input type="number" id="galeoniExtraRimanenti" min="0" step="1" style="max-width:160px">
     </div>
 
     <div class="panel">
@@ -529,9 +536,14 @@ function calcolaRole(role, tassoBase) {
   // Galeoni spesi durante la Role (es. locande): spesa diretta, sempre sottratta
   // per intero, non entra nel confronto "prendi solo il premio più alto". Il
   // Coefficiente di Debito (1 se nessun debito) moltiplica solo questa spesa.
+  // Se la spesa e' marcata come Evento/luogo a pagamento (galeoniPerExtra), NON
+  // la sottraiamo qui dai Galeoni: la gestisce il chiamante (calcolaTutto), che
+  // conosce quanto fondo Extra resta disponibile tra una Role e l'altra.
   const galeoniSpesi = Number(role.galeoniSpesi) || 0;
   const coeffDebito = Number(role.coeffDebito) || 1;
-  if (galeoniSpesi) totali['Galeoni'] = (totali['Galeoni'] || 0) - (galeoniSpesi * coeffDebito);
+  if (galeoniSpesi && !role.galeoniPerExtra) {
+    totali['Galeoni'] = (totali['Galeoni'] || 0) - (galeoniSpesi * coeffDebito);
+  }
 
   return totali;
 }
@@ -1457,9 +1469,22 @@ function creaRoleCard() {
   noteDebito.innerHTML = 'Il Coefficiente di Debito (1,2–1,7) moltiplica solo i <b>Galeoni spesi</b> qui sopra. Chi ha Crescita a Debito può spendere risorse solo per Role e acquisti di Commercio Magico — non per Conoscenze o Sapienze.';
   body.appendChild(noteDebito);
 
+  const domandaGaleoniExtraWrap = document.createElement('div');
+  domandaGaleoniExtraWrap.className = 'fmt-case f-galeoni-extra-wrap';
+  domandaGaleoniExtraWrap.style.cssText = 'margin-top:10px; display:none;';
+  const gnameExtra = `${rid}_galextra`;
+  domandaGaleoniExtraWrap.innerHTML = `
+    <div class="fmt-case-label">Questi Galeoni sono per partecipare a un Evento o per ruolare in un luogo a pagamento (es. locande)?</div>
+    <div class="radio-option"><input type="radio" name="${gnameExtra}" value="no" id="${gnameExtra}_no" class="f-galeoni-extra-radio" checked><label for="${gnameExtra}_no">No — sono una spesa normale</label></div>
+    <div class="radio-option"><input type="radio" name="${gnameExtra}" value="si" id="${gnameExtra}_si" class="f-galeoni-extra-radio"><label for="${gnameExtra}_si">Sì — attinge prima dai 100 Galeoni Extra (poi dai Galeoni normali una volta esauriti)</label></div>
+  `;
+  body.appendChild(domandaGaleoniExtraWrap);
+
   rigaBase.querySelector('.f-galeonispesi').addEventListener('input', (e) => {
     const mostra = (parseFloat(e.target.value) || 0) !== 0;
     div.querySelectorAll('.f-coeff-debito-wrap').forEach(el => { el.style.display = mostra ? 'block' : 'none'; });
+    domandaGaleoniExtraWrap.style.display = mostra ? 'block' : 'none';
+    if (!mostra) domandaGaleoniExtraWrap.querySelector('.f-galeoni-extra-radio[value="no"]').checked = true;
   });
 
   const missioniList = document.createElement('div');
@@ -2410,8 +2435,17 @@ function descriviRole(role, idx, totaliRole) {
     });
   }
   if (role.galeoniSpesi) {
-    righe.push(`<b>Galeoni spesi durante la Role:</b> ${normNum(role.galeoniSpesi)}` +
-      (role.coeffDebito && role.coeffDebito !== 1 ? ` (Coefficiente di Debito ×${normNum(role.coeffDebito)})` : ''));
+    let dettaglio = `${normNum(role.galeoniSpesi)}` +
+      (role.coeffDebito && role.coeffDebito !== 1 ? ` (Coefficiente di Debito ×${normNum(role.coeffDebito)})` : '');
+    if (role.galeoniPerExtra) {
+      const daExtra = Math.abs(totaliRole['Galeoni Extra'] || 0);
+      const daNormali = Math.abs(totaliRole['Galeoni'] || 0);
+      const parti = [];
+      if (daExtra) parti.push(`${normNum(daExtra)} dai Galeoni Extra`);
+      if (daNormali) parti.push(`${normNum(daNormali)} dai Galeoni normali (Extra esaurito)`);
+      dettaglio += ` — Evento/luogo a pagamento: ${parti.join(', ') || 'nessun fondo disponibile'}`;
+    }
+    righe.push(`<b>Galeoni spesi durante la Role:</b> ${dettaglio}`);
   }
   const righeTotale = fmtRighe(totaliRole).join(', ');
   righe.push(`<b>Totale da questa Role:</b> ${righeTotale || 'nessuna variazione'}`);
@@ -2544,6 +2578,7 @@ function leggiRoleDalDOM(roleEl) {
   const link = roleEl.querySelector('.f-link').value.trim();
   const galeoniSpesi = parseFloat(roleEl.querySelector('.f-galeonispesi').value) || 0;
   const coeffDebito = parseFloat(roleEl.querySelector('.f-coeff-debito').value) || 1;
+  const galeoniPerExtra = roleEl.querySelector('.f-galeoni-extra-radio:checked')?.value === 'si';
   const missioni = [...roleEl.querySelectorAll('.missione-card')].map(mEl => {
     const m = {
       nome: mEl.querySelector('.f-nome').value.trim(),
@@ -2558,7 +2593,7 @@ function leggiRoleDalDOM(roleEl) {
     m.prove = leggiProveDalDOM(mEl);
     return m;
   });
-  return { titolo, link, numPosts, galeoniSpesi, coeffDebito, missioni };
+  return { titolo, link, numPosts, galeoniSpesi, coeffDebito, galeoniPerExtra, missioni };
 }
 
 function leggiMateriaDalDOM(matEl) {
@@ -2668,9 +2703,18 @@ function calcolaTutto() {
   const roleEls = [...document.querySelectorAll('#roles_list > .role-card')];
   const riepilogoRoleDiv = document.getElementById('riepilogo_roles');
   riepilogoRoleDiv.innerHTML = '';
+  let extraRimanente = parseFloat(document.getElementById('galeoniExtraRimanenti').value) || 0;
   roleEls.forEach((roleEl, idx) => {
     const role = leggiRoleDalDOM(roleEl);
     const totaliRole = calcolaRole(role, tassoBase);
+    if (role.galeoniPerExtra && role.galeoniSpesi) {
+      const spesaEffettiva = role.galeoniSpesi * (role.coeffDebito || 1);
+      const daExtra = Math.min(spesaEffettiva, extraRimanente);
+      const daNormali = spesaEffettiva - daExtra;
+      extraRimanente -= daExtra;
+      if (daExtra) totaliRole['Galeoni Extra'] = (totaliRole['Galeoni Extra'] || 0) - daExtra;
+      if (daNormali) totaliRole['Galeoni'] = (totaliRole['Galeoni'] || 0) - daNormali;
+    }
     sommaIn(totaleGenerale, totaliRole);
     if (role.titolo || role.missioni.some(m => m.nome)) sezioniPost.segnala.push(descriviRole(role, idx, totaliRole));
 
