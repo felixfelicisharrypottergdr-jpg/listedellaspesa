@@ -1033,7 +1033,7 @@ function creaRigaProva() {
   div.className = 'row';
   div.style.alignItems = 'flex-end';
   div.innerHTML = `
-    <div style="flex:2;"><label class="tight">Nome (PG o Role)</label><input type="text" class="f-prova-nome" placeholder="es. Aster"></div>
+    <div style="flex:2;"><label class="tight">Nome (PG o Role)</label><input type="text" class="f-prova-nome" placeholder="es. Gianni"></div>
     <div style="flex:2;"><label class="tight">Link</label><input type="text" class="f-prova-link" placeholder="?t=...#entry..."></div>
     <div style="max-width:44px;"><button type="button" class="danger" style="width:100%;">✕</button></div>
   `;
@@ -1046,7 +1046,7 @@ function creaBloccoProve() {
   wrap.style.marginTop = '12px';
   const hint = document.createElement('div');
   hint.className = 'hint';
-  hint.innerHTML = "📎 <b>Prove a supporto</b> <span class='format-tag'>facoltativo — non blocca il calcolo se lo lasci vuoto</span><br>Compilalo solo se QUESTA missione richiede di dimostrare qualcosa (es. tot Role in un luogo, tot PG diversi con cui ti sei ruolato, tot Role con lo stesso PG) — la maggior parte delle missioni non lo richiede affatto. Una riga per ogni prova: nell'output il nome comparirà come link cliccabile.";
+  hint.innerHTML = "📎 <b>Prove a supporto</b> <span class='format-tag'>facoltativo — per le Missioni a completamento</span><br>Compilalo solo se QUESTA missione richiede di dimostrare qualcosa (es. tot Role in un luogo, tot PG diversi con cui hai ruolato, tot Role con lo stesso PG) — la maggior parte delle Missioni non lo richiede. Una riga per ogni prova: nell'output il nome comparirà come link cliccabile.";
   wrap.appendChild(hint);
   const list = document.createElement('div');
   list.className = 'prove_list';
