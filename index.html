@@ -448,6 +448,7 @@
         <h2>📋 Lista della Spesa da pubblicare sul Forum <span class="format-tag">questo è l'UNICO post che devi pubblicare</span></h2>
         <div class="hint">Copia questo intero blocco, senza toglierne pezzi, e pubblicalo così com'è nel topic della tua Lista della Spesa — <b>compreso il riquadro richiudibile "📎 Dati per l'Accredito"</b> in fondo. Chi si occupa degli accrediti non vede mai questo tool: legge solo il post che pubblichi, quindi tutto quello che gli serve deve essere dentro di esso.</div>
         <textarea id="outPostForum" class="output-box" readonly style="min-height:260px;"></textarea>
+        <button type="button" class="secondary" id="btn_copia_post" style="margin-top:10px;">📋 Copia tutto</button>
       </div>
       <div class="panel">
         <h2>Riepilogo per Role</h2>
@@ -3015,6 +3016,33 @@ document.getElementById('calcola_btn_sapienze').addEventListener('click', calcol
 document.getElementById('calcola_btn_parametri').addEventListener('click', calcolaTutto);
 document.getElementById('calcola_btn_conoscenze').addEventListener('click', calcolaTutto);
 document.getElementById('calcola_btn_commercio').addEventListener('click', calcolaTutto);
+
+document.getElementById('btn_copia_post').addEventListener('click', async () => {
+  const testo = document.getElementById('outPostForum').value;
+  const btn = document.getElementById('btn_copia_post');
+  const etichettaOriginale = btn.textContent;
+  function mostraConferma(ok) {
+    btn.textContent = ok ? '✅ Copiato!' : '⚠️ Copia manualmente (Ctrl+C)';
+    setTimeout(() => { btn.textContent = etichettaOriginale; }, 2000);
+  }
+  try {
+    await navigator.clipboard.writeText(testo);
+    mostraConferma(true);
+  } catch (e) {
+    // fallback per contesti senza Clipboard API (es. file aperto localmente)
+    const area = document.getElementById('outPostForum');
+    area.removeAttribute('readonly');
+    area.focus();
+    area.select();
+    try {
+      const riuscito = document.execCommand('copy');
+      mostraConferma(riuscito);
+    } catch (e2) {
+      mostraConferma(false);
+    }
+    area.setAttribute('readonly', 'readonly');
+  }
+});
 
 // ============ CONTINUA UNA LISTA DELLA SPESA GIA' INIZIATA ============
 // Ricostruisce lo stato del form leggendo il TESTO GIA' PUBBLICATO in
