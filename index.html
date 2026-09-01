@@ -244,33 +244,15 @@
     <div class="panel">
       <div class="acc-header" id="oggetti_toggle">
         <span class="acc-chevron">▾</span>
-        <h2 style="margin:0; flex:1;">Oggetti consumati <span class="format-tag">tutte le Role · opzionale</span></h2>
+        <h2 style="margin:0; flex:1;">Bagaglio: Oggetti, Pozioni, Immunità <span class="format-tag">tutte le Role · opzionale</span></h2>
       </div>
       <div class="acc-body">
         <div class="hint">
-          Una riga per ogni oggetto coinvolto. Ci sono tre casi possibili — usa quello giusto a seconda di cosa è successo:
+          Una riga per ogni Oggetto/Pozione/Immunità coinvolto — scegli categoria e cosa è successo, il tool scrive la riga corretta da solo. <span class="format-tag">I Premi Fanta Felix Felicis sono una sezione a parte della scheda: non vanno inseriti qui.</span>
         </div>
-        <div class="fmt-guide">
-          <div class="fmt-case">
-            <div class="fmt-case-label">1. Cambia la quantità di un oggetto già in scheda</div>
-            <div class="fmt-case-desc">L'hai consumato, perso o ne hai guadagnati altri esemplari.</div>
-            <div class="fmt-case-syntax">Scrivi: <code>Nome Oggetto: +numero</code> oppure <code>Nome Oggetto: -numero</code></div>
-            <div class="fmt-case-example">Esempio: <code>Pozione Curativa: -1</code> <span>(ne hai usata una)</span></div>
-          </div>
-          <div class="fmt-case">
-            <div class="fmt-case-label">2. Consumi un uso di un oggetto ricaricabile già in scheda</div>
-            <div class="fmt-case-desc">L'oggetto resta lo stesso (es. un calderone con un tot. di usi disponibili), cambia solo quanti usi ha già consumato.</div>
-            <div class="fmt-case-syntax">Scrivi: <code>USI: Nome Oggetto: +numero di usi consumati ora</code></div>
-            <div class="fmt-case-example">Esempio: <code>USI: Calderone Performante: +1</code> <span>(un uso in più consumato)</span></div>
-          </div>
-          <div class="fmt-case">
-            <div class="fmt-case-label">3. Ottieni un oggetto che potrebbe non essere ancora in scheda</div>
-            <div class="fmt-case-desc">Acquisto, creazione, premio: funziona sia se è la prima volta sia se ne possiedi già — nel secondo caso la quantità si somma automaticamente.</div>
-            <div class="fmt-case-syntax">Scrivi: <code>NUOVO: Nome Oggetto [Quantità]: Descrizione</code></div>
-            <div class="fmt-case-example">Esempio: <code>NUOVO: Pozione Ridente [2]: creata durante la lezione di Pozioni</code></div>
-          </div>
-        </div>
-        <textarea id="oggettiGlobali" placeholder="Pozione Curativa: -1&#10;USI: Calderone Performante: +1&#10;NUOVO: Pozione Ridente [2]: creata durante la lezione di Pozioni"></textarea>
+        <div class="movimenti_bagaglio_list"></div>
+        <div id="movimenti_bagaglio_empty" class="empty-state">Nessun movimento di Bagaglio ancora aggiunto.</div>
+        <button type="button" class="secondary" id="add_movimento_bagaglio_btn">+ Aggiungi movimento</button>
       </div>
     </div>
 
@@ -1090,6 +1072,116 @@ function fmtProve(prove) {
   return (prove && prove.length) ? ` (${prove.map(p => `[URL=${p.link}]${p.nome}[/URL]`).join(', ')})` : '';
 }
 
+// ============ BAGAGLIO: Oggetti / Pozioni / Immunità (scelta guidata) ============
+const CATEGORIE_BAGAGLIO_LISTA = [
+  { value: 'OGGETTO', label: 'Oggetto' },
+  { value: 'POZIONE', label: 'Pozione' },
+  { value: 'IMMUNITA', label: 'Immunità' }
+];
+let bagaglioCounter = 0;
+
+function aggiornaContatoreBagaglio() {
+  const n = document.querySelectorAll('.movimenti_bagaglio_list > div').length;
+  document.getElementById('movimenti_bagaglio_empty').style.display = n ? 'none' : 'block';
+}
+
+function creaRigaMovimentoBagaglio() {
+  bagaglioCounter++;
+  const bid = 'bag' + bagaglioCounter;
+  const div = document.createElement('div');
+  div.className = 'panel';
+  div.style.cssText = 'border:1px dashed var(--border); margin-bottom:12px; position:relative;';
+  div.innerHTML = `
+    <button type="button" class="danger" style="position:absolute; top:14px; right:14px;">✕</button>
+    <div class="row">
+      <div style="max-width:170px;"><label class="tight">Categoria</label>
+        <select class="f-bag-categoria">${CATEGORIE_BAGAGLIO_LISTA.map(c => `<option value="${c.value}">${c.label}</option>`).join('')}</select>
+      </div>
+      <div><label class="tight">Nome</label><input type="text" class="f-bag-nome" placeholder="es. Pozione Curativa"></div>
+    </div>
+    <div class="fmt-case" style="margin-top:10px;">
+      <div class="fmt-case-label">Cosa è successo?</div>
+      <div class="radio-option"><input type="radio" name="${bid}_azione" value="qty" class="f-bag-azione-radio" checked><label>Cambia la quantità di uno che ho già (consumato, perso, guadagnato)</label></div>
+      <div class="radio-option"><input type="radio" name="${bid}_azione" value="usi" class="f-bag-azione-radio"><label>Consumo/recupero usi di uno ricaricabile che ho già</label></div>
+      <div class="radio-option"><input type="radio" name="${bid}_azione" value="nuovo" class="f-bag-azione-radio"><label>È nuovo, non l'ho mai avuto (acquisto, creazione, premio...)</label></div>
+    </div>
+    <div class="f-bag-campo-delta row" style="margin-top:10px;">
+      <div style="max-width:220px;"><label class="tight f-bag-delta-label">Variazione quantità</label><input type="number" class="f-bag-delta" step="1" placeholder="es. -1 oppure 2"></div>
+    </div>
+    <div class="f-bag-campo-nuovo row" style="margin-top:10px; display:none;">
+      <div style="max-width:120px;"><label class="tight">Quantità</label><input type="number" class="f-bag-qty-nuovo" min="1" step="1" value="1"></div>
+      <div><label class="tight">Descrizione / effetto</label><input type="text" class="f-bag-desc-nuovo" placeholder="es. creata durante la lezione di Pozioni"></div>
+    </div>
+  `;
+  div.querySelector('.danger').addEventListener('click', () => { div.remove(); aggiornaContatoreBagaglio(); });
+
+  const campoDelta = div.querySelector('.f-bag-campo-delta');
+  const campoNuovo = div.querySelector('.f-bag-campo-nuovo');
+  const labelDelta = div.querySelector('.f-bag-delta-label');
+  div.querySelectorAll('.f-bag-azione-radio').forEach(r => r.addEventListener('change', (e) => {
+    const val = e.target.value;
+    campoDelta.style.display = (val === 'qty' || val === 'usi') ? 'flex' : 'none';
+    campoNuovo.style.display = val === 'nuovo' ? 'flex' : 'none';
+    labelDelta.textContent = val === 'usi' ? 'Usi consumati ora (± numero)' : 'Variazione quantità';
+  }));
+
+  return div;
+}
+
+function leggiMovimentiBagaglioDalDOM() {
+  return [...document.querySelectorAll('.movimenti_bagaglio_list > div')].map(div => {
+    const categoria = div.querySelector('.f-bag-categoria').value;
+    const nome = div.querySelector('.f-bag-nome').value.trim();
+    const azione = div.querySelector('.f-bag-azione-radio:checked').value;
+    if (!nome) return null;
+
+    if (azione === 'nuovo') {
+      const qty = parseInt(div.querySelector('.f-bag-qty-nuovo').value, 10) || 1;
+      const desc = div.querySelector('.f-bag-desc-nuovo').value.trim();
+      return { riga: `NUOVO ${categoria}: ${nome} [${qty}]: ${desc}`, narrativa: `- NUOVO ${CATEGORIE_BAGAGLIO_LISTA.find(c => c.value === categoria).label}: ${nome} [${qty}]${desc ? ': ' + desc : ''}` };
+    }
+    const delta = parseFloat(div.querySelector('.f-bag-delta').value) || 0;
+    if (!delta) return null;
+    const segno = delta >= 0 ? '+' : '';
+    if (azione === 'usi') {
+      return { riga: `USI: ${nome}: ${segno}${delta}`, narrativa: `- ${nome}: ${segno}${normNum(delta)} usi consumati` };
+    }
+    return { riga: `${nome}: ${segno}${delta}`, narrativa: `- ${nome}: ${segno}${normNum(delta)}` };
+  }).filter(Boolean);
+}
+
+// Riga tipo: "- NUOVO Pozione: Nome [Qty]: Descrizione" oppure "- Nome: ±N" oppure "- Nome: ±N usi consumati"
+function parseMovimentoBagaglioRiga(riga) {
+  const r = riga.trim();
+  let m = r.match(/^-\s*NUOVO\s+(Oggetto|Pozione|Immunità)\s*:\s*(.+?)\s*\[(\d+)\](?::\s*(.*))?$/i);
+  if (m) {
+    const catLabel = m[1].toLowerCase();
+    const categoria = (CATEGORIE_BAGAGLIO_LISTA.find(c => c.label.toLowerCase() === catLabel) || CATEGORIE_BAGAGLIO_LISTA[0]).value;
+    return { categoria, nome: m[2].trim(), azione: 'nuovo', qty: parseInt(m[3], 10) || 1, desc: (m[4] || '').trim() };
+  }
+  m = r.match(/^-\s*(.+?):\s*([+-]?[\d.,]+)\s*usi consumati$/i);
+  if (m) return { categoria: 'OGGETTO', nome: m[1].trim(), azione: 'usi', delta: parseValoreNum(m[2]) };
+  m = r.match(/^-\s*(.+?):\s*([+-]?[\d.,]+)\s*$/);
+  if (m) return { categoria: 'OGGETTO', nome: m[1].trim(), azione: 'qty', delta: parseValoreNum(m[2]) };
+  return null;
+}
+
+function popolaMovimentoBagaglioDaDati(dati) {
+  const div = creaRigaMovimentoBagaglio();
+  div.querySelector('.f-bag-categoria').value = dati.categoria;
+  div.querySelector('.f-bag-nome').value = dati.nome;
+  const radio = div.querySelector(`.f-bag-azione-radio[value="${dati.azione}"]`);
+  radio.checked = true;
+  trigger(radio, 'change');
+  if (dati.azione === 'nuovo') {
+    div.querySelector('.f-bag-qty-nuovo').value = dati.qty;
+    div.querySelector('.f-bag-desc-nuovo').value = dati.desc;
+  } else {
+    div.querySelector('.f-bag-delta').value = dati.delta;
+  }
+  return div;
+}
+
 // ============ SELETTORE CATALOGO MISSIONI FH/FW (riutilizzabile) ============
 const CATEGORIE_PER_FONTE = { FH: ['Caotica', 'Neutrale', 'Legale'], FW: ['Sinistra', 'Neutrale', 'Virtuosa'] };
 const NOME_FONTE = { FH: 'FantaHogwarts', FW: 'FantaWiz' };
@@ -1760,6 +1852,12 @@ document.getElementById('add_missione_standalone_btn').addEventListener('click',
   aggiornaContatoreMissioneStandalone();
 });
 aggiornaContatoreMissioneStandalone();
+
+document.getElementById('add_movimento_bagaglio_btn').addEventListener('click', () => {
+  document.querySelector('.movimenti_bagaglio_list').appendChild(creaRigaMovimentoBagaglio());
+  aggiornaContatoreBagaglio();
+});
+aggiornaContatoreBagaglio();
 
 // ============ CONVERSIONE PP -> GALEONI: riepilogo live ============
 function aggiornaRiepilogoConversione() {
@@ -2589,6 +2687,7 @@ function assemblaPostForum(sezioni, nomePG) {
   if (sezioni.parametri.length) blocchi.push(`[size=13][color=coral][font=medievalsharp]<b>Acquista Parametri Magici, Fisici e Dialettica</b>[/font][/color][/size]\n` + sezioni.parametri.join('\n'));
   if (sezioni.conoscenze) blocchi.push(`[size=13][color=darkblue][font=medievalsharp]<b>Acquista Conoscenze</b>[/font][/color][/size]\n` + sezioni.conoscenze);
   if (sezioni.commercio.length) blocchi.push(`[size=13][color=seagreen][font=medievalsharp]<b>Commercio Magico</b>[/font][/color][/size]\n` + sezioni.commercio.join('\n<hr>\n'));
+  if (sezioni.bagaglio.length) blocchi.push(`[size=13][color=peru][font=medievalsharp]<b>Bagaglio: Oggetti, Pozioni, Immunità</b>[/font][/color][/size]\n` + sezioni.bagaglio.join('\n'));
   if (!blocchi.length) return '';
   blocchi.push(sezioni.recap);
   const titolo = `[size=13][color=darkred][font=medievalsharp]<b>Lista della Spesa di ${nomePG || 'PG'}</b>[/font][/color][/size]`;
@@ -2756,7 +2855,7 @@ function calcolaSapienza(sap) {
 function calcolaTutto() {
   const tassoBase = parseFloat(document.getElementById('tassoBase').value) || 0;
   const totaleGenerale = {};
-  const sezioniPost = { segnala: [], voti: [], sapienze: [], parametri: [], conoscenze: '', commercio: [] };
+  const sezioniPost = { segnala: [], voti: [], sapienze: [], parametri: [], conoscenze: '', commercio: [], bagaglio: [] };
 
   // --- Role (Segnala e Riscatta) ---
   const roleEls = [...document.querySelectorAll('#roles_list > .role-card')];
@@ -3030,8 +3129,10 @@ function calcolaTutto() {
   document.getElementById('outBoxA').value = fmtRighe(totaleGenerale).join('\n') || '(nessuna variazione)';
   document.getElementById('outBoxE').value = tutteBoxELines.join(', ') || '(nessuna)';
   document.getElementById('outBoxF').value = tutteBoxFLines.join(', ') || '(nessuna)';
-  const righeBoxGManuali = document.getElementById('oggettiGlobali').value.trim();
-  const tutteRigheBoxG = [...righeBoxGCommercio, ...(righeBoxGManuali && righeBoxGManuali !== '(nessuno)' ? righeBoxGManuali.split('\n') : [])];
+  const movimentiBagaglio = leggiMovimentiBagaglioDalDOM();
+  const righeBoxGManuali = movimentiBagaglio.map(m => m.riga);
+  const tutteRigheBoxG = [...righeBoxGCommercio, ...righeBoxGManuali];
+  sezioniPost.bagaglio = movimentiBagaglio.map(m => m.narrativa);
   document.getElementById('outBoxG').value = tutteRigheBoxG.length ? tutteRigheBoxG.join('\n') : '(nessuno)';
 
   sezioniPost.recap = costruisciRecapFinale(totaleGenerale);
@@ -3678,7 +3779,19 @@ function caricaListaSpesaPrecedente(testo) {
     aggiornaContatoreCommercio();
   }
 
-  nonRicostruibile.push('Oggetti consumati (testo libero) — se ne avevi scritti, ricopiali a mano da "📎 Dati per l\'Accredito → BOX G" qui sotto');
+  // --- Bagaglio: Oggetti, Pozioni, Immunità ---
+  const mBag = testo.match(/<b>Bagaglio: Oggetti, Pozioni, Immunità<\/b>\[\/font\]\[\/color\]\[\/size\]\s*\n([\s\S]*?)(?=\n\[size=13\]|\n\[size=10\]|$)/);
+  if (mBag) {
+    document.querySelector('.movimenti_bagaglio_list').innerHTML = '';
+    let n = 0;
+    mBag[1].split('\n').map(r => r.trim()).filter(r => r.startsWith('-')).forEach(riga => {
+      const dati = parseMovimentoBagaglioRiga(riga);
+      if (dati) { document.querySelector('.movimenti_bagaglio_list').appendChild(popolaMovimentoBagaglioDaDati(dati)); n++; }
+    });
+    if (n) ricostruito.push(`${n} movimenti di Bagaglio (Oggetti/Pozioni/Immunità)`);
+    aggiornaContatoreBagaglio();
+  }
+
   nonRicostruibile.push('Conversione PP → Galeoni — se ne avevi fatta una, non compare separata dal totale: se serve ancora, reimpostala');
 
   return { ricostruito, nonRicostruibile };
