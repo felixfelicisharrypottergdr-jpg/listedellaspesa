@@ -946,6 +946,18 @@ function costoConoscenza(daVoto, aVoto, inPianoDiStudi, contatoreE) {
 }
 
 
+// ============ BLOCCO STAGIONALE "MIGLIORA VOTI" (1 agosto - 1 ottobre) ============
+// In questa finestra il Piano di Studi dell'anno appena concluso sta per
+// chiudersi e quello del nuovo anno non e' ancora iniziato: non ha senso
+// chiedere di migliorare voti ne' nell'uno ne' nell'altro.
+function inFinestraBloccoVoti(data) {
+  const mese = data.getMonth(); // 0 = gennaio ... 7 = agosto, 8 = settembre
+  if (mese === 7) return true; // tutto agosto
+  if (mese === 8) return true; // tutto settembre
+  return false;
+}
+const VOTI_BLOCCATI = inFinestraBloccoVoti(new Date());
+
 const SEZIONI = [
   { id: 'segnala', label: 'Segnala e Riscatta Role', pronto: true },
   { id: 'voti', label: 'Migliora Voti', pronto: true },
@@ -965,9 +977,10 @@ const tabBar = document.getElementById('tab_bar');
 SEZIONI.forEach(s => {
   const btn = document.createElement('button');
   btn.type = 'button';
+  const bloccata = s.id === 'voti' && VOTI_BLOCCATI;
   btn.className = 'tab-btn' + (s.id === 'segnala' ? ' active' : '');
   btn.dataset.tab = s.id;
-  btn.innerHTML = s.label + (s.pronto ? '' : ' <span class="lock">🔒 presto</span>');
+  btn.innerHTML = s.label + (!s.pronto ? ' <span class="lock">🔒 presto</span>' : bloccata ? ' <span class="lock">🔒 1 ago - 30 set</span>' : '');
   btn.addEventListener('click', () => {
     if (!s.pronto) return;
     apriPagina(s.id);
@@ -983,6 +996,24 @@ SEZIONI.filter(s => !s.pronto).forEach(s => {
   div.innerHTML = `<div class="panel"><div class="placeholder-page"><div class="glyph">🔒</div><h3>${s.label}</h3>Questa sezione arriverà nei prossimi passaggi.</div></div>`;
   document.querySelector('.container').appendChild(div);
 });
+
+// --- Blocco stagionale "Migliora Voti" (1 agosto - 1 ottobre) ---
+if (VOTI_BLOCCATI) {
+  const paginaVoti = document.querySelector('.page[data-page="voti"]');
+  const banner = document.createElement('div');
+  banner.className = 'panel';
+  banner.style.cssText = 'border: 2px solid var(--red); background: var(--red-soft);';
+  banner.innerHTML = `
+    <h2 style="color: var(--red); margin-bottom:8px;">🔒 Sezione non disponibile dal 1 agosto al 30 settembre</h2>
+    <div style="color:#5C2020;">
+      In questo periodo il Piano di Studi dell'anno appena concluso sta per chiudersi, e quello del nuovo anno scolastico non è ancora iniziato: non è possibile migliorare voti né nell'uno né nell'altro, perché il PG non può aver già preso voti — bassi o alti che siano — in qualcosa che non ha ancora studiato. La sezione tornerà disponibile automaticamente dal 1 ottobre.
+    </div>
+  `;
+  // nascondo tutto il contenuto funzionale della pagina e mostro solo il banner
+  const contenutoOriginale = [...paginaVoti.children];
+  contenutoOriginale.forEach(el => { el.style.display = 'none'; });
+  paginaVoti.insertBefore(banner, paginaVoti.firstChild);
+}
 
 // ============ ACCORDION GENERICO ============
 function abilitaAccordion(headerEl) {
@@ -1101,8 +1132,8 @@ function creaRigaMovimentoBagaglio() {
     </div>
     <div class="fmt-case" style="margin-top:10px;">
       <div class="fmt-case-label">Cosa è successo?</div>
-      <div class="radio-option"><input type="radio" name="${bid}_azione" value="qty" class="f-bag-azione-radio" checked><label>Cambia la quantità di uno che ho già (terminato, perso, guadagnato, distrutto)</label></div>
-      <div class="radio-option"><input type="radio" name="${bid}_azione" value="usi" class="f-bag-azione-radio"><label>Consumo/recupero usi di uno che ho già</label></div>
+      <div class="radio-option"><input type="radio" name="${bid}_azione" value="qty" class="f-bag-azione-radio" checked><label>Cambia la quantità di uno che ho già (consumato, perso, guadagnato)</label></div>
+      <div class="radio-option"><input type="radio" name="${bid}_azione" value="usi" class="f-bag-azione-radio"><label>Consumo/recupero usi di uno ricaricabile che ho già</label></div>
       <div class="radio-option"><input type="radio" name="${bid}_azione" value="nuovo" class="f-bag-azione-radio"><label>È nuovo, non l'ho mai avuto (acquisto, creazione, premio...)</label></div>
     </div>
     <div class="f-bag-campo-delta row" style="margin-top:10px;">
@@ -2917,9 +2948,12 @@ function calcolaTutto() {
 
   // --- Materie (Migliora Voti) ---
   let contatoreE = parseInt(document.getElementById('eGiaPossedute').value, 10) || 0;
-  const materiaEls = [...document.querySelectorAll('#materie_list > .materia-card')];
+  const materiaEls = VOTI_BLOCCATI ? [] : [...document.querySelectorAll('#materie_list > .materia-card')];
   const riepilogoMaterieDiv = document.getElementById('riepilogo_materie');
   riepilogoMaterieDiv.innerHTML = '';
+  if (VOTI_BLOCCATI) {
+    riepilogoMaterieDiv.innerHTML = '<div class="empty-state">🔒 Sezione non disponibile dal 1 agosto al 30 settembre — eventuali Materie compilate non vengono conteggiate.</div>';
+  }
   const tutteBoxELines = [];
   materiaEls.forEach((matEl, idx) => {
     const mat = leggiMateriaDalDOM(matEl);
