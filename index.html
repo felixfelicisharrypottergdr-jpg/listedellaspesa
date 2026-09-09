@@ -828,7 +828,7 @@ Compila una scheda per ogni <b>Role</b> segnalata. Tra le missioni <i>non a comp
 </div>
 <div class="acc-body">
 <div class="hint">
-Una riga per ogni Oggetto/Pozione/Immunità coinvolto — scegli categoria e cosa è successo, il tool scrive la riga corretta da solo. <span class="format-tag">I Premi Fanta Felix Felicis sono una sezione a parte della scheda: non vanno inseriti qui.</span>
+Una riga per ogni Oggetto/Pozione/Immunità coinvolto — scegli categoria e cosa è successo, il tool scrive la riga corretta da solo. Se hai passato un oggetto a un altro PG, scegli <b>Trasferimento a un altro PG</b>: verrà scalato dal tuo Bagaglio e il post indicherà automaticamente il destinatario con il link alla sua scheda. <span class="format-tag">I Premi Fanta Felix Felicis sono una sezione a parte della scheda: non vanno inseriti qui.</span>
 </div>
 <div class="movimenti_bagaglio_list"></div>
 <div id="movimenti_bagaglio_empty" class="empty-state">Nessun movimento di Bagaglio ancora aggiunto.</div>
@@ -1260,7 +1260,7 @@ const MISSIONI_FH_RAW = [
 {"nome": "Il Reporter", "anchor": "reporter", "categoria": "Neutrale", "illegale": false, "scolastico": false, "livelli":[{"nome": "Facile", "requisiti": null, "completamento": false, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {"Popolarità": 1.0}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": "da chiedere nella propria Lista della Spesa se l'articolo non è anonimo"}, "seScoperto":null},{"nome": "Facile [font=medievalsharp][color=darkred]Caotico[/color][/font]", "requisiti": "3 Malvagità", "completamento": false, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Popolarità": 1.5, "Malvagità": 1.5}, "parametri": {}, "scelta": [], "nota": "da chiedere nella propria Lista della Spesa se l'articolo non è anonimo"}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "completamento": false, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Popolarità": 2.0}, "parametri": {}, "scelta": [{"valore": 2.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": "da chiedere nella propria Lista della Spesa se l'articolo non è anonimo"}, "seScoperto":null},{"nome": "Difficile", "requisiti": null, "completamento": false, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Popolarità": 2.0}, "parametri": {}, "scelta": [{"valore": 1.0, "opzioni": ["Bontà", "Malvagità"]}], "nota": "da chiedere nella propria Lista della Spesa 2 PP extra se a seguito di intervista al PG Reporter se l'articolo non è anonimo al ai PG dell'articolo se viene nominato"}, "seScoperto":null},{"nome": "Difficile [font=medievalsharp][color=darkred]Caotico[/color][/font]", "requisiti": "5 Malvagità", "completamento": false, "complessa": true, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 3.0, "altri": {"Popolarità": 2.5, "Malvagità": 2.0}, "parametri": {}, "scelta": [], "nota": "da chiedere nella propria Lista della Spesa 2 PP extra se a seguito di intervista al PG Reporter se l'articolo non è anonimo al ai PG dell'articolo se viene nominato"}, "seScoperto":null}]},
 {"nome": "Il Secchione", "anchor": "secchione", "categoria": "Neutrale", "illegale": false, "scolastico": true, "livelli":[{"nome": "Medio", "requisiti": null, "completamento": false, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 10.0, "altri": {"Punti Casa": 30.0, "Stima Docenti": 1.0}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": null, "completamento": false, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 15.0, "altri": {"Punti Casa": 50.0, "Stima Docenti": 1.5}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Estremo", "requisiti": "Il PG riceve una Borsa di Studio alla fine dell'anno", "completamento": false, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "borseDiStudio": [{"nome": "P.I.U.M.A.", "ppFisso": 5.0, "stimaDocenti": 2.0, "prestigio": 1.0}, {"nome": "R.O.T.O.L.O.", "ppFisso": 10.0, "stimaDocenti": 2.5, "prestigio": 2.0}, {"nome": "T.O.M.O.", "ppFisso": 15.0, "stimaDocenti": 3.0, "prestigio": 3.0}], "seScoperto":null}]},
 {"nome": "Il Segugio", "anchor": "segugio", "categoria": "Neutrale", "illegale": false, "scolastico": true, "livelli":[{"nome": "Facile", "requisiti": null, "completamento": false, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "completamento": false, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Difficile", "requisiti": null, "completamento": false, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
-{"nome": "Il So-Tutto-Sull'-Argomento", "anchor": "sotutto", "categoria": "Neutrale", "illegale": false, "scolastico": false, "livelli":[{"nome": "Facile", "requisiti": null, "completamento": false, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "completamento": false, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
+{"nome": "Il So-Tutto-Sull'Argomento", "anchor": "sotutto", "categoria": "Neutrale", "illegale": false, "scolastico": false, "livelli":[{"nome": "Facile", "requisiti": null, "completamento": false, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 1.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": null, "completamento": false, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
 {"nome": "Lo Spendaccione", "anchor": "spendaccione", "categoria": "Neutrale", "illegale": false, "scolastico": false, "livelli":[{"nome": "Facile", "requisiti": null, "completamento": false, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
 {"nome": "Lo Spiato", "anchor": "spiato", "categoria": "Neutrale", "illegale": false, "scolastico": true, "livelli":[{"nome": "Facile", "requisiti": null, "completamento": false, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": 2.0, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null}]},
 {"nome": "Gli Studiosi", "anchor": "studiosi", "categoria": "Neutrale", "illegale": false, "scolastico": true, "livelli":[{"nome": "Facile", "requisiti": null, "completamento": false, "complessa": false, "premio": {"ppPostRate": null, "ppPostCap": null, "ppFisso": null, "altri": {}, "parametri": {}, "scelta": [], "nota": null}, "seScoperto":null},{"nome": "Medio", "requisiti": "Troll, Desolante o Scadente nella Conoscenza da migliorare", "completamento": false, "complessa": true, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Stima Docenti": 1.5, "Punti Casa": 30.0}, "parametri": {}, "scelta": [], "nota": "per il PG che chiede ripetizioni dei Docenti"}, "seScoperto":null},{"nome": "Difficile", "requisiti": "Accettabile, Oltre Ogni Previsione o Eccezionale nella Conoscenza del Ripetente da migliorare", "completamento": false, "complessa": true, "premio": {"ppPostRate": 2.0, "ppPostCap": null, "ppFisso": null, "altri": {"Stima Docenti": 2.0, "Punti Casa": 40.0}, "parametri": {}, "scelta": [], "nota": "per il PG che dà ripetizioni dei Docenti"}, "seScoperto":null}]},
@@ -1714,10 +1714,19 @@ div.innerHTML = `
 <div class="fmt-case-label">Cosa è successo?</div>
 <div class="radio-option"><input type="radio" name="${bid}_azione" value="qty" class="f-bag-azione-radio" checked><label>Cambia la quantità di uno che ho già (consumato, perso, guadagnato)</label></div>
 <div class="radio-option"><input type="radio" name="${bid}_azione" value="usi" class="f-bag-azione-radio"><label>Consumo/recupero usi di uno ricaricabile che ho già</label></div>
+<div class="radio-option"><input type="radio" name="${bid}_azione" value="trasferisci" class="f-bag-azione-radio"><label>Trasferimento a un altro PG — lo tolgo dal mio Bagaglio e indico a chi va</label></div>
 <div class="radio-option"><input type="radio" name="${bid}_azione" value="nuovo" class="f-bag-azione-radio"><label>È nuovo, non l'ho mai avuto (acquisto, creazione, premio...)</label></div>
 </div>
 <div class="f-bag-campo-delta row" style="margin-top:10px;">
 <div style="max-width:220px;"><label class="tight f-bag-delta-label">Variazione quantità</label><input type="number" class="f-bag-delta" step="1" placeholder="es. -1 oppure 2"></div>
+</div>
+<div class="f-bag-campo-trasferimento" style="margin-top:10px; display:none;">
+<div class="hint">Il tool scalerà automaticamente la quantità dal tuo Bagaglio e scriverà nel post: <b>oggetto da trasferire a [URL=link scheda]Nome PG[/URL]</b>.</div>
+<div class="row">
+<div style="max-width:170px;"><label class="tight">Quantità trasferita</label><input type="number" class="f-bag-qty-trasferita" min="1" step="1" value="1"></div>
+<div><label class="tight">Nome PG destinatario</label><input type="text" class="f-bag-dest-nome" placeholder="es. Mary Sue"></div>
+</div>
+<div style="margin-top:10px;"><label class="tight">Link della scheda del PG destinatario</label><input type="text" class="f-bag-dest-link" placeholder="https://..."></div>
 </div>
 <div class="f-bag-campo-nuovo row" style="margin-top:10px; display:none;">
 <div style="max-width:120px;"><label class="tight">Quantità</label><input type="number" class="f-bag-qty-nuovo" min="1" step="1" value="1"></div>
@@ -1727,11 +1736,13 @@ div.innerHTML = `
 div.querySelector('.danger').addEventListener('click', () => { div.remove(); aggiornaContatoreBagaglio(); });
 
 const campoDelta = div.querySelector('.f-bag-campo-delta');
+const campoTrasferimento = div.querySelector('.f-bag-campo-trasferimento');
 const campoNuovo = div.querySelector('.f-bag-campo-nuovo');
 const labelDelta = div.querySelector('.f-bag-delta-label');
 div.querySelectorAll('.f-bag-azione-radio').forEach(r => r.addEventListener('change', (e) => {
 const val = e.target.value;
 campoDelta.style.display = (val === 'qty' || val === 'usi') ? 'flex' : 'none';
+campoTrasferimento.style.display = val === 'trasferisci' ? 'block' : 'none';
 campoNuovo.style.display = val === 'nuovo' ? 'flex' : 'none';
 labelDelta.textContent = val === 'usi' ? 'Usi consumati ora (± numero)' : 'Variazione quantità';
 }));
@@ -1751,6 +1762,18 @@ const qty = parseInt(div.querySelector('.f-bag-qty-nuovo').value, 10) || 1;
 const desc = div.querySelector('.f-bag-desc-nuovo').value.trim();
 return { riga: `NUOVO ${categoria}: ${nome} [${qty}]: ${desc}`, narrativa: `- NUOVO ${CATEGORIE_BAGAGLIO_LISTA.find(c => c.value === categoria).label}: ${nome} [${qty}]${desc ? ': ' + desc : ''}` };
 }
+
+if (azione === 'trasferisci') {
+const qty = Math.max(1, parseInt(div.querySelector('.f-bag-qty-trasferita').value, 10) || 1);
+const destinatarioNome = div.querySelector('.f-bag-dest-nome').value.trim();
+const destinatarioLink = div.querySelector('.f-bag-dest-link').value.trim();
+if (!destinatarioNome || !destinatarioLink) return null;
+return {
+riga: `${nome}: -${qty}`,
+narrativa: `- ${nome}: -${qty} — oggetto da trasferire a [URL=${destinatarioLink}]${destinatarioNome}[/URL]`
+};
+}
+
 const delta = parseFloat(div.querySelector('.f-bag-delta').value) || 0;
 if (!delta) return null;
 const segno = delta >= 0 ? '+' : '';
@@ -1761,18 +1784,29 @@ return { riga: `${nome}: ${segno}${delta}`, narrativa: `- ${nome}: ${segno}${nor
 }).filter(Boolean);
 }
 
-// Riga tipo: "- NUOVO Pozione: Nome [Qty]: Descrizione" oppure "- Nome: ±N" oppure "- Nome: ±N usi consumati"
+// Righe riconosciute anche quando si usa "Continua una Lista già iniziata".
+// Il trasferimento mantiene il -N nel Box G del PG richiedente e ricostruisce nome/link del destinatario.
 function parseMovimentoBagaglioRiga(riga) {
 const r = riga.trim();
-let m = r.match(/^-\s*NUOVO\s+(Oggetto|Pozione|Immunità)\s*:\s*(.+?)\s*\[(\d+)\](?::\s*(.*))?$/i);
+let m = r.match(/^\-\s*(.+?):\s*-(\d+)\s*[—-]\s*oggetto da trasferire a\s*\[URL=([^\]]+)\](.+?)\[\/URL\]\s*$/i);
+if (m) return {
+categoria: 'OGGETTO',
+nome: m[1].trim(),
+azione: 'trasferisci',
+qtyTrasferita: parseInt(m[2], 10) || 1,
+destinatarioLink: m[3].trim(),
+destinatarioNome: m[4].trim()
+};
+
+m = r.match(/^\-\s*NUOVO\s+(Oggetto|Pozione|Immunità)\s*:\s*(.+?)\s*\[(\d+)\](?::\s*(.*))?$/i);
 if (m) {
 const catLabel = m[1].toLowerCase();
 const categoria = (CATEGORIE_BAGAGLIO_LISTA.find(c => c.label.toLowerCase() === catLabel) || CATEGORIE_BAGAGLIO_LISTA[0]).value;
 return { categoria, nome: m[2].trim(), azione: 'nuovo', qty: parseInt(m[3], 10) || 1, desc: (m[4] || '').trim() };
 }
-m = r.match(/^-\s*(.+?):\s*([+-]?[\d.,]+)\s*usi consumati$/i);
+m = r.match(/^\-\s*(.+?):\s*([+-]?[\d.,]+)\s*usi consumati$/i);
 if (m) return { categoria: 'OGGETTO', nome: m[1].trim(), azione: 'usi', delta: parseValoreNum(m[2]) };
-m = r.match(/^-\s*(.+?):\s*([+-]?[\d.,]+)\s*$/);
+m = r.match(/^\-\s*(.+?):\s*([+-]?[\d.,]+)\s*$/);
 if (m) return { categoria: 'OGGETTO', nome: m[1].trim(), azione: 'qty', delta: parseValoreNum(m[2]) };
 return null;
 }
@@ -1782,11 +1816,16 @@ const div = creaRigaMovimentoBagaglio();
 div.querySelector('.f-bag-categoria').value = dati.categoria;
 div.querySelector('.f-bag-nome').value = dati.nome;
 const radio = div.querySelector(`.f-bag-azione-radio[value="${dati.azione}"]`);
+if (!radio) return div;
 radio.checked = true;
 trigger(radio, 'change');
 if (dati.azione === 'nuovo') {
 div.querySelector('.f-bag-qty-nuovo').value = dati.qty;
 div.querySelector('.f-bag-desc-nuovo').value = dati.desc;
+} else if (dati.azione === 'trasferisci') {
+div.querySelector('.f-bag-qty-trasferita').value = dati.qtyTrasferita || 1;
+div.querySelector('.f-bag-dest-nome').value = dati.destinatarioNome || '';
+div.querySelector('.f-bag-dest-link').value = dati.destinatarioLink || '';
 } else {
 div.querySelector('.f-bag-delta').value = dati.delta;
 }
@@ -3863,7 +3902,15 @@ nomeParte = nomeParte.slice(0, -suffissoComp.length);
 }
 const { prove, resto: nome } = estraiProveDaSuffisso(nomeParte);
 const premio = estraiPremioDaDescrizione(descrizione);
-return { nome: nome.trim(), completamento, prove, premio };
+
+// Compatibilità con le Liste generate prima della correzione del catalogo:
+// il vecchio tool poteva salvare Il So-Tutto-Sull'Argomento con premio vuoto.
+const nomeMissione = nome.trim();
+if (/Il So-Tutto-Sull(?:'|’)-?Argomento/i.test(nomeMissione) && !premio.ppPostRate && !premio.ppFisso) {
+if (/\(Facile(?:\s|—|\))/i.test(nomeMissione)) premio.ppFisso = 1;
+else if (/\(Medio(?:\s|—|\))/i.test(nomeMissione)) premio.ppFisso = 2;
+}
+return { nome: nomeMissione, completamento, prove, premio };
 }
 
 function parseRoleBlocco(blocco) {
