@@ -780,9 +780,20 @@ button.big {
 </div>
 
 <div class="panel" style="border: 2px solid var(--gold);">
-<label class="tight" for="nomePG">Nome del PG <span class="format-tag">obbligatorio · compare nel titolo del post</span></label>
+<div class="row">
+<div>
+<label class="tight" for="nomePG">Nome del PG <span class="format-tag">obbligatorio</span></label>
 <input type="text" id="nomePG" placeholder="es. Mary Sue">
-<div class="hint" style="margin-top:8px;">Il post generato inizierà con "Lista della Spesa di [Nome]" — evita di doverlo scrivere (o cancellare per sbaglio) a mano.</div>
+</div>
+<div>
+<label class="tight">Tipo di PG <span class="format-tag">obbligatorio</span></label>
+<div class="row" style="gap:8px; align-items:stretch;">
+<label class="radio-option" style="flex:1; margin:0; padding:9px 11px; border:1px solid var(--gold-soft); border-radius:10px; background:#fff; cursor:pointer;"><input type="radio" name="tipoPgLista" value="studente"> Studente</label>
+<label class="radio-option" style="flex:1; margin:0; padding:9px 11px; border:1px solid var(--gold-soft); border-radius:10px; background:#fff; cursor:pointer;"><input type="radio" name="tipoPgLista" value="adulto"> Adulto</label>
+</div>
+</div>
+</div>
+<div class="hint" id="tipo_pg_hint" style="margin-top:8px;">La scelta mostra solo le sezioni compatibili con il PG.</div>
 </div>
 
 <div class="tab-bar" id="tab_bar"></div>
@@ -1012,6 +1023,9 @@ Non hai ancora calcolato nulla.<br>Compila una o più sezioni qui sopra — puoi
 <textarea id="outPostForum" class="output-box" readonly style="min-height:260px;"></textarea>
 <button type="button" class="secondary" id="btn_copia_post" style="margin-top:10px;">📋 Copia tutto</button>
 </div>
+<details class="panel" style="padding:16px 20px;">
+<summary style="cursor:pointer; font-weight:700; color:var(--ink-soft);">Dettagli di controllo</summary>
+<div style="margin-top:14px; display:flex; flex-direction:column; gap:18px;">
 <div class="panel">
 <h2>Riepilogo per Role</h2>
 <div id="riepilogo_roles"></div>
@@ -1036,7 +1050,6 @@ Non hai ancora calcolato nulla.<br>Compila una o più sezioni qui sopra — puoi
 <h2>Riepilogo Commercio Magico</h2>
 <div id="riepilogo_commercio"></div>
 </div>
-<div class="hint" style="margin: 0 4px;">⚠ I box qui sotto sono un <b>doppione di comodo</b>, utile solo se stai testando il tool: gli stessi identici dati sono già dentro il post qui sopra, nel riquadro richiudibile "📎 Dati per l'Accredito". Chi fa gli accrediti lavora sempre a partire dal post pubblicato sul forum, mai da questa pagina.</div>
 <div class="panel">
 <h2>Box A — Elenco Variazioni <span class="format-tag">incolla nel Generatore Accrediti</span></h2>
 <textarea id="outBoxA" class="output-box" readonly></textarea>
@@ -1057,6 +1070,7 @@ Non hai ancora calcolato nulla.<br>Compila una o più sezioni qui sopra — puoi
 <h2>Conoscenze Acquistate <span class="format-tag">incolla direttamente nella scheda, non nel Generatore</span></h2>
 <textarea id="outConoscenze" class="output-box" readonly style="min-height:140px;"></textarea>
 </div>
+</div></details>
 </div>
 </div>
 
@@ -1540,13 +1554,29 @@ const VOTI_BLOCCATI = inFinestraBloccoVoti(new Date());
 
 const SEZIONI = [
 { id: 'segnala', label: 'Segnala e Riscatta Role', pronto: true },
-{ id: 'voti', label: 'Migliora Voti', pronto: true },
-{ id: 'sapienze', label: 'Migliora Sapienze', pronto: true },
+{ id: 'voti', label: 'Migliora Voti', pronto: true, tipo: 'studente' },
+{ id: 'sapienze', label: 'Migliora Sapienze', pronto: true, tipo: 'adulto' },
 { id: 'parametri', label: 'Acquista Dialettica e Parametri', pronto: true },
 { id: 'conoscenze', label: 'Acquista Conoscenze', pronto: true },
 { id: 'commercio', label: 'Commercio Magico', pronto: true },
 { id: 'risultato', label: 'Risultato', pronto: true }
 ];
+
+function tipoPgListaSelezionato() {
+return document.querySelector('input[name="tipoPgLista"]:checked')?.value || '';
+}
+function aggiornaSezioniTipoPg() {
+const tipo = tipoPgListaSelezionato();
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  const def = SEZIONI.find(s => s.id === btn.dataset.tab);
+  btn.style.display = def && def.tipo && def.tipo !== tipo ? 'none' : '';
+});
+const active = document.querySelector('.tab-btn.active');
+if (active && active.style.display === 'none') apriPagina('segnala');
+const hint = document.getElementById('tipo_pg_hint');
+if (hint) hint.textContent = tipo ? (tipo === 'studente' ? 'Modalità Studente: Voti visibili, Sapienze nascoste.' : 'Modalità Adulto: Sapienze visibili, Voti nascosti.') : 'Scegli Studente o Adulto per mostrare le sezioni compatibili.';
+}
+
 
 function apriPagina(id) {
 document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === id));
@@ -1567,6 +1597,8 @@ apriPagina(s.id);
 });
 tabBar.appendChild(btn);
 });
+document.querySelectorAll('input[name="tipoPgLista"]').forEach(r => r.addEventListener('change', aggiornaSezioniTipoPg));
+aggiornaSezioniTipoPg();
 
 // placeholder per le sezioni non ancora pronte (restano visitabili in futuro)
 SEZIONI.filter(s => !s.pronto).forEach(s => {
@@ -1760,7 +1792,7 @@ if (!nome) return null;
 if (azione === 'nuovo') {
 const qty = parseInt(div.querySelector('.f-bag-qty-nuovo').value, 10) || 1;
 const desc = div.querySelector('.f-bag-desc-nuovo').value.trim();
-return { riga: `NUOVO ${categoria}: ${nome} [${qty}]: ${desc}`, narrativa: `- NUOVO ${CATEGORIE_BAGAGLIO_LISTA.find(c => c.value === categoria).label}: ${nome} [${qty}]${desc ? ': ' + desc : ''}` };
+return { azione: 'nuovo', categoria, nome, qty, desc, riga: `NUOVO ${categoria}: ${nome} [${qty}]: ${desc}`, narrativa: `- NUOVO ${CATEGORIE_BAGAGLIO_LISTA.find(c => c.value === categoria).label}: ${nome} [${qty}]${desc ? ': ' + desc : ''}` };
 }
 
 if (azione === 'trasferisci') {
@@ -1769,6 +1801,7 @@ const destinatarioNome = div.querySelector('.f-bag-dest-nome').value.trim();
 const destinatarioLink = div.querySelector('.f-bag-dest-link').value.trim();
 if (!destinatarioNome || !destinatarioLink) return null;
 return {
+azione: 'trasferisci', categoria, nome, qtyTrasferita: qty, destinatarioNome, destinatarioLink,
 riga: `${nome}: -${qty}`,
 narrativa: `- ${nome}: -${qty} — oggetto da trasferire a [URL=${destinatarioLink}]${destinatarioNome}[/URL]`
 };
@@ -1778,9 +1811,9 @@ const delta = parseFloat(div.querySelector('.f-bag-delta').value) || 0;
 if (!delta) return null;
 const segno = delta >= 0 ? '+' : '';
 if (azione === 'usi') {
-return { riga: `USI: ${nome}: ${segno}${delta}`, narrativa: `- ${nome}: ${segno}${normNum(delta)} usi consumati` };
+return { azione: 'usi', categoria, nome, delta, riga: `USI: ${nome}: ${segno}${delta}`, narrativa: `- ${nome}: ${segno}${normNum(delta)} usi consumati` };
 }
-return { riga: `${nome}: ${segno}${delta}`, narrativa: `- ${nome}: ${segno}${normNum(delta)}` };
+return { azione: 'qty', categoria, nome, delta, riga: `${nome}: ${segno}${delta}`, narrativa: `- ${nome}: ${segno}${normNum(delta)}` };
 }).filter(Boolean);
 }
 
@@ -3304,28 +3337,35 @@ return righe.join('\n');
 // non vede mai il tool compilato, vede solo il testo pubblicato sul forum.
 // Un riquadro richiudibile li tiene fuori dai piedi nella lettura narrativa,
 // ma restano comunque testo presente e copiabile dal post stesso.
-function costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG) {
+function costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG, tipoPg, nomePG, movimentiBagaglio) {
+const trasferimenti = (movimentiBagaglio || [])
+.filter(m => m.azione === 'trasferisci')
+.map(m => ({
+  categoria: m.categoria,
+  nome: m.nome,
+  quantita: m.qtyTrasferita,
+  destinatarioNome: m.destinatarioNome,
+  destinatarioLink: m.destinatarioLink
+}));
+const extraRaw = document.getElementById('galeoniExtraRimanenti')?.value;
+const extraBase = extraRaw === '' || extraRaw == null ? null : Number(extraRaw);
+const payload = {
+  versione: 2,
+  tipoPg,
+  nomePg: nomePG,
+  boxA: fmtRighe(totaleGenerale),
+  boxE: tipoPg === 'studente' ? tutteBoxELines : [],
+  boxF: tipoPg === 'adulto' ? tutteBoxFLines : [],
+  boxG: tutteRigheBoxG,
+  trasferimenti,
+  galeoniExtraBase: Number.isFinite(extraBase) ? extraBase : null
+};
 const righe = [];
-righe.push(`<details><summary><b>📎 Dati per l'Accredito — (non modificare, non cancellare, copiare così com'è nella tua Lista della Spesa)</b></summary>`);
-righe.push('');
-righe.push(`<b>BOX A — Elenco Variazioni:</b>`);
-righe.push(fmtRighe(totaleGenerale).join('\n') || '(nessuna variazione)');
-if (tutteBoxELines.length) {
-righe.push('');
-righe.push(`<b>BOX E — Materie Studenti:</b>`);
-righe.push(tutteBoxELines.join(', '));
-}
-if (tutteBoxFLines.length) {
-righe.push('');
-righe.push(`<b>BOX F — Sapienze Adulti:</b>`);
-righe.push(tutteBoxFLines.join(', '));
-}
-if (tutteRigheBoxG.length) {
-righe.push('');
-righe.push(`<b>BOX G — Inventario:</b>`);
-righe.push(tutteRigheBoxG.join('\n'));
-}
-righe.push('</details>');
+righe.push(`<details><summary><b>📎 Dati per l'Accredito — non modificare</b></summary>`);
+righe.push(`[FF-ACCREDITI-V2]`);
+righe.push(JSON.stringify(payload));
+righe.push(`[/FF-ACCREDITI-V2]`);
+righe.push(`</details>`);
 return righe.join('\n');
 }
 
@@ -3503,6 +3543,20 @@ return { totali, boxFLines };
 }
 
 function calcolaTutto() {
+const nomePGCheck = document.getElementById('nomePG').value.trim();
+const tipoPgCheck = tipoPgListaSelezionato();
+const errori = [];
+if (!nomePGCheck) errori.push('Inserisci il Nome del PG.');
+if (!tipoPgCheck) errori.push('Seleziona Studente o Adulto.');
+document.querySelectorAll('.movimenti_bagaglio_list > div').forEach((div, i) => {
+  const azione = div.querySelector('.f-bag-azione-radio:checked')?.value;
+  if (azione !== 'trasferisci') return;
+  const nomeOggetto = div.querySelector('.f-bag-nome')?.value.trim();
+  const nomeDest = div.querySelector('.f-bag-dest-nome')?.value.trim();
+  const linkDest = div.querySelector('.f-bag-dest-link')?.value.trim();
+  if (!nomeOggetto || !nomeDest || !linkDest) errori.push(`Completa il trasferimento Bagaglio n. ${i + 1}: oggetto, destinatario e link sono obbligatori.`);
+});
+if (errori.length) { alert(errori.join('\n')); return; }
 const tassoBase = parseFloat(document.getElementById('tassoBase').value) || 0;
 const totaleGenerale = {};
 const sezioniPost = { segnala: [], voti: [], sapienze: [], parametri: [], conoscenze: '', commercio: [], bagaglio: [] };
@@ -3567,7 +3621,8 @@ sezioniPost.segnala.push(['<u>Missioni completate senza una Role (offgame / a co
 
 // --- Materie (Migliora Voti) ---
 let contatoreE = parseInt(document.getElementById('eGiaPossedute').value, 10) || 0;
-const materiaEls = VOTI_BLOCCATI ? [] : [...document.querySelectorAll('#materie_list > .materia-card')];
+const tipoPgLista = tipoPgListaSelezionato();
+const materiaEls = (tipoPgLista !== 'studente' || VOTI_BLOCCATI) ? [] : [...document.querySelectorAll('#materie_list > .materia-card')];
 const riepilogoMaterieDiv = document.getElementById('riepilogo_materie');
 riepilogoMaterieDiv.innerHTML = '';
 if (VOTI_BLOCCATI) {
@@ -3597,7 +3652,7 @@ totalBadge.textContent = righeTesto || '—';
 if (!materiaEls.length) riepilogoMaterieDiv.innerHTML = '<div class="empty-state">Nessuna Materia compilata.</div>';
 
 // --- Sapienze (Migliora Sapienze) ---
-const sapienzaEls = [...document.querySelectorAll('#sapienze_list > .sapienza-card')];
+const sapienzaEls = tipoPgLista !== 'adulto' ? [] : [...document.querySelectorAll('#sapienze_list > .sapienza-card')];
 const riepilogoSapienzeDiv = document.getElementById('riepilogo_sapienze');
 riepilogoSapienzeDiv.innerHTML = '';
 const tutteBoxFLines = [];
@@ -3791,7 +3846,7 @@ document.getElementById('outBoxG').value = tutteRigheBoxG.length ? tutteRigheBox
 sezioniPost.recap = costruisciRecapFinale(totaleGenerale);
 const nomePG = document.getElementById('nomePG').value.trim();
 const postNarrativo = assemblaPostForum(sezioniPost, nomePG);
-const bloccoDati = postNarrativo ? costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG) : '';
+const bloccoDati = postNarrativo ? costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG, tipoPgLista, nomePG, movimentiBagaglio) : '';
 document.getElementById('outPostForum').value = postNarrativo
 ? postNarrativo + '\n<hr>\n' + bloccoDati
 : '(nessuna sezione compilata)';
@@ -4305,6 +4360,18 @@ return div;
 function caricaListaSpesaPrecedente(testo) {
 const ricostruito = [];
 const nonRicostruibile = [];
+
+// --- Tipo PG dal protocollo ufficiale ---
+const mProtocollo = String(testo || '').match(/\[FF-ACCREDITI-V2\]\s*([\s\S]*?)\s*\[\/FF-ACCREDITI-V2\]/i);
+if (mProtocollo) {
+  try {
+    const datiProtocollo = JSON.parse(mProtocollo[1].trim());
+    if (datiProtocollo && ['studente','adulto'].includes(datiProtocollo.tipoPg)) {
+      const radio = document.querySelector(`input[name="tipoPgLista"][value="${datiProtocollo.tipoPg}"]`);
+      if (radio) { radio.checked = true; aggiornaSezioniTipoPg(); ricostruito.push('Tipo di PG'); }
+    }
+  } catch (e) {}
+}
 
 // --- Nome PG ---
 const mNome = testo.match(/Lista della Spesa di\s+([^<]+?)<\/b>/);
