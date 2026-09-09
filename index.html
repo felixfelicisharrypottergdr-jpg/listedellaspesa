@@ -395,13 +395,16 @@ body {
 
 /* Navigazione */
 .tab-bar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
   padding: 9px;
   gap: 6px;
   border: 1px solid rgba(156,107,36,.23);
   border-radius: 16px;
-  background: rgba(251,247,236,.78);
+  background: rgba(251,247,236,.94);
   box-shadow: 0 8px 22px rgba(55,42,31,.07);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
 }
 
 .tab-btn {
@@ -681,6 +684,11 @@ button.big {
   background-clip: padding-box;
 }
 
+/* Pannelli opzionali: compatti finché non servono */
+.compact-optional-panel.collapsed { padding-top: 14px; padding-bottom: 14px; }
+.compact-optional-panel.collapsed > .acc-header { margin: 0; }
+.compact-optional-panel.collapsed h2 { font-size: 20px; }
+
 /* Responsive */
 @media (max-width: 720px) {
   body { padding: 14px 10px 46px; }
@@ -817,22 +825,26 @@ Compila una scheda per ogni <b>Role</b> segnalata. Tra le missioni <i>non a comp
 <button type="button" class="secondary" id="add_role_btn">+ Aggiungi Role</button>
 </div>
 
-<div class="panel">
-<h2>Missioni completate senza una Role <span id="missione_standalone_counter_badge" class="format-tag">0</span></h2>
-<div class="hint">Usa questa sezione per le missioni a completamento svolte OFFGame o non legate a una Role precisa (es. "ruola con 5 PG diversi", "spendi 500 Galeoni in un negozio"). Il premio si somma sempre per intero — qui non c'è competizione con altre missioni.</div>
+<div class="panel collapsed compact-optional-panel">
+<div class="acc-header" id="missioni_standalone_toggle">
+<span class="acc-chevron">▾</span>
+<h2 style="margin:0; flex:1;">Missioni senza Role <span id="missione_standalone_counter_badge" class="format-tag">0</span></h2>
+</div>
+<div class="acc-body">
+<div class="hint">Per missioni completate senza una Role precisa.</div>
 <div id="missioni_standalone_list"></div>
-<div id="missioni_standalone_empty" class="empty-state">Nessuna missione di questo tipo ancora aggiunta.</div>
+<div id="missioni_standalone_empty" class="empty-state">Nessuna missione aggiunta.</div>
 <button type="button" class="secondary" id="add_missione_standalone_btn">+ Aggiungi missione senza Role</button>
 </div>
+</div>
 
-<div class="panel">
-<h2>Galeoni Extra <span class="format-tag">solo se hai marcato una spesa come Evento/luogo a pagamento</span></h2>
-<div class="hint">I 100 Galeoni Extra si ricevono una tantum alla creazione del PG e si usano solo per partecipare a Eventi o ruolare in luoghi a pagamento (es. locande). Una volta esauriti, le stesse spese iniziano ad attingere dai Galeoni normali. Serve solo se in una Role qui sotto hai risposto "Sì" alla domanda su Galeoni Extra.</div>
-<label class="tight" for="galeoniExtraRimanenti">Quanti Galeoni Extra ha ancora il PG, prima di questa richiesta? <span class="format-tag">controllalo sulla Scheda Valori</span></label>
+<div class="panel" id="galeoni_extra_panel" style="display:none;">
+<h2>Galeoni Extra</h2>
+<label class="tight" for="galeoniExtraRimanenti">Galeoni Extra disponibili prima di questa richiesta</label>
 <input type="number" id="galeoniExtraRimanenti" min="0" step="1" style="max-width:160px">
 </div>
 
-<div class="panel">
+<div class="panel compact-optional-panel">
 <div class="acc-header" id="oggetti_toggle">
 <span class="acc-chevron">▾</span>
 <h2 style="margin:0; flex:1;">Bagaglio: Oggetti, Pozioni, Immunità <span class="format-tag">tutte le Role · opzionale</span></h2>
@@ -847,7 +859,7 @@ Una riga per ogni Oggetto/Pozione/Immunità coinvolto — scegli categoria e cos
 </div>
 </div>
 
-<div class="panel">
+<div class="panel compact-optional-panel">
 <div class="acc-header" id="conversione_toggle">
 <span class="acc-chevron">▾</span>
 <h2 style="margin:0; flex:1;">Conversione PP → Galeoni <span class="format-tag">opzionale</span></h2>
@@ -1565,6 +1577,39 @@ const SEZIONI = [
 function tipoPgListaSelezionato() {
 return document.querySelector('input[name="tipoPgLista"]:checked')?.value || '';
 }
+
+function ruoloUsaGaleoniExtra() {
+  if (tipoPgListaSelezionato() !== 'adulto') return false;
+  return [...document.querySelectorAll('#roles_list > .role-card')].some(roleEl => {
+    const spesa = parseFloat(roleEl.querySelector('.f-galeonispesi')?.value) || 0;
+    const extra = roleEl.querySelector('.f-galeoni-extra-radio:checked')?.value === 'si';
+    return spesa > 0 && extra;
+  });
+}
+
+function aggiornaVisibilitaGaleoniExtra() {
+  const tipo = tipoPgListaSelezionato();
+  const adulto = tipo === 'adulto';
+
+  document.querySelectorAll('#roles_list > .role-card').forEach(roleEl => {
+    const spesa = parseFloat(roleEl.querySelector('.f-galeonispesi')?.value) || 0;
+    const wrap = roleEl.querySelector('.f-galeoni-extra-wrap');
+    if (wrap) wrap.style.display = adulto && spesa > 0 ? 'block' : 'none';
+    if (!adulto) {
+      const no = roleEl.querySelector('.f-galeoni-extra-radio[value="no"]');
+      if (no) no.checked = true;
+    }
+  });
+
+  const panel = document.getElementById('galeoni_extra_panel');
+  const usaExtra = ruoloUsaGaleoniExtra();
+  if (panel) panel.style.display = usaExtra ? 'block' : 'none';
+  if (!adulto) {
+    const campo = document.getElementById('galeoniExtraRimanenti');
+    if (campo) campo.value = '';
+  }
+}
+
 function aggiornaSezioniTipoPg() {
 const tipo = tipoPgListaSelezionato();
 document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -1575,6 +1620,7 @@ const active = document.querySelector('.tab-btn.active');
 if (active && active.style.display === 'none') apriPagina('segnala');
 const hint = document.getElementById('tipo_pg_hint');
 if (hint) hint.textContent = tipo ? (tipo === 'studente' ? 'Modalità Studente: Voti visibili, Sapienze nascoste.' : 'Modalità Adulto: Sapienze visibili, Voti nascosti.') : 'Scegli Studente o Adulto per mostrare le sezioni compatibili.';
+aggiornaVisibilitaGaleoniExtra();
 }
 
 
@@ -1634,7 +1680,7 @@ if (e.target.closest('button, input, textarea, select, a')) return;
 headerEl.parentElement.classList.toggle('collapsed');
 });
 }
-['oggetti_toggle', 'conversione_toggle', 'info_toggle_segnala', 'info_toggle_voti', 'info_toggle_sapienze', 'info_toggle_parametri', 'info_toggle_conoscenze', 'info_toggle_commercio', 'tutorial_toggle'].forEach(id => {
+['missioni_standalone_toggle', 'oggetti_toggle', 'conversione_toggle', 'info_toggle_segnala', 'info_toggle_voti', 'info_toggle_sapienze', 'info_toggle_parametri', 'info_toggle_conoscenze', 'info_toggle_commercio', 'tutorial_toggle'].forEach(id => {
 const header = document.getElementById(id);
 header.addEventListener('click', () => header.parentElement.classList.toggle('collapsed'));
 header.parentElement.classList.add('collapsed'); // chiusi di default
@@ -2277,7 +2323,7 @@ header.innerHTML = `
 const delBtn = document.createElement('button');
 delBtn.type = 'button'; delBtn.className = 'danger'; delBtn.textContent = '✕';
 delBtn.title = 'Rimuovi Role';
-delBtn.addEventListener('click', (e) => { e.stopPropagation(); div.remove(); aggiornaContatoreRole(); });
+delBtn.addEventListener('click', (e) => { e.stopPropagation(); div.remove(); aggiornaContatoreRole(); aggiornaVisibilitaGaleoniExtra(); });
 header.appendChild(delBtn);
 div.appendChild(header);
 abilitaAccordion(header);
@@ -2317,9 +2363,10 @@ body.appendChild(domandaGaleoniExtraWrap);
 rigaBase.querySelector('.f-galeonispesi').addEventListener('input', (e) => {
 const mostra = (parseFloat(e.target.value) || 0) !== 0;
 div.querySelectorAll('.f-coeff-debito-wrap').forEach(el => { el.style.display = mostra ? 'block' : 'none'; });
-domandaGaleoniExtraWrap.style.display = mostra ? 'block' : 'none';
 if (!mostra) domandaGaleoniExtraWrap.querySelector('.f-galeoni-extra-radio[value="no"]').checked = true;
+aggiornaVisibilitaGaleoniExtra();
 });
+domandaGaleoniExtraWrap.querySelectorAll('.f-galeoni-extra-radio').forEach(r => r.addEventListener('change', aggiornaVisibilitaGaleoniExtra));
 
 const missioniList = document.createElement('div');
 missioniList.className = 'missioni_list';
@@ -2330,7 +2377,10 @@ const addMissioneBtn = document.createElement('button');
 addMissioneBtn.type = 'button'; addMissioneBtn.className = 'secondary';
 addMissioneBtn.textContent = '+ Aggiungi missione completata';
 addMissioneBtn.style.marginTop = '4px';
-addMissioneBtn.addEventListener('click', () => missioniList.appendChild(creaMissioneCard()));
+addMissioneBtn.addEventListener('click', () => {
+  missioniList.querySelectorAll('.missione-card').forEach(card => card.classList.add('collapsed'));
+  missioniList.appendChild(creaMissioneCard());
+});
 body.appendChild(addMissioneBtn);
 
 div.appendChild(body);
@@ -2351,12 +2401,16 @@ return div;
 }
 
 document.getElementById('add_role_btn').addEventListener('click', () => {
-document.getElementById('roles_list').appendChild(creaRoleCard());
+document.querySelectorAll('#roles_list > .role-card').forEach(card => card.classList.add('collapsed'));
+const nuova = creaRoleCard();
+document.getElementById('roles_list').appendChild(nuova);
 aggiornaContatoreRole();
+aggiornaVisibilitaGaleoniExtra();
 });
 // prima Role all'avvio, per comodità
 document.getElementById('roles_list').appendChild(creaRoleCard());
 aggiornaContatoreRole();
+aggiornaVisibilitaGaleoniExtra();
 
 // ============ COSTRUZIONE FORM DINAMICO — MISSIONI SENZA ROLE ============
 let missioneStandaloneCounter = 0;
@@ -2531,6 +2585,7 @@ return div;
 }
 
 document.getElementById('add_missione_standalone_btn').addEventListener('click', () => {
+document.querySelectorAll('#missioni_standalone_list > .missione-standalone-card').forEach(card => card.classList.add('collapsed'));
 document.getElementById('missioni_standalone_list').appendChild(creaMissioneStandaloneCard());
 aggiornaContatoreMissioneStandalone();
 });
@@ -3347,7 +3402,8 @@ const trasferimenti = (movimentiBagaglio || [])
   destinatarioNome: m.destinatarioNome,
   destinatarioLink: m.destinatarioLink
 }));
-const extraRaw = document.getElementById('galeoniExtraRimanenti')?.value;
+const extraAttivi = tipoPg === 'adulto' && ruoloUsaGaleoniExtra();
+const extraRaw = extraAttivi ? document.getElementById('galeoniExtraRimanenti')?.value : '';
 const extraBase = extraRaw === '' || extraRaw == null ? null : Number(extraRaw);
 const payload = {
   versione: 2,
@@ -3548,6 +3604,7 @@ const tipoPgCheck = tipoPgListaSelezionato();
 const errori = [];
 if (!nomePGCheck) errori.push('Inserisci il Nome del PG.');
 if (!tipoPgCheck) errori.push('Seleziona Studente o Adulto.');
+if (ruoloUsaGaleoniExtra() && String(document.getElementById('galeoniExtraRimanenti')?.value ?? '').trim() === '') errori.push('Inserisci i Galeoni Extra disponibili prima della richiesta.');
 document.querySelectorAll('.movimenti_bagaglio_list > div').forEach((div, i) => {
   const azione = div.querySelector('.f-bag-azione-radio:checked')?.value;
   if (azione !== 'trasferisci') return;
@@ -3565,7 +3622,7 @@ const sezioniPost = { segnala: [], voti: [], sapienze: [], parametri: [], conosc
 const roleEls = [...document.querySelectorAll('#roles_list > .role-card')];
 const riepilogoRoleDiv = document.getElementById('riepilogo_roles');
 riepilogoRoleDiv.innerHTML = '';
-let extraRimanente = parseFloat(document.getElementById('galeoniExtraRimanenti').value) || 0;
+let extraRimanente = ruoloUsaGaleoniExtra() ? (parseFloat(document.getElementById('galeoniExtraRimanenti').value) || 0) : 0;
 roleEls.forEach((roleEl, idx) => {
 const role = leggiRoleDalDOM(roleEl);
 const totaliRole = calcolaRole(role, tassoBase);
