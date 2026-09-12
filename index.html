@@ -801,13 +801,50 @@ button.big {
 .quick-action-copy i{color:#D7B66C;}
 .quick-action-copy span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .quick-action-bar button{min-width:220px;box-shadow:none;}
+
+/* CTA Risultato: separato dalla navigazione delle sezioni */
+#quick_calcola_btn{
+  background:linear-gradient(145deg,#D1A24C,#96651F);
+  border:1px solid rgba(244,220,161,.46);
+  color:#FFF9EA;
+  font-size:13.5px;
+  letter-spacing:.025em;
+  box-shadow:0 7px 18px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.20);
+}
+#quick_calcola_btn:hover{
+  background:linear-gradient(145deg,#DCAF59,#A16D23);
+}
 .validation-toast{
   display:none; margin:0; padding:11px 14px; border-radius:11px; border:1px solid rgba(139,58,58,.25);
   border-left:4px solid var(--red); background:#F7E7E2; color:#672B2B; font-size:12px; line-height:1.45;
 }
 .validation-toast.show{display:block;}
 .validation-toast b{color:#542020;}
-.tab-btn[data-tab="risultato"]{margin-left:auto;}
+/* Navigazione principale: le 5 sezioni disponibili restano sempre su una sola riga su desktop.
+   Il Risultato non è una sezione di compilazione: si apre dal CTA sticky in basso. */
+#tab_bar{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  align-items:stretch;
+}
+#tab_bar .tab-btn{
+  width:100%;
+  min-width:0;
+  white-space:normal;
+  line-height:1.2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+#tab_bar .tab-btn[style*="display: none"]{display:none !important;}
+@media(max-width:760px){
+  #tab_bar{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media(max-width:430px){
+  #tab_bar{grid-template-columns:1fr;}
+}
+
 .role-card>.acc-header,.missione-card>.acc-header{min-height:32px;}
 .role-card.collapsed>.acc-header,.missione-card.collapsed>.acc-header{margin-bottom:0;}
 .role-card.collapsed{padding-top:11px;padding-bottom:11px;}
@@ -916,7 +953,7 @@ button.big {
 </div>
 <div class="fmt-case">
 <div class="fmt-case-label">4. Pubblica il risultato così com'è</div>
-<div class="fmt-case-desc">Copia il riquadro <b>"📋 Lista della Spesa da pubblicare sul Forum"</b> nella pagina "Risultato" e incollalo, tale e quale, nel topic della tua Lista della Spesa — <b>incluso il riquadro richiudibile "📎 Dati per l'Accredito"</b> in fondo, che non è decorativo: è la parte che lo Staff userà davvero. Non modificarlo a meno che non ti serva aggiungere qualcosa che il tool non ti ha permesso di scrivere (es. un link di prova non previsto). Questo è il testo da cui lo Staff inserirà nella tua scheda tutti i premi che hai richiesto: se qualcosa qui è impreciso o mancante, lo sarà anche quello che ti verrà accreditato — vale la pena ricontrollarlo con attenzione prima di pubblicarlo.</div>
+<div class="fmt-case-desc">Premi il pulsante fisso <b>"Calcola e apri il Risultato"</b>, poi copia il riquadro <b>"📋 Lista della Spesa da pubblicare sul Forum"</b> e incollalo, tale e quale, nel topic della tua Lista della Spesa — <b>incluso il riquadro richiudibile "📎 Dati per l'Accredito"</b> in fondo, che non è decorativo: è la parte che lo Staff userà davvero. Non modificarlo a meno che non ti serva aggiungere qualcosa che il tool non ti ha permesso di scrivere (es. un link di prova non previsto). Questo è il testo da cui lo Staff inserirà nella tua scheda tutti i premi che hai richiesto: se qualcosa qui è impreciso o mancante, lo sarà anche quello che ti verrà accreditato — vale la pena ricontrollarlo con attenzione prima di pubblicarlo.</div>
 </div>
 </div>
 </div>
@@ -943,7 +980,7 @@ button.big {
 <div id="validation_toast" class="validation-toast" role="alert"></div>
 <div class="quick-action-bar" id="quick_action_bar">
   <div class="quick-action-copy"><i class="fa-solid fa-circle-check"></i><span id="quick_action_text">Compila le sezioni che ti servono: puoi calcolare tutto da qui in qualsiasi momento.</span><span id="quick_action_stats" class="quick-stats">Nessun dato ancora</span></div>
-  <button type="button" id="quick_calcola_btn"><i class="fa-solid fa-wand-magic-sparkles"></i>&nbsp; Calcola e vai al risultato</button>
+  <button type="button" id="quick_calcola_btn"><i class="fa-solid fa-wand-magic-sparkles"></i>&nbsp; Calcola e apri il Risultato</button>
 </div>
 
 <!-- ============ PAGINA: SEGNALA E RISCATTA ROLE ============ -->
@@ -1710,8 +1747,7 @@ const SEZIONI = [
 { id: 'sapienze', label: 'Migliora Sapienze', pronto: true, tipo: 'adulto' },
 { id: 'parametri', label: 'Acquista Dialettica e Parametri', pronto: true },
 { id: 'conoscenze', label: 'Acquista Conoscenze', pronto: true },
-{ id: 'commercio', label: 'Commercio Magico', pronto: true },
-{ id: 'risultato', label: 'Risultato', pronto: true }
+{ id: 'commercio', label: 'Commercio Magico', pronto: true }
 ];
 
 function tipoPgListaSelezionato() {
