@@ -966,6 +966,41 @@ button.big {
   .price-guide-head{align-items:flex-start;flex-direction:column;}
 }
 
+
+/* UX/UI v8 — guide di sezione più leggibili e prezzi integrati */
+.section-help-label{
+  display:inline-flex;align-items:center;gap:9px;
+  font-weight:850;color:var(--green);font-size:16px;line-height:1.25;
+  letter-spacing:.01em;
+}
+.section-help-label i{
+  width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;
+  border-radius:50%;background:var(--green-soft);color:var(--green);
+  border:1px solid rgba(63,107,79,.18);font-size:13px;
+}
+.page > .collapsed > .acc-header{padding:8px 10px;margin-bottom:2px;}
+.page > .collapsed > .acc-body.info-box{
+  font-size:13.5px;line-height:1.62;padding:15px 17px;margin-top:8px!important;
+}
+.section-help-copy{margin:0 0 12px;}
+.section-help-prices{margin-top:12px;}
+.section-help-prices .price-card{background:rgba(255,255,255,.80);}
+.section-help-prices .price-row{font-size:12px;padding:7px 0;}
+.section-help-prices .price-card h3{font-size:17px;}
+.section-help-prices .price-note{font-size:11px;}
+.section-help-links{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;}
+.section-help-links a{
+  display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;
+  border:1px solid rgba(156,107,36,.25);background:#FFF9EA;color:var(--gold-deep);
+  font-size:10.8px;font-weight:800;text-decoration:none;
+}
+.section-help-links a:hover{border-color:rgba(156,107,36,.55);}
+.sapienza-self-knowledge{margin:10px 0 0;}
+@media(max-width:620px){
+  .section-help-label{font-size:15px;}
+  .page > .collapsed > .acc-body.info-box{font-size:13px;}
+}
+
 </style>
 </head>
 <body>
@@ -1054,7 +1089,7 @@ button.big {
 <div class="collapsed">
 <div class="acc-header" id="info_toggle_segnala">
 <span class="acc-chevron">▾</span>
-<span style="font-weight:700; color: var(--green); font-size:13px;">ℹ️ Come funziona questa sezione</span>
+<span class="section-help-label"><i class="fa-solid fa-circle-info"></i> Come funziona questa sezione</span>
 </div>
 <div class="acc-body info-box" style="margin-top:10px;">
 Compila una scheda per ogni <b>Role</b> segnalata. Tra le missioni <i>non a completamento</i> vale solo il premio più alto per tipo; le missioni <i>a completamento</i> si sommano sempre per intero.
@@ -1129,30 +1164,26 @@ Una riga per ogni Oggetto/Pozione/Immunità coinvolto — scegli categoria e cos
 <div class="collapsed">
 <div class="acc-header" id="info_toggle_voti">
 <span class="acc-chevron">▾</span>
-<span style="font-weight:700; color: var(--green); font-size:13px;">ℹ️ Come funziona questa sezione</span>
+<span class="section-help-label"><i class="fa-solid fa-circle-info"></i> Come funziona questa sezione</span>
 </div>
 <div class="acc-body info-box" style="margin-top:10px;">
-Il costo di ogni Conoscenza dipende dal voto di partenza: <b>Troll→Desolante</b> e <b>Desolante→Scadente</b> costano 100 Galeoni (o una role di studio) e valgono per <i>tutte</i> le Conoscenze della Materia che hanno quel voto, insieme. <b>Scadente→Accettabile</b> costa 15 Galeoni a Conoscenza. <b>Accettabile→Oltre Ogni Previsione</b> costa 3 PP a Conoscenza. <b>Oltre Ogni Previsione→Eccezionale</b> costa 4 PP a Conoscenza, +1 PP ogni 10 Eccezionale già ottenute in Piano di Studi (solo se la Conoscenza è nel Piano di Studi di quest'anno).
-</div>
-</div>
-
-
-<details class="price-guide">
-<summary><span class="price-guide-title"><i class="fa-solid fa-coins"></i><span>Consulta prezzi dei Voti</span></span></summary>
-<div class="price-guide-body">
-  <div class="price-guide-head"><p>Apri solo quando ti serve controllare quanto puoi permetterti.</p><a class="price-guide-link" href="https://felixfelicisharrypottergdr.forumfree.it/?t=80398053#migliorarepiano" target="_blank" rel="noopener">Regolamento ↗</a></div>
+<p class="section-help-copy">Il costo dipende dal voto di partenza. I primi due passaggi migliorano insieme <b>tutte le Conoscenze della Materia</b> che hanno quel voto; da Scadente in su il costo è per singola Conoscenza.</p>
+<div class="section-help-prices">
   <div class="price-card">
+    <h3>Prezzi dei Voti</h3>
     <div class="price-list">
-      <div class="price-row"><span>Troll → Desolante</span><b>100 G o Role</b></div>
-      <div class="price-row"><span>Desolante → Scadente</span><b>100 G o Role</b></div>
-      <div class="price-row"><span>Scadente → Accettabile</span><b>15 G / Conoscenza</b></div>
+      <div class="price-row"><span>Troll → Desolante</span><b>100 Galeoni oppure 1 Role di studio</b></div>
+      <div class="price-row"><span>Desolante → Scadente</span><b>100 Galeoni oppure 1 Role di studio</b></div>
+      <div class="price-row"><span>Scadente → Accettabile</span><b>15 Galeoni / Conoscenza</b></div>
       <div class="price-row"><span>Accettabile → Oltre Ogni Previsione</span><b>3 PP / Conoscenza</b></div>
-      <div class="price-row"><span>Oltre Ogni Previsione → Eccezionale</span><b>4 PP + crescita</b></div>
+      <div class="price-row"><span>Oltre Ogni Previsione → Eccezionale</span><b>4 PP / Conoscenza + 1 PP ogni 10 E</b></div>
     </div>
-    <div class="price-note">Il passaggio a Eccezionale aumenta di +1 PP ogni 10 Eccezionale già possedute in Piano di Studi. Il tool calcola automaticamente il prezzo effettivo.</div>
+    <div class="price-note">Per Eccezionale, il +1 PP si applica ogni 10 Eccezionale già possedute nel Piano di Studi. Il tool usa il numero inserito sotto per calcolare automaticamente il costo effettivo.</div>
   </div>
 </div>
-</details>
+<div class="section-help-links"><a href="https://felixfelicisharrypottergdr.forumfree.it/?t=80398053#migliorarepiano" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Regolamento Voti</a></div>
+</div>
+</div>
 
 <div class="panel">
 <label class="tight" for="eGiaPossedute">Quante Eccezionale (E) ha già il PG in Piano di Studi, prima di questa richiesta?</label>
@@ -1176,44 +1207,38 @@ Il costo di ogni Conoscenza dipende dal voto di partenza: <b>Troll→Desolante</
 <div class="collapsed">
 <div class="acc-header" id="info_toggle_sapienze">
 <span class="acc-chevron">▾</span>
-<span style="font-weight:700; color: var(--green); font-size:13px;">ℹ️ Come funziona questa sezione</span>
+<span class="section-help-label"><i class="fa-solid fa-circle-info"></i> Come funziona questa sezione</span>
 </div>
 <div class="acc-body info-box" style="margin-top:10px;">
-Ogni Sapienza ha 5 Livelli (I–V). Il costo di ogni Livello dipende dal tipo di Sapienza: le <b>Sapienze Magiche</b> hanno Conoscenze sviluppabili singolarmente (es. Sapienza Offensiva → Ad Caelum, Ardor, Bombarda Maxima...); le <b>Sapienze Fisiche e Sociali</b> hanno un unico Livello complessivo, più costoso. Per salire di più Livelli insieme, il costo è la somma del prezzo di ciascun Livello attraversato.
-</div>
-</div>
-
-
-<details class="price-guide">
-<summary><span class="price-guide-title"><i class="fa-solid fa-coins"></i><span>Consulta prezzi delle Sapienze</span></span></summary>
-<div class="price-guide-body">
-  <div class="price-guide-head"><p>Prezzo del singolo Livello raggiunto; se sali di più Livelli, il tool somma automaticamente tutti i passaggi.</p></div>
-  <div class="price-guide-grid">
-    <div class="price-card">
-      <h3>Sapienze Magiche</h3>
-      <div class="price-list">
-        <div class="price-row"><span>Livello I</span><b>50 G</b></div>
-        <div class="price-row"><span>Livello II</span><b>5 PP</b></div>
-        <div class="price-row"><span>Livello III</span><b>10 PP</b></div>
-        <div class="price-row"><span>Livello IV</span><b>15 PP</b></div>
-        <div class="price-row"><span>Livello V</span><b>20 PP</b></div>
-      </div>
-      <div class="price-note"><a class="price-guide-link" href="https://felixfelicisharrypottergdr.forumfree.it/?t=79207498#entry659054408" target="_blank" rel="noopener">Maggiori info ↗</a></div>
+<p class="section-help-copy">Ogni Sapienza è suddivisa in <b>5 Livelli (I–V)</b>. Nelle <b>Sapienze Magiche</b> esistono più Conoscenze sviluppabili separatamente (per esempio Sapienza Offensiva → Ad Caelum, Ardor, Bombarda Maxima...). Ogni <b>Sapienza Fisica o Sociale</b>, invece, ha <b>una sola Conoscenza, che coincide con la Sapienza stessa</b>: quella Conoscenza è a sua volta suddivisa nei 5 Livelli e ha costi più alti. Se sali di più Livelli nella stessa richiesta, il costo è la somma di tutti i Livelli attraversati.</p>
+<div class="section-help-prices price-guide-grid">
+  <div class="price-card">
+    <h3>Sapienze Magiche — prezzo per Conoscenza</h3>
+    <div class="price-list">
+      <div class="price-row"><span>Livello I</span><b>50 Galeoni</b></div>
+      <div class="price-row"><span>Livello II</span><b>5 PP</b></div>
+      <div class="price-row"><span>Livello III</span><b>10 PP</b></div>
+      <div class="price-row"><span>Livello IV</span><b>15 PP</b></div>
+      <div class="price-row"><span>Livello V</span><b>20 PP</b></div>
     </div>
-    <div class="price-card">
-      <h3>Sapienze Fisiche e Sociali</h3>
-      <div class="price-list">
-        <div class="price-row"><span>Livello I</span><b>150 G</b></div>
-        <div class="price-row"><span>Livello II</span><b>10 PP</b></div>
-        <div class="price-row"><span>Livello III</span><b>20 PP</b></div>
-        <div class="price-row"><span>Livello IV</span><b>40 PP</b></div>
-        <div class="price-row"><span>Livello V</span><b>80 PP</b></div>
-      </div>
-      <div class="price-note"><a class="price-guide-link" href="https://felixfelicisharrypottergdr.forumfree.it/?t=80397118#costosapmagica" target="_blank" rel="noopener">Maggiori info ↗</a></div>
+  </div>
+  <div class="price-card">
+    <h3>Sapienze Fisiche e Sociali — unica Conoscenza</h3>
+    <div class="price-list">
+      <div class="price-row"><span>Livello I</span><b>150 Galeoni</b></div>
+      <div class="price-row"><span>Livello II</span><b>10 PP</b></div>
+      <div class="price-row"><span>Livello III</span><b>20 PP</b></div>
+      <div class="price-row"><span>Livello IV</span><b>40 PP</b></div>
+      <div class="price-row"><span>Livello V</span><b>80 PP</b></div>
     </div>
   </div>
 </div>
-</details>
+<div class="section-help-links">
+<a href="https://felixfelicisharrypottergdr.forumfree.it/?t=79207498#entry659054408" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Sapienze Magiche</a>
+<a href="https://felixfelicisharrypottergdr.forumfree.it/?t=80397118#costosapmagica" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Sapienze Fisiche e Sociali</a>
+</div>
+</div>
+</div>
 
 <div class="panel">
 <h2>Sapienze da migliorare <span id="sapienza_counter_badge" class="format-tag">0</span></h2>
@@ -1230,44 +1255,36 @@ Ogni Sapienza ha 5 Livelli (I–V). Il costo di ogni Livello dipende dal tipo di
 <div class="collapsed">
 <div class="acc-header" id="info_toggle_parametri">
 <span class="acc-chevron">▾</span>
-<span style="font-weight:700; color: var(--green); font-size:13px;">ℹ️ Come funziona questa sezione</span>
+<span class="section-help-label"><i class="fa-solid fa-circle-info"></i> Come funziona questa sezione</span>
 </div>
 <div class="acc-body info-box" style="margin-top:10px;">
-Ogni punto aggiuntivo di un Parametro Magico o Fisico costa <b>100 PP</b> per i primi 5 punti acquistati in totale (Magici e Fisici insieme), <b>150 PP</b> per i successivi 5, <b>200 PP</b> per i successivi 5, e così via — il contatore è condiviso tra tutti i Parametri, non separato per ciascuno. La Dialettica ha invece una tabella propria in Galeoni (il primo punto è gratuito, di base).
-</div>
-</div>
-
-
-<details class="price-guide">
-<summary><span class="price-guide-title"><i class="fa-solid fa-coins"></i><span>Consulta prezzi di Dialettica e Parametri</span></span></summary>
-<div class="price-guide-body">
-  <div class="price-guide-head"><p>Riferimento rapido prima di impostare l'acquisto.</p><a class="price-guide-link" href="https://felixfelicisharrypottergdr.forumfree.it/?t=80327413#ottparam" target="_blank" rel="noopener">Regolamento ↗</a></div>
-  <div class="price-guide-grid">
-    <div class="price-card">
-      <h3>Dialettica</h3>
-      <div class="price-list">
-        <div class="price-row"><span>Punto 1</span><b>Di base</b></div>
-        <div class="price-row"><span>Punto 2</span><b>50 G</b></div>
-        <div class="price-row"><span>Punto 3</span><b>100 G</b></div>
-        <div class="price-row"><span>Punto 4</span><b>200 G</b></div>
-        <div class="price-row"><span>Punto 5</span><b>400 G</b></div>
-        <div class="price-row"><span>Punto 6+</span><b>600 G ciascuno</b></div>
-      </div>
-      <div class="price-note">Gli Studenti possono acquistare Dialettica fino a 10 Punti.</div>
+<p class="section-help-copy">La <b>Dialettica</b> si compra in Galeoni. I <b>Parametri Magici e Fisici</b> si comprano in PP e il costo cresce <b>separatamente per ogni Parametro</b>: conta quindi quanti punti aggiuntivi hai già acquistato proprio in Acume, Empatia, Destrezza ecc., non il totale complessivo degli altri Parametri.</p>
+<div class="section-help-prices price-guide-grid">
+  <div class="price-card">
+    <h3>Dialettica</h3>
+    <div class="price-list">
+      <div class="price-row"><span>Punto 1</span><b>Ottenuto di base</b></div>
+      <div class="price-row"><span>Punto 2</span><b>50 Galeoni</b></div>
+      <div class="price-row"><span>Punto 3</span><b>100 Galeoni</b></div>
+      <div class="price-row"><span>Punto 4</span><b>200 Galeoni</b></div>
+      <div class="price-row"><span>Punto 5</span><b>400 Galeoni</b></div>
+      <div class="price-row"><span>Punto 6 e successivi</span><b>600 Galeoni / punto</b></div>
     </div>
-    <div class="price-card">
-      <h3>Parametri Magici e Fisici</h3>
-      <div class="price-list">
-        <div class="price-row"><span>Primi 5 punti aggiuntivi</span><b>100 PP / punto</b></div>
-        <div class="price-row"><span>Successivi 5</span><b>150 PP / punto</b></div>
-        <div class="price-row"><span>Successivi 5</span><b>200 PP / punto</b></div>
-        <div class="price-row"><span>Ogni fascia successiva</span><b>+50 PP / punto</b></div>
-      </div>
-      <div class="price-note">Il riepilogo sotto usa il contatore inserito nel tool per mostrarti il costo effettivo del prossimo punto.</div>
+    <div class="price-note">La Dialettica non si perde con il tempo. I PG Studenti possono acquistarla fino a un massimo di 10 Punti.</div>
+  </div>
+  <div class="price-card">
+    <h3>Parametri Magici e Fisici</h3>
+    <div class="price-list">
+      <div class="price-row"><span>Primi 5 punti aggiuntivi nello stesso Parametro</span><b>100 PP / punto</b></div>
+      <div class="price-row"><span>Successivi 5 nello stesso Parametro</span><b>150 PP / punto</b></div>
+      <div class="price-row"><span>Successivi 5 nello stesso Parametro</span><b>200 PP / punto</b></div>
+      <div class="price-row"><span>Ogni fascia successiva di 5</span><b>+50 PP / punto</b></div>
     </div>
   </div>
 </div>
-</details>
+<div class="section-help-links"><a href="https://felixfelicisharrypottergdr.forumfree.it/?t=80327413#ottparam" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Regolamento Parametri e Dialettica</a></div>
+</div>
+</div>
 
 <div class="panel">
 <h2>Dialettica <span class="format-tag">opzionale</span></h2>
@@ -1276,12 +1293,6 @@ Ogni punto aggiuntivo di un Parametro Magico o Fisico costa <b>100 PP</b> per i 
 <div style="max-width:170px;"><label class="tight">Livello finale</label><select id="dialetticaFinale"></select></div>
 </div>
 <div id="riepilogoDialettica" class="role-summary" style="margin-top:10px;">Nessun acquisto di Dialettica impostato.</div>
-</div>
-
-<div class="panel">
-<label class="tight" for="puntiParamGiaAcquistati">Quanti punti aggiuntivi di Parametri Magici/Fisici ha già acquistato in totale, prima di questa richiesta?</label>
-<input type="number" id="puntiParamGiaAcquistati" value="0" min="0" step="1" style="max-width:160px">
-<div id="anteprimaPrezzoParam" class="role-summary" style="margin-top:10px;">Con questo valore, il prossimo punto acquistato costerà <b>100 PP</b>.</div>
 </div>
 
 <div class="panel">
@@ -1299,37 +1310,32 @@ Ogni punto aggiuntivo di un Parametro Magico o Fisico costa <b>100 PP</b> per i 
 <div class="collapsed">
 <div class="acc-header" id="info_toggle_conoscenze">
 <span class="acc-chevron">▾</span>
-<span style="font-weight:700; color: var(--green); font-size:13px;">ℹ️ Come funziona questa sezione</span>
+<span class="section-help-label"><i class="fa-solid fa-circle-info"></i> Come funziona questa sezione</span>
 </div>
 <div class="acc-body info-box" style="margin-top:10px;">
-Compila un blocco per ogni gruppo di Conoscenze dello stesso Tipo e della stessa Categoria (es. "5 Conoscenze Avanzate di categoria Arcaiche"). Il costo è per singola Conoscenza: Generica 10 G, Scolastica V/VI anno 20 G, Scolastica VII anno 30 G, Fatture e Pozioni Fatturanti 40 G, Extra 50 G, Avanzata 100 G. Le Conoscenze create dai player hanno prezzo libero (opzione "Personalizzata"). L'output è già pronto da incollare nella scheda, oltre alla spesa in Galeoni che va nel Box A.
-</div>
-</div>
-
-
-<details class="price-guide">
-<summary><span class="price-guide-title"><i class="fa-solid fa-coins"></i><span>Consulta prezzi delle Conoscenze</span></span></summary>
-<div class="price-guide-body">
-  <div class="price-guide-head"><p>Prezzo per singola Conoscenza.</p><a class="price-guide-link" href="https://felixfelicisharrypottergdr.forumfree.it/?t=80349928#acquistare" target="_blank" rel="noopener">Regolamento ↗</a></div>
-  <div class="price-guide-grid">
-    <div class="price-card">
-      <div class="price-list">
-        <div class="price-row"><span>Generiche</span><b>10 G</b></div>
-        <div class="price-row"><span>Scolastiche V e VI anno</span><b>20 G</b></div>
-        <div class="price-row"><span>Scolastiche VII anno</span><b>30 G</b></div>
-      </div>
+<p class="section-help-copy">Compila un blocco per ogni gruppo di Conoscenze dello stesso Tipo e della stessa Categoria. Il prezzo indicato sotto è <b>per singola Conoscenza</b>; il tool moltiplica automaticamente per quante ne inserisci. Le Conoscenze create dai player usano il prezzo personalizzato.</p>
+<div class="section-help-prices price-guide-grid">
+  <div class="price-card">
+    <h3>Conoscenze</h3>
+    <div class="price-list">
+      <div class="price-row"><span>Generiche</span><b>10 Galeoni ciascuna</b></div>
+      <div class="price-row"><span>Scolastiche V e VI anno</span><b>20 Galeoni ciascuna</b></div>
+      <div class="price-row"><span>Scolastiche VII anno</span><b>30 Galeoni ciascuna</b></div>
     </div>
-    <div class="price-card">
-      <div class="price-list">
-        <div class="price-row"><span>Fatture e Pozioni Fatturanti</span><b>40 G</b></div>
-        <div class="price-row"><span>Extra</span><b>50 G</b></div>
-        <div class="price-row"><span>Avanzate</span><b>100 G</b></div>
-        <div class="price-row"><span>Create dai player</span><b>Prezzo variabile</b></div>
-      </div>
+  </div>
+  <div class="price-card">
+    <h3>Conoscenze speciali</h3>
+    <div class="price-list">
+      <div class="price-row"><span>Fatture e Pozioni Fatturanti</span><b>40 Galeoni ciascuna</b></div>
+      <div class="price-row"><span>Conoscenze Extra</span><b>50 Galeoni ciascuna</b></div>
+      <div class="price-row"><span>Conoscenze Avanzate</span><b>100 Galeoni ciascuna</b></div>
+      <div class="price-row"><span>Conoscenze create dai player</span><b>Prezzo variabile</b></div>
     </div>
   </div>
 </div>
-</details>
+<div class="section-help-links"><a href="https://felixfelicisharrypottergdr.forumfree.it/?t=80349928#acquistare" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Regolamento Conoscenze</a></div>
+</div>
+</div>
 
 <div class="panel">
 <h2>Acquisti <span id="acquisto_counter_badge" class="format-tag">0</span></h2>
@@ -1346,7 +1352,7 @@ Compila un blocco per ogni gruppo di Conoscenze dello stesso Tipo e della stessa
 <div class="collapsed">
 <div class="acc-header" id="info_toggle_commercio">
 <span class="acc-chevron">▾</span>
-<span style="font-weight:700; color: var(--green); font-size:13px;">ℹ️ Come funziona questa sezione</span>
+<span class="section-help-label"><i class="fa-solid fa-circle-info"></i> Come funziona questa sezione</span>
 </div>
 <div class="acc-body info-box" style="margin-top:10px;">
 Qui i prezzi li scrivi tu, guardandoli dal negozio o dal prezzario del PNG Commerciante scelto (es. Lo Zoppo) — il tool non conosce i prezzari, si limita a sommare. Un <b>Acquisto</b> spende Galeoni e aggiunge l'oggetto in Bagaglio; una <b>Vendita</b> guadagna Galeoni e riduce la quantità di un oggetto già posseduto.
@@ -1790,8 +1796,8 @@ const PREZZO_PARAMETRO_BASE = 100;
 const PREZZO_PARAMETRO_INCREMENTO = 50;
 const PREZZO_PARAMETRO_BLOCCO = 5;
 
-// Costo per acquistare `quantita` punti consecutivi di un Parametro Magico/Fisico,
-// partendo dal contatore CONDIVISO (Magici+Fisici insieme) di punti già acquistati.
+// Costo per acquistare `quantita` punti consecutivi di UN singolo Parametro Magico/Fisico,
+// partendo dai punti aggiuntivi già acquistati in quello stesso Parametro.
 function costoPuntiParametro(quantita, contatore) {
 let pp = 0, c = contatore;
 for (let i = 0; i < quantita; i++) {
@@ -3431,11 +3437,12 @@ addConoscenzaBtn.style.marginTop = '6px';
 magicWrap.appendChild(addConoscenzaBtn);
 body.appendChild(magicWrap);
 
-// --- modalità Sapienza Fisica/Sociale: un solo Livello complessivo ---
+// --- modalità Sapienza Fisica/Sociale: una sola Conoscenza (la Sapienza stessa), articolata in 5 Livelli ---
 const fisicaWrap = document.createElement('div');
 fisicaWrap.style.display = 'none';
 fisicaWrap.style.marginTop = '14px';
 fisicaWrap.innerHTML = `
+<div class="fixed-value-riga sapienza-self-knowledge">Conoscenza: <b class="f-fis-conoscenza-label">—</b> <span class="format-tag">coincide con la Sapienza</span></div>
 <div class="row">
 <div style="max-width:170px;"><label class="tight">Livello partenza</label>${selectLivello('f-fis-partenza', 0, 4)}</div>
 <div style="max-width:170px;"><label class="tight">Livello finale</label>${selectLivello('f-fis-finale', 1, 5)}</div>
@@ -3450,6 +3457,8 @@ const key = div.querySelector('.f-sapienza').value;
 const info = SAPIENZE_CATALOGO[key];
 header.querySelector('.role-title-preview').textContent = key || 'Nuova Sapienza';
 header.querySelector('.role-meta').textContent = info ? (info.tipo === 'magica' ? 'Magica' : info.tipo === 'fisica' ? 'Fisica' : 'Sociale') : '';
+const selfKnowledgeLabel = fisicaWrap.querySelector('.f-fis-conoscenza-label');
+if (selfKnowledgeLabel) selfKnowledgeLabel.textContent = key || '—';
 
 if (!info) { magicWrap.style.display = 'none'; fisicaWrap.style.display = 'none'; return; }
 if (info.tipo === 'magica') {
@@ -3497,6 +3506,7 @@ div.innerHTML = `
 ${PARAMETRI_MAGICI_FISICI.map(p => `<option value="${p}">${p}</option>`).join('')}
 </select>
 </div>
+<div style="max-width:190px;"><label class="tight">Punti aggiuntivi già acquistati <span class="format-tag">in questo Parametro</span></label><input type="number" class="f-param-gia" min="0" step="1" value="0"></div>
 <div style="max-width:150px;"><label class="tight">Quanti punti acquista</label><input type="number" class="f-param-qty" min="1" step="1" value="1"></div>
 <div style="max-width:44px;"><button type="button" class="danger" style="width:100%;">✕</button></div>
 `;
@@ -3511,16 +3521,6 @@ aggiornaContatoreParam();
 document.getElementById('parametri_list').appendChild(creaParametroRow());
 aggiornaContatoreParam();
 
-function aggiornaAnteprimaPrezzoParam() {
-const n = parseInt(document.getElementById('puntiParamGiaAcquistati').value, 10) || 0;
-const prezzo = PREZZO_PARAMETRO_BASE + PREZZO_PARAMETRO_INCREMENTO * Math.floor(n / PREZZO_PARAMETRO_BLOCCO);
-const mancanti = PREZZO_PARAMETRO_BLOCCO - (n % PREZZO_PARAMETRO_BLOCCO);
-document.getElementById('anteprimaPrezzoParam').innerHTML =
-`Con questo valore, il prossimo punto acquistato costerà <b>${prezzo} PP</b>` +
-(mancanti < PREZZO_PARAMETRO_BLOCCO ? ` — dopo altri ${mancanti} il prezzo salirà a ${prezzo + PREZZO_PARAMETRO_INCREMENTO} PP` : '') + `.`;
-}
-document.getElementById('puntiParamGiaAcquistati').addEventListener('input', aggiornaAnteprimaPrezzoParam);
-aggiornaAnteprimaPrezzoParam();
 
 // --- Dialettica ---
 function popolaSelectDialettica(sel, min, max) {
@@ -4399,7 +4399,7 @@ totalBadge.textContent = righeTesto || '—';
 if (!sapienzaEls.length) riepilogoSapienzeDiv.innerHTML = '<div class="empty-state">Nessuna Sapienza compilata.</div>';
 
 // --- Acquista Parametri e Dialettica ---
-let contatoreParam = parseInt(document.getElementById('puntiParamGiaAcquistati').value, 10) || 0;
+const contatoriParam = Object.create(null);
 const paramRows = [...document.querySelectorAll('#parametri_list > .row')];
 const riepilogoParametriDiv = document.getElementById('riepilogo_parametri');
 riepilogoParametriDiv.innerHTML = '';
@@ -4407,9 +4407,11 @@ const righeRiepilogoParam = [];
 paramRows.forEach(r => {
 const nome = r.querySelector('.f-param-nome').value;
 const qty = parseInt(r.querySelector('.f-param-qty').value, 10) || 0;
+const gia = Math.max(0, parseInt(r.querySelector('.f-param-gia')?.value, 10) || 0);
 if (!nome || qty <= 0) return;
-const costo = costoPuntiParametro(qty, contatoreParam);
-contatoreParam = costo.nuovoContatore;
+if (contatoriParam[nome] === undefined) contatoriParam[nome] = gia;
+const costo = costoPuntiParametro(qty, contatoriParam[nome]);
+contatoriParam[nome] = costo.nuovoContatore;
 totaleGenerale[nome] = (totaleGenerale[nome] || 0) + qty;
 totaleGenerale['Punti Post'] = (totaleGenerale['Punti Post'] || 0) - costo.pp;
 righeRiepilogoParam.push(`+${qty} ${nome} (-${costo.pp} PP)`);
