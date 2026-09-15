@@ -900,6 +900,72 @@ button.big {
 .missione-card.validation-error,.role-card.validation-error,.bag-movement-card.validation-error{border-color:rgba(139,58,58,.52)!important;box-shadow:0 0 0 3px rgba(139,58,58,.06)!important;}
 .validation-inline-note{margin:8px 0 0;padding:7px 9px;border-radius:8px;background:#F7E7E2;color:#6A2C2C;font-size:10.8px;font-weight:700;}
 @media(max-width:720px){.quick-stats{display:none;}.result-ready-summary{font-size:11.5px;}}
+
+/* UX/UI v8 — scelte premio esplicite + listini rapidi */
+.reward-choice-box{
+  border:1px solid rgba(156,107,36,.34)!important;
+  border-left:4px solid var(--gold)!important;
+  background:linear-gradient(90deg,#FBF0D9,#FFF9EA)!important;
+}
+.reward-choice-title{display:flex;align-items:center;gap:7px;flex-wrap:wrap;color:var(--plum);}
+.reward-choice-title i{color:var(--gold-deep);}
+.reward-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:9px;}
+.reward-choice-option{position:relative;display:block;margin:0;cursor:pointer;}
+.reward-choice-option input{position:absolute;opacity:0;pointer-events:none;}
+.reward-choice-option>span{
+  min-height:62px;display:flex;flex-direction:column;justify-content:center;gap:2px;
+  padding:10px 12px;border:1px solid rgba(156,107,36,.28);border-radius:10px;
+  background:rgba(255,255,255,.82);transition:.15s ease;
+}
+.reward-choice-option b{font-size:12.5px;color:var(--ink);}
+.reward-choice-option small{font-size:10.5px;color:var(--ink-soft);font-weight:600;}
+.reward-choice-option:hover>span{border-color:rgba(156,107,36,.58);transform:translateY(-1px);}
+.reward-choice-option input:checked+span{
+  color:#FFF7E5;border-color:rgba(224,199,142,.42);
+  background:linear-gradient(145deg,#4A394F,#2A2131);
+  box-shadow:0 7px 16px rgba(46,36,55,.16);
+}
+.reward-choice-option input:checked+span b{color:#FFF4D8;}
+.reward-choice-option input:checked+span small{color:#DED1C1;}
+.reward-choice-box.field-validation-error{outline:2px solid rgba(139,58,58,.30)!important;outline-offset:2px;}
+
+.price-guide{
+  margin:0;border:1px solid rgba(156,107,36,.30);border-radius:14px;
+  background:linear-gradient(180deg,rgba(255,252,244,.92),rgba(247,238,217,.92));
+  box-shadow:0 7px 18px rgba(55,42,31,.05);overflow:hidden;
+}
+.price-guide>summary{
+  list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:13px 15px;color:var(--plum);font-weight:850;font-size:12.5px;user-select:none;
+}
+.price-guide>summary::-webkit-details-marker{display:none;}
+.price-guide>summary .price-guide-title{display:flex;align-items:center;gap:9px;}
+.price-guide>summary .price-guide-title i{
+  width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;
+  border-radius:50%;background:#F2E6CB;color:var(--gold-deep);
+}
+.price-guide>summary::after{content:"Mostra";font-size:10.5px;color:var(--gold-deep);padding:3px 8px;border-radius:999px;background:#F7EACD;border:1px solid rgba(156,107,36,.22);}
+.price-guide[open]>summary::after{content:"Nascondi";}
+.price-guide-body{padding:0 15px 15px;border-top:1px solid rgba(184,156,101,.22);}
+.price-guide-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0 10px;}
+.price-guide-head p{margin:0;color:var(--ink-soft);font-size:11.5px;}
+.price-guide-link{font-size:10.5px;font-weight:800;color:var(--gold-deep);text-decoration:none;white-space:nowrap;}
+.price-guide-link:hover{text-decoration:underline;}
+.price-guide-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.price-card{border:1px solid rgba(184,156,101,.30);border-radius:11px;background:rgba(255,255,255,.72);padding:11px 12px;}
+.price-card h3{margin:0 0 7px;font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--plum);}
+.price-list{display:flex;flex-direction:column;gap:0;}
+.price-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:6px 0;border-top:1px solid rgba(184,156,101,.18);font-size:11.5px;}
+.price-row:first-child{border-top:0;padding-top:0;}
+.price-row:last-child{padding-bottom:0;}
+.price-row span{color:var(--ink-soft);}
+.price-row b{color:var(--gold-deep);white-space:nowrap;text-align:right;}
+.price-note{margin:9px 0 0;padding:8px 10px;border-radius:8px;background:#F7ECD3;color:#684D1D;font-size:10.8px;line-height:1.4;}
+@media(max-width:620px){
+  .reward-choice-grid,.price-guide-grid{grid-template-columns:1fr;}
+  .price-guide-head{align-items:flex-start;flex-direction:column;}
+}
+
 </style>
 </head>
 <body>
@@ -1070,6 +1136,24 @@ Il costo di ogni Conoscenza dipende dal voto di partenza: <b>Troll→Desolante</
 </div>
 </div>
 
+
+<details class="price-guide">
+<summary><span class="price-guide-title"><i class="fa-solid fa-coins"></i><span>Consulta prezzi dei Voti</span></span></summary>
+<div class="price-guide-body">
+  <div class="price-guide-head"><p>Apri solo quando ti serve controllare quanto puoi permetterti.</p><a class="price-guide-link" href="https://felixfelicisharrypottergdr.forumfree.it/?t=80398053#migliorarepiano" target="_blank" rel="noopener">Regolamento ↗</a></div>
+  <div class="price-card">
+    <div class="price-list">
+      <div class="price-row"><span>Troll → Desolante</span><b>100 G o Role</b></div>
+      <div class="price-row"><span>Desolante → Scadente</span><b>100 G o Role</b></div>
+      <div class="price-row"><span>Scadente → Accettabile</span><b>15 G / Conoscenza</b></div>
+      <div class="price-row"><span>Accettabile → Oltre Ogni Previsione</span><b>3 PP / Conoscenza</b></div>
+      <div class="price-row"><span>Oltre Ogni Previsione → Eccezionale</span><b>4 PP + crescita</b></div>
+    </div>
+    <div class="price-note">Il passaggio a Eccezionale aumenta di +1 PP ogni 10 Eccezionale già possedute in Piano di Studi. Il tool calcola automaticamente il prezzo effettivo.</div>
+  </div>
+</div>
+</details>
+
 <div class="panel">
 <label class="tight" for="eGiaPossedute">Quante Eccezionale (E) ha già il PG in Piano di Studi, prima di questa richiesta?</label>
 <input type="number" id="eGiaPossedute" value="0" min="0" step="1" style="max-width:160px">
@@ -1099,6 +1183,38 @@ Ogni Sapienza ha 5 Livelli (I–V). Il costo di ogni Livello dipende dal tipo di
 </div>
 </div>
 
+
+<details class="price-guide">
+<summary><span class="price-guide-title"><i class="fa-solid fa-coins"></i><span>Consulta prezzi delle Sapienze</span></span></summary>
+<div class="price-guide-body">
+  <div class="price-guide-head"><p>Prezzo del singolo Livello raggiunto; se sali di più Livelli, il tool somma automaticamente tutti i passaggi.</p></div>
+  <div class="price-guide-grid">
+    <div class="price-card">
+      <h3>Sapienze Magiche</h3>
+      <div class="price-list">
+        <div class="price-row"><span>Livello I</span><b>50 G</b></div>
+        <div class="price-row"><span>Livello II</span><b>5 PP</b></div>
+        <div class="price-row"><span>Livello III</span><b>10 PP</b></div>
+        <div class="price-row"><span>Livello IV</span><b>15 PP</b></div>
+        <div class="price-row"><span>Livello V</span><b>20 PP</b></div>
+      </div>
+      <div class="price-note"><a class="price-guide-link" href="https://felixfelicisharrypottergdr.forumfree.it/?t=79207498#entry659054408" target="_blank" rel="noopener">Maggiori info ↗</a></div>
+    </div>
+    <div class="price-card">
+      <h3>Sapienze Fisiche e Sociali</h3>
+      <div class="price-list">
+        <div class="price-row"><span>Livello I</span><b>150 G</b></div>
+        <div class="price-row"><span>Livello II</span><b>10 PP</b></div>
+        <div class="price-row"><span>Livello III</span><b>20 PP</b></div>
+        <div class="price-row"><span>Livello IV</span><b>40 PP</b></div>
+        <div class="price-row"><span>Livello V</span><b>80 PP</b></div>
+      </div>
+      <div class="price-note"><a class="price-guide-link" href="https://felixfelicisharrypottergdr.forumfree.it/?t=80397118#costosapmagica" target="_blank" rel="noopener">Maggiori info ↗</a></div>
+    </div>
+  </div>
+</div>
+</details>
+
 <div class="panel">
 <h2>Sapienze da migliorare <span id="sapienza_counter_badge" class="format-tag">0</span></h2>
 <div id="sapienze_list"></div>
@@ -1120,6 +1236,38 @@ Ogni Sapienza ha 5 Livelli (I–V). Il costo di ogni Livello dipende dal tipo di
 Ogni punto aggiuntivo di un Parametro Magico o Fisico costa <b>100 PP</b> per i primi 5 punti acquistati in totale (Magici e Fisici insieme), <b>150 PP</b> per i successivi 5, <b>200 PP</b> per i successivi 5, e così via — il contatore è condiviso tra tutti i Parametri, non separato per ciascuno. La Dialettica ha invece una tabella propria in Galeoni (il primo punto è gratuito, di base).
 </div>
 </div>
+
+
+<details class="price-guide">
+<summary><span class="price-guide-title"><i class="fa-solid fa-coins"></i><span>Consulta prezzi di Dialettica e Parametri</span></span></summary>
+<div class="price-guide-body">
+  <div class="price-guide-head"><p>Riferimento rapido prima di impostare l'acquisto.</p><a class="price-guide-link" href="https://felixfelicisharrypottergdr.forumfree.it/?t=80327413#ottparam" target="_blank" rel="noopener">Regolamento ↗</a></div>
+  <div class="price-guide-grid">
+    <div class="price-card">
+      <h3>Dialettica</h3>
+      <div class="price-list">
+        <div class="price-row"><span>Punto 1</span><b>Di base</b></div>
+        <div class="price-row"><span>Punto 2</span><b>50 G</b></div>
+        <div class="price-row"><span>Punto 3</span><b>100 G</b></div>
+        <div class="price-row"><span>Punto 4</span><b>200 G</b></div>
+        <div class="price-row"><span>Punto 5</span><b>400 G</b></div>
+        <div class="price-row"><span>Punto 6+</span><b>600 G ciascuno</b></div>
+      </div>
+      <div class="price-note">Gli Studenti possono acquistare Dialettica fino a 10 Punti.</div>
+    </div>
+    <div class="price-card">
+      <h3>Parametri Magici e Fisici</h3>
+      <div class="price-list">
+        <div class="price-row"><span>Primi 5 punti aggiuntivi</span><b>100 PP / punto</b></div>
+        <div class="price-row"><span>Successivi 5</span><b>150 PP / punto</b></div>
+        <div class="price-row"><span>Successivi 5</span><b>200 PP / punto</b></div>
+        <div class="price-row"><span>Ogni fascia successiva</span><b>+50 PP / punto</b></div>
+      </div>
+      <div class="price-note">Il riepilogo sotto usa il contatore inserito nel tool per mostrarti il costo effettivo del prossimo punto.</div>
+    </div>
+  </div>
+</div>
+</details>
 
 <div class="panel">
 <h2>Dialettica <span class="format-tag">opzionale</span></h2>
@@ -1157,6 +1305,31 @@ Ogni punto aggiuntivo di un Parametro Magico o Fisico costa <b>100 PP</b> per i 
 Compila un blocco per ogni gruppo di Conoscenze dello stesso Tipo e della stessa Categoria (es. "5 Conoscenze Avanzate di categoria Arcaiche"). Il costo è per singola Conoscenza: Generica 10 G, Scolastica V/VI anno 20 G, Scolastica VII anno 30 G, Fatture e Pozioni Fatturanti 40 G, Extra 50 G, Avanzata 100 G. Le Conoscenze create dai player hanno prezzo libero (opzione "Personalizzata"). L'output è già pronto da incollare nella scheda, oltre alla spesa in Galeoni che va nel Box A.
 </div>
 </div>
+
+
+<details class="price-guide">
+<summary><span class="price-guide-title"><i class="fa-solid fa-coins"></i><span>Consulta prezzi delle Conoscenze</span></span></summary>
+<div class="price-guide-body">
+  <div class="price-guide-head"><p>Prezzo per singola Conoscenza.</p><a class="price-guide-link" href="https://felixfelicisharrypottergdr.forumfree.it/?t=80349928#acquistare" target="_blank" rel="noopener">Regolamento ↗</a></div>
+  <div class="price-guide-grid">
+    <div class="price-card">
+      <div class="price-list">
+        <div class="price-row"><span>Generiche</span><b>10 G</b></div>
+        <div class="price-row"><span>Scolastiche V e VI anno</span><b>20 G</b></div>
+        <div class="price-row"><span>Scolastiche VII anno</span><b>30 G</b></div>
+      </div>
+    </div>
+    <div class="price-card">
+      <div class="price-list">
+        <div class="price-row"><span>Fatture e Pozioni Fatturanti</span><b>40 G</b></div>
+        <div class="price-row"><span>Extra</span><b>50 G</b></div>
+        <div class="price-row"><span>Avanzate</span><b>100 G</b></div>
+        <div class="price-row"><span>Create dai player</span><b>Prezzo variabile</b></div>
+      </div>
+    </div>
+  </div>
+</div>
+</details>
 
 <div class="panel">
 <h2>Acquisti <span id="acquisto_counter_badge" class="format-tag">0</span></h2>
@@ -1454,7 +1627,7 @@ const MISSIONI_FH_RAW = [
 {"nome":"Il Giocatore","anchor":"giocatore","categoria":"Neutrale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":3.0,"altri":{},"parametri":{},"scelta":[],"nota":null},"seScoperto":null}]},
 {"nome":"Incontri ravvicinati del VII tipo","anchor":"incontri","categoria":"Neutrale","illegale":false,"scolastico":true,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":true,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":1.5,"altri":{"Popolarità":0.5},"parametri":{},"scelta":[],"nota":"per ogni post in cui il PNG viene mosso attivamente se viene mosso dallo stesso PG per almeno 5 post"},"seScoperto":null}]},
 {"nome":"L'Influencer","anchor":"influencer","categoria":"Neutrale","illegale":false,"scolastico":true,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":3.0,"altri":{"Popolarità":0.5,"Stima Docenti":0.5},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Medio","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":1.5,"ppPostCap":null,"ppFisso":null,"altri":{"Popolarità":1.0,"Stima Docenti":1.0},"parametri":{},"scelta":[],"nota":null},"seScoperto":null}]},
-{"nome":"L'Intervistato","anchor":"intervistato","categoria":"Neutrale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":1.5,"ppPostCap":null,"ppFisso":null,"altri":{},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Medio","requisiti":null,"completamento":false,"complessa":true,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":null,"altri":{"Popolarità":2.0,"Stima Docenti":-1.0},"parametri":{},"scelta":[],"nota":"1 a seconda del contenuto se viene citato nome e cognome se viene citato nome e cognome"},"seScoperto":null}]},
+{"nome":"L'Intervistato","anchor":"intervistato","categoria":"Neutrale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":1.5,"ppPostCap":null,"ppFisso":null,"altri":{},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Medio","requisiti":null,"completamento":false,"complessa":true,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":null,"altri":{"Popolarità":2.0},"parametri":{},"scelta":[],"nota":null,"sceltaAlternativa":[{"label":"Contenuto positivo sul PG → +1 Stima Docenti","altri":{"Stima Docenti":1.0}},{"label":"Contenuto negativo sul PG → -1 Stima Docenti","altri":{"Stima Docenti":-1.0}}]},"seScoperto":null}]},
 {"nome":"I Lumamici","anchor":"lumamici","categoria":"Neutrale","illegale":false,"scolastico":true,"livelli":[{"nome":"Facile","requisiti":"23 Popolarità o 23 Stima","completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":3.0,"altri":{},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Medio","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":2.0,"ppPostCap":null,"ppFisso":null,"altri":{"Popolarità":3.0,"Stima Docenti":3.0},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Difficile [font=medievalsharp][color=darkred]Caotico[/color][/font]","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":2.0,"ppPostCap":null,"ppFisso":null,"altri":{},"parametri":{},"scelta":[{"valore":2.0,"opzioni":["Bontà","Malvagità"]}],"nota":null},"seScoperto":{"ppPostRate":null,"ppPostCap":null,"ppFisso":null,"altri":{"Popolarità":3.0},"parametri":{},"nota":null}}]},
 {"nome":"Il Nottempista in Vacanza","anchor":"nottempista","categoria":"Neutrale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":1.5,"ppPostCap":null,"ppFisso":null,"altri":{},"parametri":{},"scelta":[],"nota":null},"seScoperto":null}]},
 {"nome":"L'Osservatore","anchor":"osservatore","categoria":"Neutrale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":5.0,"altri":{"Popolarità":0.5},"parametri":{},"scelta":[],"nota":null},"seScoperto":null}]},
@@ -1463,8 +1636,8 @@ const MISSIONI_FH_RAW = [
 {"nome":"Il Reporter","anchor":"reporter","categoria":"Neutrale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":true,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":2.0,"altri":{"Popolarità":1.0},"parametri":{},"scelta":[{"valore":1.0,"opzioni":["Bontà","Malvagità"]}],"nota":"da chiedere nella propria Lista della Spesa se l'articolo non è anonimo"},"seScoperto":null},{"nome":"Facile [font=medievalsharp][color=darkred]Caotico[/color][/font]","requisiti":"3 Malvagità","completamento":false,"complessa":true,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":3.0,"altri":{"Popolarità":1.5,"Malvagità":1.5},"parametri":{},"scelta":[],"nota":"da chiedere nella propria Lista della Spesa se l'articolo non è anonimo"},"seScoperto":null},{"nome":"Medio","requisiti":null,"completamento":false,"complessa":true,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":3.0,"altri":{"Popolarità":2.0},"parametri":{},"scelta":[{"valore":2.0,"opzioni":["Bontà","Malvagità"]}],"nota":"da chiedere nella propria Lista della Spesa se l'articolo non è anonimo"},"seScoperto":null},{"nome":"Difficile","requisiti":null,"completamento":false,"complessa":true,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":3.0,"altri":{"Popolarità":2.0},"parametri":{},"scelta":[{"valore":1.0,"opzioni":["Bontà","Malvagità"]}],"nota":"da chiedere nella propria Lista della Spesa 2 PP extra se a seguito di intervista al PG Reporter se l'articolo non è anonimo al ai PG dell'articolo se viene nominato"},"seScoperto":null},{"nome":"Difficile [font=medievalsharp][color=darkred]Caotico[/color][/font]","requisiti":"5 Malvagità","completamento":false,"complessa":true,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":3.0,"altri":{"Popolarità":2.5,"Malvagità":2.0},"parametri":{},"scelta":[],"nota":"da chiedere nella propria Lista della Spesa 2 PP extra se a seguito di intervista al PG Reporter se l'articolo non è anonimo al ai PG dell'articolo se viene nominato"},"seScoperto":null}]},
 {"nome":"Il Secchione","anchor":"secchione","categoria":"Neutrale","illegale":false,"scolastico":true,"livelli":[{"nome":"Medio","requisiti":null,"completamento":true,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":10.0,"altri":{"Punti Casa":30.0,"Stima Docenti":1.0},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Difficile","requisiti":null,"completamento":true,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":15.0,"altri":{"Punti Casa":50.0,"Stima Docenti":1.5},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Estremo","requisiti":"Il PG riceve una Borsa di Studio alla fine dell'anno","completamento":true,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":null,"altri":{},"parametri":{},"scelta":[],"nota":null},"borseDiStudio":[{"nome":"P.I.U.M.A.","ppFisso":5.0,"stimaDocenti":2.0,"prestigio":1.0},{"nome":"R.O.T.O.L.O.","ppFisso":10.0,"stimaDocenti":2.5,"prestigio":2.0},{"nome":"T.O.M.O.","ppFisso":15.0,"stimaDocenti":3.0,"prestigio":3.0}],"seScoperto":null}]},
 {"nome":"Il Segugio","anchor":"segugio","categoria":"Neutrale","illegale":false,"scolastico":true,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":null,"altri":{},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Medio","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":null,"altri":{},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Difficile","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":null,"altri":{},"parametri":{},"scelta":[],"nota":null},"seScoperto":null}]},
-{"nome":"Il So-Tutto-Sull'Argomento","anchor":"sotutto","categoria":"Neutrale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":1.0,"altri":{},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Medio","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":2.0,"altri":{},"parametri":{},"scelta":[],"nota":null},"seScoperto":null}]},
-{"nome":"Lo Spendaccione","anchor":"spendaccione","categoria":"Neutrale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":null,"completamento":true,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":null,"altri":{},"parametri":{},"scelta":[],"nota":null},"seScoperto":null}]},
+{"nome":"Il So-Tutto-Sull'Argomento","anchor":"sotutto","categoria":"Neutrale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":1.0,"altri":{},"parametri":{},"scelta":[{"valore":1.0,"opzioni":["Bontà","Malvagità"]}],"nota":null},"seScoperto":null},{"nome":"Medio","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":2.0,"altri":{},"parametri":{},"scelta":[{"valore":1.5,"opzioni":["Bontà","Malvagità"]}],"nota":null},"seScoperto":null}]},
+{"nome":"Lo Spendaccione","anchor":"spendaccione","categoria":"Neutrale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":null,"completamento":true,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":5.0,"altri":{"Popolarità":2.0},"parametri":{},"scelta":[{"valore":1.0,"opzioni":["Bontà","Malvagità"]}],"nota":null},"seScoperto":null}]},
 {"nome":"Lo Spiato","anchor":"spiato","categoria":"Neutrale","illegale":false,"scolastico":true,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":2.0,"altri":{},"parametri":{},"scelta":[],"nota":null},"seScoperto":null}]},
 {"nome":"Gli Studiosi","anchor":"studiosi","categoria":"Neutrale","illegale":false,"scolastico":true,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":null,"altri":{},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Medio","requisiti":"Troll, Desolante o Scadente nella Conoscenza da migliorare","completamento":false,"complessa":true,"premio":{"ppPostRate":2.0,"ppPostCap":null,"ppFisso":null,"altri":{"Stima Docenti":1.5,"Punti Casa":30.0},"parametri":{},"scelta":[],"nota":"per il PG che chiede ripetizioni dei Docenti"},"seScoperto":null},{"nome":"Difficile","requisiti":"Accettabile, Oltre Ogni Previsione o Eccezionale nella Conoscenza del Ripetente da migliorare","completamento":false,"complessa":true,"premio":{"ppPostRate":2.0,"ppPostCap":null,"ppFisso":null,"altri":{"Stima Docenti":2.0,"Punti Casa":40.0},"parametri":{},"scelta":[],"nota":"per il PG che dà ripetizioni dei Docenti"},"seScoperto":null}]},
 {"nome":"Il Terzo Occhio Wannabe","anchor":"terzoocchio","categoria":"Neutrale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":1.5,"ppPostCap":null,"ppFisso":null,"altri":{},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Medio","requisiti":"Voto superiore al PG Consultante","completamento":false,"complessa":false,"premio":{"ppPostRate":1.5,"ppPostCap":null,"ppFisso":null,"altri":{"Popolarità":1.0},"parametri":{},"scelta":[{"valore":1.0,"opzioni":["Bontà","Malvagità"]}],"nota":null},"seScoperto":null}]},
@@ -1485,7 +1658,7 @@ const MISSIONI_FH_RAW = [
 {"nome":"Il Paladino","anchor":"paladino","categoria":"Legale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":2.0,"altri":{"Popolarità":1.0,"Bontà":1.0},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Medio","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":3.0,"altri":{"Popolarità":2.0,"Bontà":2.0},"parametri":{},"scelta":[],"nota":null},"seScoperto":null}]},
 {"nome":"Il Prudente","anchor":"prudente","categoria":"Legale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":1.0,"altri":{"Bontà":1.0},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Medio","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":2.0,"altri":{"Bontà":1.5},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Difficile","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":3.0,"altri":{"Bontà":2.0},"parametri":{},"scelta":[],"nota":null},"seScoperto":null}]},
 {"nome":"Il Soccorritore","anchor":"soccorritore","categoria":"Legale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":2.0,"altri":{"Stima Docenti":1.0,"Bontà":1.0,"Punti Casa":10.0},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Medio","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":3.0,"altri":{"Bontà":2.0},"parametri":{},"scelta":[],"nota":null},"seScoperto":null}]},
-{"nome":"Lo Zelante","anchor":"zelante","categoria":"Legale","illegale":false,"scolastico":true,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":true,"premio":{"ppPostRate":1.5,"ppPostCap":null,"ppFisso":null,"altri":{"Stima Docenti":0.5,"Bontà":1.0},"parametri":{},"scelta":[],"nota":"\\"},"seScoperto":null},{"nome":"Medio","requisiti":null,"completamento":true,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":5.0,"altri":{"Stima Docenti":1.0,"Bontà":1.5,"Punti Casa":20.0},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Difficile","requisiti":"5 Bontà","completamento":true,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":10.0,"altri":{"Stima Docenti":1.5,"Bontà":2.0},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Estremo","requisiti":"10 Bontà","completamento":true,"complessa":true,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":null,"altri":{"Prestigio":5.0,"Stima Docenti":2.0,"Bontà":3.0},"parametri":{},"scelta":[],"nota":"1 5 Virtuosi per il nuovo anno scolastico o se il PG è al VII anno"},"seScoperto":null}]}
+{"nome":"Lo Zelante","anchor":"zelante","categoria":"Legale","illegale":false,"scolastico":true,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":true,"premio":{"ppPostRate":1.5,"ppPostCap":null,"ppFisso":null,"altri":{"Stima Docenti":0.5,"Bontà":1.0},"parametri":{},"scelta":[],"nota":"\\"},"seScoperto":null},{"nome":"Medio","requisiti":null,"completamento":true,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":5.0,"altri":{"Stima Docenti":1.0,"Bontà":1.5,"Punti Casa":20.0},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Difficile","requisiti":"5 Bontà","completamento":true,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":10.0,"altri":{"Stima Docenti":1.5,"Bontà":2.0},"parametri":{},"scelta":[],"nota":null},"seScoperto":null},{"nome":"Estremo","requisiti":"10 Bontà","completamento":true,"complessa":true,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":null,"altri":{"Bontà":3.0},"parametri":{},"scelta":[],"nota":null,"sceltaAlternativa":[{"label":"PG non al VII anno → +2 Stima Docenti","altri":{"Stima Docenti":2.0}},{"label":"PG al VII anno → +5 Prestigio","altri":{"Prestigio":5.0}}]},"seScoperto":null}]}
 ];
 
 const MISSIONI_FW_RAW = [
@@ -1547,7 +1720,7 @@ const MISSIONI_FW_RAW = [
 {"nome":"Il Giornalista","anchor":"giornalista","categoria":"Neutrale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":"PG Giornalista","completamento":false,"complessa":false,"premio":{"ppPostRate":1.5,"ppPostCap":5,"ppFisso":null,"altri":{"Prestigio":1.0},"parametri":{},"scelta":[{"valore":0.5,"opzioni":["Virtuoso","Sinistro"]}],"nota":null},"seScoperto":null},{"nome":"Medio","requisiti":"PG Giornalista","completamento":false,"complessa":true,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":2.0,"altri":{"Prestigio":1.0,"Popolarità":0.5},"parametri":{},"scelta":[],"nota":"per ogni articolo"},"seScoperto":null},{"nome":"Difficile","requisiti":"PG Giornalista","completamento":true,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":null,"altri":{"Prestigio":2.0,"Popolarità":1.0},"parametri":{},"scelta":[],"nota":null},"seScoperto":null}]},
 {"nome":"La Guida","anchor":"guida","categoria":"Neutrale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":"PG Notevole o Veterano","completamento":false,"complessa":false,"premio":{"ppPostRate":2.0,"ppPostCap":5,"ppFisso":null,"altri":{"Prestigio":1.0},"parametri":{},"scelta":[],"nota":null},"seScoperto":null}]},
 {"nome":"L'Insegnante","anchor":"insegnante","categoria":"Neutrale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":"5 Virtuoso o Sinistro","completamento":false,"complessa":false,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":3.0,"altri":{},"parametri":{},"scelta":[{"valore":1.0,"opzioni":["Virtuoso","Sinistro"]}],"nota":null},"seScoperto":null}]},
-{"nome":"L'Intervistato","anchor":"intervistato","categoria":"Neutrale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":1.5,"ppPostCap":5,"ppFisso":null,"altri":{"Popolarità":0.5},"parametri":{},"scelta":[{"valore":0.5,"opzioni":["Virtuoso","Sinistro"]}],"nota":null},"seScoperto":null},{"nome":"Medio","requisiti":null,"completamento":false,"complessa":true,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":null,"altri":{"Prestigio":-1.0,"Popolarità":1.0},"parametri":{},"scelta":[{"valore":1.0,"opzioni":["Sinistro","Virtuoso"]}],"nota":"se viene detto qualcosa di positivo o negativo riguardo il suo lavoro"},"seScoperto":null}]},
+{"nome":"L'Intervistato","anchor":"intervistato","categoria":"Neutrale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":null,"completamento":false,"complessa":false,"premio":{"ppPostRate":1.5,"ppPostCap":5,"ppFisso":null,"altri":{"Popolarità":0.5},"parametri":{},"scelta":[{"valore":0.5,"opzioni":["Virtuoso","Sinistro"]}],"nota":null},"seScoperto":null},{"nome":"Medio","requisiti":null,"completamento":false,"complessa":true,"premio":{"ppPostRate":null,"ppPostCap":null,"ppFisso":null,"altri":{"Popolarità":1.0},"parametri":{},"scelta":[{"valore":1.0,"opzioni":["Sinistro","Virtuoso"]}],"nota":null,"sceltaAlternativa":[{"label":"Contenuto positivo sul lavoro del PG → +1 Prestigio","altri":{"Prestigio":1.0}},{"label":"Contenuto negativo sul lavoro del PG → -1 Prestigio","altri":{"Prestigio":-1.0}}]},"seScoperto":null}]},
 {"nome":"L'Intracciabile","anchor":"intracciabile","categoria":"Neutrale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":"PG Intracciabile","completamento":false,"complessa":false,"premio":{"ppPostRate":1.5,"ppPostCap":5,"ppFisso":null,"altri":{},"parametri":{},"scelta":[{"valore":0.5,"opzioni":["Virtuoso","Sinistro"]}],"nota":null},"seScoperto":null}]},
 {"nome":"Locandiere e Cameriere","anchor":"locandiere","categoria":"Neutrale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":"PG Locandiere o Cameriere","completamento":false,"complessa":false,"premio":{"ppPostRate":1.5,"ppPostCap":5,"ppFisso":null,"altri":{"Prestigio":1.0,"Popolarità":0.5},"parametri":{},"scelta":[{"valore":0.5,"opzioni":["Virtuoso","Sinistro"]}],"nota":null},"seScoperto":null}]},
 {"nome":"Il Magizoologo","anchor":"magizoologo","categoria":"Neutrale","illegale":false,"scolastico":false,"livelli":[{"nome":"Facile","requisiti":"PG Magizoologo","completamento":false,"complessa":false,"premio":{"ppPostRate":1.5,"ppPostCap":5,"ppFisso":null,"altri":{"Prestigio":1.0},"parametri":{},"scelta":[{"valore":0.5,"opzioni":["Virtuoso","Sinistro"]}],"nota":null},"seScoperto":null}]},
@@ -2323,15 +2496,34 @@ let sceltaInput = null;
 if (liv.premio.scelta && liv.premio.scelta.length) {
 const sc = liv.premio.scelta[0];
 const box = document.createElement('div');
-box.className = 'fmt-case';
+box.className = 'fmt-case reward-choice-box';
 box.style.marginTop = '10px';
 const gname = 'catscelta_' + Math.random().toString(36).slice(2);
 box.innerHTML = `
-<div class="fmt-case-label">Il premio ti fa scegliere: quale preferisci?</div>
-<div class="radio-option"><input type="radio" name="${gname}" value="0" class="cat-scelta-radio" checked><label>${sc.valore >= 0 ? '+' : ''}${sc.valore} ${sc.opzioni[0]}</label></div>
-<div class="radio-option"><input type="radio" name="${gname}" value="1" class="cat-scelta-radio"><label>${sc.valore >= 0 ? '+' : ''}${sc.valore} ${sc.opzioni[1]}</label></div>`;
+<div class="fmt-case-label reward-choice-title"><i class="fa-solid fa-code-branch"></i> Scegli il premio <span class="format-tag">obbligatorio</span></div>
+<div class="fmt-case-desc">Questa Missione prevede un premio alternativo: seleziona quello effettivamente ottenuto.</div>
+<div class="reward-choice-grid">
+<label class="reward-choice-option"><input type="radio" name="${gname}" value="0" class="cat-scelta-radio"><span><b>${sc.valore >= 0 ? '+' : ''}${normNum(sc.valore)} ${sc.opzioni[0]}</b><small>Seleziona questo premio</small></span></label>
+<label class="reward-choice-option"><input type="radio" name="${gname}" value="1" class="cat-scelta-radio"><span><b>${sc.valore >= 0 ? '+' : ''}${normNum(sc.valore)} ${sc.opzioni[1]}</b><small>Seleziona questo premio</small></span></label>
+</div>`;
 dettaglio.appendChild(box);
 sceltaInput = box;
+box.addEventListener('change', emetti);
+}
+
+let sceltaAlternativaInput = null;
+if (liv.premio.sceltaAlternativa && liv.premio.sceltaAlternativa.length) {
+const box = document.createElement('div');
+box.className = 'fmt-case reward-choice-box reward-choice-alt-box';
+box.style.marginTop = '10px';
+const gname = 'catalternativa_' + Math.random().toString(36).slice(2);
+box.innerHTML = `
+<div class="fmt-case-label reward-choice-title"><i class="fa-solid fa-code-branch"></i> Specifica l'esito <span class="format-tag">obbligatorio</span></div>
+<div class="reward-choice-grid">
+${liv.premio.sceltaAlternativa.map((op, idx) => `<label class="reward-choice-option"><input type="radio" name="${gname}" value="${idx}" class="cat-scelta-alt-radio"><span><b>${op.label}</b><small>Usa l'esito realmente avvenuto in gioco</small></span></label>`).join('')}
+</div>`;
+dettaglio.appendChild(box);
+sceltaAlternativaInput = box;
 box.addEventListener('change', emetti);
 }
 
@@ -2399,10 +2591,27 @@ for (const [k, v] of Object.entries(liv.seScoperto.altri || {})) premio.altri[k]
 for (const [k, v] of Object.entries(liv.seScoperto.parametri || {})) premio.parametri[k] = (premio.parametri[k] || 0) + v;
 }
 if (sceltaInput) {
+const sceltaSelezionata = sceltaInput.querySelector('.cat-scelta-radio:checked');
+if (!sceltaSelezionata) {
+riepilogo.innerHTML = '<b>Scegli quale premio alternativo hai ottenuto.</b>';
+onCambiamento(null);
+return;
+}
 const sc = liv.premio.scelta[0];
-const idx = parseInt(sceltaInput.querySelector('.cat-scelta-radio:checked').value, 10);
+const idx = parseInt(sceltaSelezionata.value, 10);
 const statScelta = sc.opzioni[idx];
 premio.altri[statScelta] = (premio.altri[statScelta] || 0) + sc.valore;
+}
+if (sceltaAlternativaInput) {
+const sceltaSelezionata = sceltaAlternativaInput.querySelector('.cat-scelta-alt-radio:checked');
+if (!sceltaSelezionata) {
+riepilogo.innerHTML = '<b>Specifica l’esito della Missione per determinare il premio corretto.</b>';
+onCambiamento(null);
+return;
+}
+const idx = parseInt(sceltaSelezionata.value, 10);
+const opzione = liv.premio.sceltaAlternativa[idx];
+for (const [k, v] of Object.entries(opzione.altri || {})) premio.altri[k] = (premio.altri[k] || 0) + v;
 }
 const pezzi = [];
 if (premio.ppPostRate) pezzi.push(`${normNum(premio.ppPostRate)} PP/post${premio.ppPostCap ? ' (tetto ' + premio.ppPostCap + ')' : ''}`);
@@ -4012,7 +4221,13 @@ function validaCompilazioneDettagliata() {
       const nomeEmesso = String(m.querySelector('.f-nome')?.value || '').trim();
       if (sceltaMissione && (!sceltaLivello || !nomeEmesso)) {
         errori.push(`Role ${idx+1}, Missione ${mi+1}: completa livello/esito richiesto.`);
-        marcaErrore(m, !sceltaLivello ? m.querySelector('.cat-livello') : (m.querySelector('.cat-prestigio-variabile') || m.querySelector('.cat-livello')), 'Completa la selezione della Missione prima di calcolare.');
+        const campoMancante = !sceltaLivello
+          ? m.querySelector('.cat-livello')
+          : (m.querySelector('.cat-prestigio-variabile') ||
+             (!m.querySelector('.cat-scelta-radio:checked') ? m.querySelector('.reward-choice-box') : null) ||
+             (!m.querySelector('.cat-scelta-alt-radio:checked') ? m.querySelector('.reward-choice-alt-box') : null) ||
+             m.querySelector('.cat-livello'));
+        marcaErrore(m, campoMancante, 'Completa la selezione della Missione prima di calcolare.');
       }
     });
   });
@@ -4023,7 +4238,13 @@ function validaCompilazioneDettagliata() {
     const catalogo = m.querySelector('.f-sorgente-radio[value="catalogo"]')?.checked;
     if (catalogo && sceltaMissione && (!sceltaLivello || !nomeEmesso)) {
       errori.push(`Missione senza Role ${i+1}: completa livello/esito richiesto.`);
-      marcaErrore(m, !sceltaLivello ? m.querySelector('.cat-livello') : (m.querySelector('.cat-prestigio-variabile') || m.querySelector('.cat-livello')), 'Completa la selezione della Missione.');
+      const campoMancante = !sceltaLivello
+        ? m.querySelector('.cat-livello')
+        : (m.querySelector('.cat-prestigio-variabile') ||
+           (!m.querySelector('.cat-scelta-radio:checked') ? m.querySelector('.reward-choice-box') : null) ||
+           (!m.querySelector('.cat-scelta-alt-radio:checked') ? m.querySelector('.reward-choice-alt-box') : null) ||
+           m.querySelector('.cat-livello'));
+      marcaErrore(m, campoMancante, 'Completa la selezione della Missione.');
     }
   });
   document.querySelectorAll('.movimenti_bagaglio_list > div').forEach((div, i) => {
