@@ -2247,7 +2247,7 @@ if (!nome) return null;
 if (azione === 'nuovo') {
 const qty = parseInt(div.querySelector('.f-bag-qty-nuovo').value, 10) || 1;
 const desc = div.querySelector('.f-bag-desc-nuovo').value.trim();
-return { azione: 'nuovo', categoria, nome, qty, desc, riga: `NUOVO ${categoria}: ${nome} [${qty}]: ${desc}`, narrativa: `- NUOVO ${CATEGORIE_BAGAGLIO_LISTA.find(c => c.value === categoria).label}: ${nome} [${qty}]${desc ? ': ' + desc : ''}` };
+return { azione: 'nuovo', categoria, nome, qty, desc, riga: `NUOVO ${categoria}: ${nome} [${qty}]${desc ? ': ' + desc : ''}`, narrativa: `- NUOVO ${CATEGORIE_BAGAGLIO_LISTA.find(c => c.value === categoria).label}: ${nome} [${qty}]${desc ? ': ' + desc : ''}` };
 }
 
 if (azione === 'trasferisci') {
@@ -4523,7 +4523,7 @@ quantiInDispensa++;
 return; // la Dispensa non è gestita dal Box G del Generatore Accrediti
 }
 const desc = usi ? `(0/${usi} usi)` : '';
-righeBoxGCommercio.push(`NUOVO: ${nomeOgg} [${qty}]: ${desc}`.trimEnd());
+righeBoxGCommercio.push(`NUOVO: ${nomeOgg} [${qty}]${desc ? ': ' + desc : ''}`);
 });
 if (subtotale) totaleGenerale['Galeoni'] = (totaleGenerale['Galeoni'] || 0) - subtotale;
 if (nome || righeNarrativa.length) {
