@@ -1851,6 +1851,20 @@ const icone = CATEGORIE_CONOSCENZA[categoria] || [];
 return icone.map(cls => `<i class="${cls}"></i>`).join('');
 }
 
+// Sezione della Scheda Valori in cui va accreditata la Conoscenza.
+// Non contiene alcun catalogo di Conoscenze: usa solo la tipologia scelta
+// dal player e il markup del detail gia' prodotto da questo tool.
+function sezioneConoscenzaDaTipo(tipo) {
+const t = String(tipo || '').toLowerCase();
+if (t.includes('avanzat')) return 'avanzate';
+if (t.includes('extra')) return 'extra';
+if (t.includes('scolastic')) return 'scolastiche';
+// Nelle Schede Valori Fatture e Pozioni Fatturanti sono archiviate insieme
+// alle Conoscenze Scolastiche.
+if (t.includes('fatture') || t.includes('fatturant')) return 'scolastiche';
+return '';
+}
+
 function parseRigheConoscenza(testo) {
 const righe = testo.split('\n').map(s => s.trim()).filter(Boolean);
 const valide = [];
@@ -3932,7 +3946,7 @@ return righe.join('\n');
 // non vede mai il tool compilato, vede solo il testo pubblicato sul forum.
 // Un riquadro richiudibile li tiene fuori dai piedi nella lettura narrativa,
 // ma restano comunque testo presente e copiabile dal post stesso.
-function costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG, tipoPg, nomePG, movimentiBagaglio) {
+function costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG, tipoPg, nomePG, movimentiBagaglio, conoscenzeAcquistate) {
 const trasferimenti = (movimentiBagaglio || [])
 .filter(m => m.azione === 'trasferisci')
 .map(m => ({
@@ -3954,12 +3968,17 @@ const payload = {
   boxF: tipoPg === 'adulto' ? tutteBoxFLines : [],
   boxG: tutteRigheBoxG,
   trasferimenti,
+  conoscenzeAcquistate: Array.isArray(conoscenzeAcquistate) ? conoscenzeAcquistate : [],
   galeoniExtraBase: Number.isFinite(extraBase) ? extraBase : null
 };
 const righe = [];
 righe.push(`<details><summary><b>📎 Dati per l'Accredito — non modificare</b></summary>`);
 righe.push(`[FF-ACCREDITI-V2]`);
-righe.push(JSON.stringify(payload));
+// I detail delle Conoscenze contengono tag HTML. Li serializziamo come escape
+// Unicode per evitare che il forum li interpreti dentro al blocco tecnico;
+// JSON.parse li ripristinera' identici nel Generatore Accrediti.
+const payloadJson = JSON.stringify(payload).replace(/</g, '\\u003C').replace(/>/g, '\\u003E');
+righe.push(payloadJson);
 righe.push(`[/FF-ACCREDITI-V2]`);
 righe.push(`</details>`);
 return righe.join('\n');
@@ -4434,6 +4453,7 @@ riepilogoParametriDiv.innerHTML = righeRiepilogoParam.length
 // --- Acquista Conoscenze ---
 const acquistoEls = [...document.querySelectorAll('#acquisti_list > .acquisto-card')];
 const righeOutputConoscenze = [];
+const acquistiConoscenzeAccredito = [];
 let totaleGaleoniConoscenze = 0;
 let righeScartateTotali = 0;
 acquistoEls.forEach(acqEl => {
@@ -4449,9 +4469,17 @@ totaleGaleoniConoscenze += r.totale;
 
 righeOutputConoscenze.push(`Tipo di conoscenza: ${tipo}${tipo !== 'Personalizzata' ? ' (' + r.prezzoUnitario + ' G)' : ' (' + r.prezzoUnitario + ' G, prezzo libero)'}`);
 righeOutputConoscenze.push(`Categoria:`);
-righeOutputConoscenze.push(`<details><summary> <u>${renderIconeCategoria(categoria)} ${categoria}</u></summary>`);
-valide.forEach(({ nome, link }) => righeOutputConoscenze.push(`[URL=${link}]${nome}[/URL]`));
-righeOutputConoscenze.push(`</details>`);
+const detailLines = [`<details><summary> <u>${renderIconeCategoria(categoria)} ${categoria}</u></summary>`];
+valide.forEach(({ nome, link }) => detailLines.push(`[URL=${link}]${nome}[/URL]`));
+detailLines.push(`</details>`);
+righeOutputConoscenze.push(...detailLines);
+acquistiConoscenzeAccredito.push({
+  tipo,
+  sezione: sezioneConoscenzaDaTipo(tipo),
+  categoria,
+  detailsHtml: detailLines.join('\n'),
+  conoscenze: valide.map(({ nome, link }) => ({ nome, link }))
+});
 righeOutputConoscenze.push(`Totale: -${r.totale} G`);
 righeOutputConoscenze.push('');
 });
@@ -4570,7 +4598,7 @@ document.getElementById('outBoxG').value = tutteRigheBoxG.length ? tutteRigheBox
 sezioniPost.recap = costruisciRecapFinale(totaleGenerale);
 const nomePG = document.getElementById('nomePG').value.trim();
 const postNarrativo = assemblaPostForum(sezioniPost, nomePG);
-const bloccoDati = postNarrativo ? costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG, tipoPgLista, nomePG, movimentiBagaglio) : '';
+const bloccoDati = postNarrativo ? costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG, tipoPgLista, nomePG, movimentiBagaglio, acquistiConoscenzeAccredito) : '';
 document.getElementById('outPostForum').value = postNarrativo
 ? postNarrativo + '\n<hr>\n' + bloccoDati
 : '(nessuna sezione compilata)';
