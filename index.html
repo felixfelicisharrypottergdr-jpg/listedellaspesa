@@ -2195,6 +2195,10 @@ document.getElementById('movimenti_bagaglio_empty').style.display = n ? 'none' :
 function creaRigaMovimentoBagaglio() {
 bagaglioCounter++;
 const bid = 'bag' + bagaglioCounter;
+const catalogoNomiOptions = [...new Set((FELIX_PREZZARI_CATALOGO.prodotti || []).map(p => p.nome).filter(Boolean))]
+  .sort((a,b)=>a.localeCompare(b,'it'))
+  .map(n => `<option value="${String(n).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}"></option>`)
+  .join('');
 const div = document.createElement('div');
 div.className = 'bag-movement-card';
 div.innerHTML = `
@@ -2203,7 +2207,7 @@ div.innerHTML = `
 <div style="max-width:170px;"><label class="tight">Categoria</label>
 <select class="f-bag-categoria">${CATEGORIE_BAGAGLIO_LISTA.map(c => `<option value="${c.value}">${c.label}</option>`).join('')}</select>
 </div>
-<div><label class="tight">Nome</label><input type="text" class="f-bag-nome" placeholder="es. Pozione Curativa"></div>
+<div><label class="tight">Nome</label><input type="text" class="f-bag-nome" list="${bid}_catalogo_nomi" placeholder="es. Pozione Curativa"><datalist id="${bid}_catalogo_nomi">${catalogoNomiOptions}</datalist></div>
 </div>
 <div class="fmt-case bag-action-box" style="margin-top:10px;">
 <div class="fmt-case-label">Cosa è successo?</div>
@@ -2229,7 +2233,7 @@ div.innerHTML = `
 <div style="max-width:220px;"><label class="tight f-bag-delta-label">Variazione quantità</label><input type="number" class="f-bag-delta" step="1" placeholder="es. -1 oppure 2"></div>
 </div>
 <div class="f-bag-campo-trasferimento" style="margin-top:10px; display:none;">
-<div class="hint">Il tool scalerà automaticamente la quantità dal tuo Bagaglio e scriverà nel post: <b>oggetto da trasferire a [URL=link scheda]Nome PG[/URL]</b>.</div>
+<div class="hint">Il tool scalerà automaticamente la quantità dal tuo Bagaglio e scriverà nel post: <b>oggetto da trasferire a [URL=link scheda]Nome PG[/URL]</b>. Il catalogo suggerisce il nome, ma lo stato reale dell'oggetto (usi, post, note, modifiche, illegalità...) verrà letto dalla Scheda del mittente durante l'accredito.</div>
 <div class="row">
 <div style="max-width:170px;"><label class="tight">Quantità trasferita</label><input type="number" class="f-bag-qty-trasferita" min="1" step="1" value="1"></div>
 <div><label class="tight">Nome PG destinatario</label><input type="text" class="f-bag-dest-nome" placeholder="es. Mary Sue"></div>
@@ -2283,8 +2287,11 @@ const qty = Math.max(1, parseInt(div.querySelector('.f-bag-qty-trasferita').valu
 const destinatarioNome = div.querySelector('.f-bag-dest-nome').value.trim();
 const destinatarioLink = div.querySelector('.f-bag-dest-link').value.trim();
 if (!destinatarioNome || !destinatarioLink) return null;
+const prodottoCatalogo = (FELIX_PREZZARI_CATALOGO.prodotti || []).find(p => normalizeText(p.nome) === normalizeText(nome));
 return {
 azione: 'trasferisci', categoria, nome, qtyTrasferita: qty, destinatarioNome, destinatarioLink,
+preservaStato: true,
+catalogProductId: prodottoCatalogo ? prodottoCatalogo.product_id : '',
 riga: `${nome}: -${qty}`,
 narrativa: `- ${nome}: -${qty} — oggetto da trasferire a [URL=${destinatarioLink}]${destinatarioNome}[/URL]`
 };
@@ -4119,7 +4126,9 @@ const trasferimenti = (movimentiBagaglio || [])
   nome: m.nome,
   quantita: m.qtyTrasferita,
   destinatarioNome: m.destinatarioNome,
-  destinatarioLink: m.destinatarioLink
+  destinatarioLink: m.destinatarioLink,
+  preservaStato: m.preservaStato !== false,
+  catalogProductId: m.catalogProductId || ''
 }));
 const extraAttivi = tipoPg === 'adulto' && ruoloUsaGaleoniExtra();
 const extraRaw = extraAttivi ? document.getElementById('galeoniExtraRimanenti')?.value : '';
