@@ -1045,7 +1045,7 @@ button.big {
 </div>
 </div>
 <div id="continua_lista_box" style="display:none; margin-top:16px;">
-<div class="hint">Incolla qui sotto <b>l'intero post</b> della tua Lista della Spesa già pubblicata sul forum (quella che il tool ti ha dato l'ultima volta, non ancora accreditata) — va bene copiarla così com'è, riquadro "📎 Dati per l'Accredito" incluso. Il tool ricostruirà Role, missioni, Materie, Sapienze e il resto già compilati, così puoi aggiungere solo quello che ti serve in più senza riscrivere tutto da capo.</div>
+<div class="hint">Incolla qui sotto <b>l'intero post</b> della tua Lista della Spesa già pubblicata sul forum (quella che il tool ti ha dato l'ultima volta, non ancora accreditata) — va bene copiarla così com'è, riquadro "⚙️ Dati tecnici per l'Accredito" incluso. Il tool ricostruirà Role, missioni, Materie, Sapienze e il resto già compilati, così puoi aggiungere solo quello che ti serve in più senza riscrivere tutto da capo.</div>
 <textarea id="inputListaPrecedente" style="min-height:180px;" placeholder="Incolla qui l'intero post pubblicato in precedenza..."></textarea>
 <button type="button" class="big" id="btn_carica_lista" style="margin-top:10px;">Carica e continua →</button>
 <div id="esito_caricamento" style="margin-top:12px; display:none;"></div>
@@ -1415,7 +1415,7 @@ Non hai ancora calcolato nulla.<br>Compila una o più sezioni qui sopra — puoi
 <div id="risultato_pieno" style="display:none; flex-direction:column; gap:18px;">
 <div class="panel" style="border: 2px solid var(--gold);">
 <h2>📋 Lista pronta da pubblicare <span class="format-tag">un solo post</span></h2>
-<div class="result-ready-summary"><i class="fa-solid fa-circle-check"></i><div><b>Controlla il testo qui sotto e copialo interamente.</b><span>Il riquadro “📎 Dati per l’Accredito” è già incluso e non va rimosso o modificato.</span></div></div>
+<div class="result-ready-summary"><i class="fa-solid fa-circle-check"></i><div><b>Controlla il testo qui sotto e copialo interamente.</b><span>Il riquadro “⚙️ Dati tecnici per l’Accredito” è già incluso in fondo e non va rimosso o modificato.</span></div></div>
 <textarea id="outPostForum" class="output-box" readonly style="min-height:260px;"></textarea>
 <button type="button" class="big" id="btn_copia_post" style="margin-top:10px;"><i class="fa-regular fa-copy"></i>&nbsp; Copia Lista completa</button>
 </div>
@@ -3913,6 +3913,15 @@ function prezzoCatalogoRiga(product, offer, qty, wrapper) {
   const quantitaEffettiva = product.acquisto_behavior === 'MODIFICA_TARGET_IMMEDIATA' ? 1 : Math.max(1, qty || 1);
   return Number.isFinite(unit) ? unit * quantitaEffettiva : 0;
 }
+function compattaTestoSchedaCatalogo(raw) {
+  return String(raw || '')
+    .replace(/\r/g, '')
+    .replace(/\n+/g, ' · ')
+    .replace(/•\s*/g, '')
+    .replace(/\s*·\s*/g, ' · ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 function descrizioneCatalogoPerScheda(product, offer) {
   if (!product || !offer) return '';
   // I consumabili semplici come i Dolciumi non hanno bisogno di un contatore
@@ -3920,10 +3929,20 @@ function descrizioneCatalogoPerScheda(product, offer) {
   if (normalizeText(product.nome) === 'dolciumi') return '';
   const parti = [];
   const suffix = String(offer.scheda_suffix_auto || product.scheda_suffix_auto || '').trim();
+  const effetti = compattaTestoSchedaCatalogo(offer.effetti_off || product.effetti_off || '');
+  const usiRaw = compattaTestoSchedaCatalogo(offer.usi_raw || product.usi_raw || '');
+  const tipoContatore = String(offer.contatore_tipo || product.contatore_tipo || '').toUpperCase();
   if (suffix) parti.push(suffix);
-  if (offer.variante_label) parti.push(offer.variante_label);
+  // Per contatori non numerici o meccaniche basate sulla Resistenza il semplice
+  // (0/X) non esiste: conserviamo la regola d'uso nella riga della Scheda.
+  if (!suffix && usiRaw && tipoContatore && tipoContatore !== 'NESSUNO' && !normalizeText(effetti).includes(normalizeText(usiRaw))) parti.push(`Usi: ${usiRaw}`);
+  if (offer.variante_label) parti.push(compattaTestoSchedaCatalogo(offer.variante_label));
   if (offer.tipo_offerta === 'Alternativa' && offer.venditore && offer.venditore !== product.negozio_base) parti.push(`Versione: ${offer.venditore}`);
-  return parti.join(' | ');
+  // La Scheda deve conservare anche le caratteristiche della specifica offerta
+  // acquistata: prezzi alternativi possono avere effetti/valori diversi. Le
+  // compattiamo su una sola riga per non spezzare il protocollo inventario.
+  if (effetti) parti.push(effetti);
+  return parti.filter(Boolean).join(' | ');
 }
 function creaRigaOggettoAcquisto() {
   const wrapper = document.createElement('div');
@@ -4227,10 +4246,12 @@ const pp = totaleGenerale['Punti Post'] || 0;
 const gal = totaleGenerale['Galeoni'] || 0;
 const altri = Object.entries(totaleGenerale).filter(([k, v]) => k !== 'Punti Post' && k !== 'Galeoni' && Math.round((v || 0) * 100) !== 0);
 const righe = [];
-righe.push(`[size=10][font=medievalsharp]<b>[color=maroon]COMPLESSIVO ACCREDITO[/color]</b>[/font][/size]`);
-righe.push(`<b>Complessivo PP spesi e guadagnati:</b> ${pp ? (pp >= 0 ? '+' : '') + normNum(pp) + ' PP' : '//'}`);
-righe.push(`<b>Complessivo Galeoni spesi e guadagnati:</b> ${gal ? (gal >= 0 ? '+' : '') + normNum(gal) + ' G' : '//'}`);
-righe.push(`<b>Altri punti/altro guadagnati o persi:</b> ${altri.length ? altri.map(([k, v]) => `${v >= 0 ? '+' : ''}${normNum(v)} ${k}`).join(', ') : '//'}`);
+righe.push(`[quote]`);
+righe.push(`[size=10][font=medievalsharp]<b>[color=maroon]RIEPILOGO DELLA RICHIESTA[/color]</b>[/font][/size]`);
+righe.push(`<b>Punti Post</b>  →  ${pp ? (pp >= 0 ? '+' : '') + normNum(pp) + ' PP' : '//'}`);
+righe.push(`<b>Galeoni</b>  →  ${gal ? (gal >= 0 ? '+' : '') + normNum(gal) + ' G' : '//'}`);
+righe.push(`<b>Altre variazioni</b>  →  ${altri.length ? altri.map(([k, v]) => `${v >= 0 ? '+' : ''}${normNum(v)} ${k}`).join(' · ') : '//'}`);
+righe.push(`[/quote]`);
 return righe.join('\n');
 }
 
@@ -4254,7 +4275,8 @@ const extraAttivi = tipoPg === 'adulto' && ruoloUsaGaleoniExtra();
 const extraRaw = extraAttivi ? document.getElementById('galeoniExtraRimanenti')?.value : '';
 const extraBase = extraRaw === '' || extraRaw == null ? null : Number(extraRaw);
 const payload = {
-  versione: 2,
+  versione: 3,
+  protocolRevision: '3.1-commerce-sync',
   catalogVersion: String(FELIX_PREZZARI_CATALOGO.versione || '1'),
   tipoPg,
   nomePg: nomePG,
@@ -4270,31 +4292,38 @@ const payload = {
   galeoniExtraBase: Number.isFinite(extraBase) ? extraBase : null
 };
 const righe = [];
-righe.push(`<details><summary><b>📎 Dati per l'Accredito — non modificare</b></summary>`);
-righe.push(`[FF-ACCREDITI-V2]`);
+righe.push(`<details><summary><b>⚙️ Dati tecnici per l'Accredito</b> — <i>riservato allo Staff, non modificare</i></summary>`);
+righe.push(`[size=8][color=gray]Questo blocco permette allo Staff di leggere automaticamente la richiesta. Non è necessario aprirlo o modificarlo.[/color][/size]`);
+righe.push(`[FF-ACCREDITI-V3]`);
 // I detail delle Conoscenze contengono tag HTML. Li serializziamo come escape
 // Unicode per evitare che il forum li interpreti dentro al blocco tecnico;
 // JSON.parse li ripristinera' identici nel Generatore Accrediti.
 const payloadJson = JSON.stringify(payload).replace(/</g, '\\u003C').replace(/>/g, '\\u003E');
 righe.push(payloadJson);
-righe.push(`[/FF-ACCREDITI-V2]`);
+righe.push(`[/FF-ACCREDITI-V3]`);
 righe.push(`</details>`);
 return righe.join('\n');
 }
 
 function assemblaPostForum(sezioni, nomePG) {
 const blocchi = [];
-if (sezioni.segnala.length) blocchi.push(`[size=13][color=sienna][font=medievalsharp]<b>Segnala e riscatta role e converti PP in Galeoni</b>[/font][/color][/size]\n` + sezioni.segnala.join('\n<hr>\n'));
-if (sezioni.voti.length) blocchi.push(`[size=13][color=cadetblue][font=medievalsharp]<b>Migliora i tuoi Voti</b>[/font][/color][/size]\n` + sezioni.voti.join('\n<hr>\n'));
-if (sezioni.sapienze.length) blocchi.push(`[size=13][color=cadetblue][font=medievalsharp]<b>Migliora le tue Sapienze</b>[/font][/color][/size]\n` + sezioni.sapienze.join('\n<hr>\n'));
-if (sezioni.parametri.length) blocchi.push(`[size=13][color=coral][font=medievalsharp]<b>Acquista Parametri Magici, Fisici e Dialettica</b>[/font][/color][/size]\n` + sezioni.parametri.join('\n'));
-if (sezioni.conoscenze) blocchi.push(`[size=13][color=darkblue][font=medievalsharp]<b>Acquista Conoscenze</b>[/font][/color][/size]\n` + sezioni.conoscenze);
-if (sezioni.commercio.length) blocchi.push(`[size=13][color=seagreen][font=medievalsharp]<b>Commercio Magico</b>[/font][/color][/size]\n` + sezioni.commercio.join('\n<hr>\n'));
-if (sezioni.bagaglio.length) blocchi.push(`[size=13][color=peru][font=medievalsharp]<b>Bagaglio: Oggetti, Pozioni, Immunità</b>[/font][/color][/size]\n` + sezioni.bagaglio.join('\n'));
+const wrap = contenuto => `[quote]\n${contenuto}\n[/quote]`;
+if (sezioni.segnala.length) blocchi.push(wrap(`[size=13][color=sienna][font=medievalsharp]<b>Segnala e riscatta role e converti PP in Galeoni</b>[/font][/color][/size]\n` + sezioni.segnala.join('\n<hr>\n')));
+if (sezioni.voti.length) blocchi.push(wrap(`[size=13][color=cadetblue][font=medievalsharp]<b>Migliora i tuoi Voti</b>[/font][/color][/size]\n` + sezioni.voti.join('\n<hr>\n')));
+if (sezioni.sapienze.length) blocchi.push(wrap(`[size=13][color=cadetblue][font=medievalsharp]<b>Migliora le tue Sapienze</b>[/font][/color][/size]\n` + sezioni.sapienze.join('\n<hr>\n')));
+if (sezioni.parametri.length) blocchi.push(wrap(`[size=13][color=coral][font=medievalsharp]<b>Acquista Parametri Magici, Fisici e Dialettica</b>[/font][/color][/size]\n` + sezioni.parametri.join('\n')));
+if (sezioni.conoscenze) blocchi.push(wrap(`[size=13][color=darkblue][font=medievalsharp]<b>Acquista Conoscenze</b>[/font][/color][/size]\n` + sezioni.conoscenze));
+if (sezioni.commercio.length) blocchi.push(wrap(`[size=13][color=seagreen][font=medievalsharp]<b>Commercio Magico</b>[/font][/color][/size]\n` + sezioni.commercio.join('\n<hr>\n')));
+if (sezioni.bagaglio.length) blocchi.push(wrap(`[size=13][color=peru][font=medievalsharp]<b>Bagaglio: Oggetti, Pozioni, Immunità</b>[/font][/color][/size]\n` + sezioni.bagaglio.join('\n')));
 if (!blocchi.length) return '';
 blocchi.push(sezioni.recap);
-const titolo = `[size=13][color=darkred][font=medievalsharp]<b>Lista della Spesa di ${nomePG || 'PG'}</b>[/font][/color][/size]`;
-return titolo + '\n<hr>\n' + blocchi.join('\n<hr>\n');
+const titolo = [
+  `[center]`,
+  `[size=16][color=#6B2432][font=medievalsharp]<b>✦ LISTA DELLA SPESA ✦</b>[/font][/color][/size]`,
+  `[size=11][color=#6F625A]<b>Lista della Spesa di ${nomePG || 'PG'}</b>[/color][/size]`,
+  `[/center]`
+].join('\n');
+return titolo + '\n<hr>\n' + blocchi.join('\n\n');
 }
 
 function leggiMissioneStandaloneDalDOM(mEl) {
@@ -4849,17 +4878,24 @@ negozioEls.forEach((negEl, idx) => {
       const meta={itemId:p.product_id,productId:p.product_id,offerId:o.offer_id,catalogVersion:String(FELIX_PREZZARI_CATALOGO.versione||'1'),venditore:o.venditore,nome:x.nome,quantita:x.qty,destinazione:p.destinazione_scheda,prezzo:x.totale,modalita:p.modalita_ui,operazione:p.operazione||'',targetName:x.targetName||'',descrizione:x.desc||''};
       catalogoAcquisti.push(meta);
 
-      if(isExpansion){ operazioniCatalogo.push({tipo:'CONFIGURA_POSTI',productId:p.product_id,targetName:p.nome,targetType:p.target_type,classificazione:x.expClass,numero:x.expNum,sostituisce:x.expReplace||'',costo:x.totale}); return; }
+      if(isExpansion){ meta.esitoTecnico='OPERAZIONE'; operazioniCatalogo.push({tipo:'CONFIGURA_POSTI',productId:p.product_id,targetName:p.nome,targetType:p.target_type,classificazione:x.expClass,numero:x.expNum,sostituisce:x.expReplace||'',costo:x.totale}); return; }
       if(p.acquisto_behavior==='MODIFICA_TARGET_IMMEDIATA'){
         let valore=null; const m=String(o.effetti_off||'').match(/\+\s*(\d+(?:[.,]\d+)?)\s*Resistenza/i); if(m) valore=Number(m[1].replace(',','.'));
-        operazioniCatalogo.push({tipo:p.operazione,productId:p.product_id,offerId:o.offer_id,targetName:x.targetName,targetType:p.target_type,costo:x.totale,valore,targetOfferId:x.targetOfferId||'',targetProductId:x.targetProduct?.product_id||'',prezzoListinoTarget:x.targetProduct?Number(catalogoOfferta(x.targetOfferId)?.prezzo_valore):null});
+        const targetOffer=x.targetOfferId?catalogoOfferta(x.targetOfferId):null;
+        meta.esitoTecnico='OPERAZIONE';
+        operazioniCatalogo.push({tipo:p.operazione,productId:p.product_id,offerId:o.offer_id,targetName:x.targetName,targetType:p.target_type,costo:x.totale,valore,targetOfferId:x.targetOfferId||'',targetProductId:x.targetProduct?.product_id||'',targetVariantLabel:targetOffer?.venditore||'',targetIsPrincipale:targetOffer?.tipo_offerta==='Principale',targetDescrizione:(x.targetProduct&&targetOffer)?descrizioneCatalogoPerScheda(x.targetProduct,targetOffer):'',prezzoListinoTarget:x.targetProduct?Number(targetOffer?.prezzo_valore):null});
         return;
       }
-      if(p.destinazione_scheda==='DISPENSA'){quantiInDispensa++;return;}
-      if(p.destinazione_scheda==='PNG'){operazioniCatalogo.push({tipo:'ADD_PNG',productId:p.product_id,nome:x.nome,quantita:x.qty,costo:x.totale});return;}
+      if(p.destinazione_scheda==='DISPENSA'){meta.esitoTecnico='DISPENSA';quantiInDispensa++;return;}
+      if(p.destinazione_scheda==='PNG'){meta.esitoTecnico='PNG';operazioniCatalogo.push({tipo:'ADD_PNG',productId:p.product_id,nome:x.nome,quantita:x.qty,costo:x.totale});return;}
       const categoria=p.destinazione_scheda==='POZIONI'?'POZIONE':'OGGETTO';
       const pref=categoria==='POZIONE'?'NUOVO POZIONE':'NUOVO';
-      righeBoxGCommercio.push(`${pref}: ${x.nome} [${x.qty}]${x.desc?': '+x.desc:''}`);
+      const boxGRiga=`${pref}: ${x.nome} [${x.qty}]${x.desc?': '+x.desc:''}`;
+      meta.esitoTecnico='INVENTARIO';
+      meta.categoriaScheda=categoria;
+      meta.schedaDescrizione=x.desc||'';
+      meta.boxGRiga=boxGRiga;
+      righeBoxGCommercio.push(boxGRiga);
       const rule=(FELIX_PREZZARI_CATALOGO.regole_speciali||[]).find(r=>r.product_id===p.product_id && r.rule_type==='EFFETTO_SCHEDA');
       if(rule) operazioniCatalogo.push({tipo:'EFFETTO_SCHEDA',productId:p.product_id,nome:x.nome,effetto:rule.regola_effetto,targetType:rule.target_type});
     });
@@ -5457,11 +5493,11 @@ const ricostruito = [];
 const nonRicostruibile = [];
 
 // --- Tipo PG dal protocollo ufficiale ---
-const mProtocollo = String(testo || '').match(/\[FF-ACCREDITI-V2\]\s*([\s\S]*?)\s*\[\/FF-ACCREDITI-V2\]/i);
+const mProtocollo = String(testo || '').match(/\[FF-ACCREDITI-V(3|2)\]\s*([\s\S]*?)\s*\[\/FF-ACCREDITI-V\1\]/i);
 let datiProtocolloV2 = null;
 if (mProtocollo) {
   try {
-    const datiProtocollo = JSON.parse(mProtocollo[1].trim());
+    const datiProtocollo = JSON.parse(mProtocollo[2].trim());
     datiProtocolloV2 = datiProtocollo;
     if (datiProtocollo && ['studente','adulto'].includes(datiProtocollo.tipoPg)) {
       const radio = document.querySelector(`input[name="tipoPgLista"][value="${datiProtocollo.tipoPg}"]`);
@@ -5469,6 +5505,10 @@ if (mProtocollo) {
     }
   } catch (e) {}
 }
+
+// Il formato forum V3 usa [quote] per separare visivamente le sezioni.
+// Li rimuoviamo solo per la ricostruzione interna, lasciando intatto il post pubblicato.
+testo = String(testo || '').replace(/\[\/?quote\]/gi, '').replace(/\n{3,}/g, '\n\n');
 
 // --- Nome PG ---
 const mNome = testo.match(/Lista della Spesa di\s+([^<]+?)<\/b>/);
