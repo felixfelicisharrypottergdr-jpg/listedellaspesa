@@ -776,7 +776,7 @@ button.big {
 }
 .bag-action-box{padding:9px 10px!important;background:rgba(255,255,255,.35)!important;}
 .bag-action-grid{
-  display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:7px;
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-top:7px;
 }
 .bag-action-option{
   position:relative; margin:0; cursor:pointer; display:flex; align-items:flex-start; gap:8px;
@@ -2222,7 +2222,8 @@ div.innerHTML = `
 <label class="bag-action-option"><input type="radio" name="${bid}_azione" value="qty" class="f-bag-azione-radio" checked><span><b>Quantità</b><small>Aggiungo o tolgo unità già possedute</small></span></label>
 <label class="bag-action-option"><input type="radio" name="${bid}_azione" value="usi" class="f-bag-azione-radio"><span><b>Contatore</b><small>Consumo o recupero Usi, Post o Role</small></span></label>
 <label class="bag-action-option"><input type="radio" name="${bid}_azione" value="trasferisci" class="f-bag-azione-radio"><span><b>Trasferimento</b><small>Passo l'oggetto a un altro PG</small></span></label>
-<label class="bag-action-option"><input type="radio" name="${bid}_azione" value="applica" class="f-bag-azione-radio"><span><b>Utilizza / Applica</b><small>Consumo un oggetto posseduto e lo applico a un bersaglio</small></span></label>
+<label class="bag-action-option"><input type="radio" name="${bid}_azione" value="usa" class="f-bag-azione-radio"><span><b>Usa / Consuma</b><small>Uso un oggetto posseduto e applico i suoi effetti personali</small></span></label>
+<label class="bag-action-option"><input type="radio" name="${bid}_azione" value="applica" class="f-bag-azione-radio"><span><b>Applica a un oggetto</b><small>Consumo un oggetto per modificare un altro elemento del Bagaglio</small></span></label>
 <label class="bag-action-option"><input type="radio" name="${bid}_azione" value="nuovo" class="f-bag-azione-radio"><span><b>Nuovo elemento</b><small>Acquisto, creazione, premio...</small></span></label>
 </div>
 </div>
@@ -2248,6 +2249,12 @@ div.innerHTML = `
 </div>
 <div style="margin-top:10px;"><label class="tight">Link della scheda del PG destinatario</label><input type="text" class="f-bag-dest-link" placeholder="https://..."></div>
 </div>
+<div class="f-bag-campo-usa" style="margin-top:10px; display:none;">
+  <div class="hint f-bag-usa-info">Seleziona un oggetto del catalogo: il tool userà il suo contatore quando presente, oppure scalerà la quantità, e mostrerà gli eventuali effetti collegati.</div>
+  <div class="row">
+    <div style="max-width:180px;"><label class="tight">Quanti usi / unità?</label><input type="number" class="f-bag-qty-usa" min="1" step="1" value="1"></div>
+  </div>
+</div>
 <div class="f-bag-campo-applica" style="margin-top:10px; display:none;">
   <div class="hint f-bag-applica-info">Seleziona un oggetto applicabile dal catalogo: il tool consumerà la quantità indicata e passerà allo Staff anche la modifica da applicare al bersaglio.</div>
   <div class="row">
@@ -2266,6 +2273,7 @@ div.querySelector('.danger').addEventListener('click', () => { div.remove(); agg
 const campoDelta = div.querySelector('.f-bag-campo-delta');
 const campoTrasferimento = div.querySelector('.f-bag-campo-trasferimento');
 const campoNuovo = div.querySelector('.f-bag-campo-nuovo');
+const campoUsa = div.querySelector('.f-bag-campo-usa');
 const campoApplica = div.querySelector('.f-bag-campo-applica');
 const campoContatore = div.querySelector('.f-bag-campo-contatore');
 const campoVersoContatore = div.querySelector('.f-bag-campo-verso-contatore');
@@ -2276,15 +2284,18 @@ campoDelta.style.display = (val === 'qty' || val === 'usi') ? 'flex' : 'none';
 campoContatore.style.display = val === 'usi' ? 'block' : 'none';
 campoVersoContatore.style.display = val === 'usi' ? 'block' : 'none';
 campoTrasferimento.style.display = val === 'trasferisci' ? 'block' : 'none';
+campoUsa.style.display = val === 'usa' ? 'block' : 'none';
 campoApplica.style.display = val === 'applica' ? 'block' : 'none';
 campoNuovo.style.display = val === 'nuovo' ? 'flex' : 'none';
 labelDelta.textContent = val === 'usi' ? 'Quanto?' : 'Variazione quantità';
 const deltaInput = div.querySelector('.f-bag-delta');
 if (val === 'usi') { deltaInput.min = '1'; deltaInput.value = deltaInput.value ? Math.abs(parseFloat(deltaInput.value) || 0) : ''; deltaInput.placeholder = 'es. 1'; }
 else { deltaInput.removeAttribute('min'); deltaInput.placeholder = 'es. -1 oppure 2'; }
+aggiornaInfoUsoBagaglio(div);
 aggiornaInfoApplicazioneBagaglio(div);
 }));
-div.querySelector('.f-bag-nome').addEventListener('input', () => aggiornaInfoApplicazioneBagaglio(div));
+div.querySelector('.f-bag-nome').addEventListener('input', () => { aggiornaInfoUsoBagaglio(div); aggiornaInfoApplicazioneBagaglio(div); });
+div.querySelector('.f-bag-qty-usa').addEventListener('input', () => aggiornaInfoUsoBagaglio(div));
 
 return div;
 }
@@ -2293,6 +2304,38 @@ function prodottiCatalogoPerNome(nome) {
   const key = normalizeText(nome || '');
   return (FELIX_PREZZARI_CATALOGO.prodotti || []).filter(p => normalizeText(p.nome) === key);
 }
+function prodottoCatalogoUnivoco(nome) {
+  const candidati = prodottiCatalogoPerNome(nome);
+  return candidati.length === 1 ? candidati[0] : null;
+}
+
+// Oggetti del catalogo il cui uso assegna PP.
+// I casi lineari vengono calcolati automaticamente; i casi composti restano
+// segnalati allo Staff perché richiedono informazioni ulteriori sulla Role.
+const EFFETTI_PP_USO_CATALOGO = Object.freeze({
+  'OBJ-119': { ppPerUso: 5, automatico: true },
+  'OBJ-120': { ppPerUso: 2, automatico: true },
+  'OBJ-122': { ppPerUso: 3, automatico: true },
+  'OBJ-126': { ppPerUso: 2, automatico: true },
+  'OBJ-127': { ppPerUso: 3, automatico: true },
+  'OBJ-128': { ppPerUso: 3, automatico: true },
+  'OBJ-129': { ppPerUso: 2, automatico: true },
+  'OBJ-130': { ppPerUso: 3, automatico: true, nota: 'Massimo 1 uso premiato per Role.' },
+  'OBJ-135': { ppPerUso: 5, automatico: true, nota: 'L’effetto comprende anche -40 Salute per chi la mangia; la Salute non viene accreditata automaticamente da questa sezione.' },
+  'OBJ-192': { ppPerUso: 1, automatico: true },
+  'OBJ-206': { automatico: false, nota: 'Penne Magiche: Studenti = 1 voto extra in una Role di studio; Adulti = +3 PP ogni 5 post fatti nella stessa Role. Richiede verifica del contesto della Role.' },
+  'OBJ-207': { automatico: false, nota: 'Strillettera: il Mittente ottiene +5 PP e +0,5 Bontà/Virtuoso oppure Malvagità/Sinistro dopo la Role; il Destinatario ha effetti propri. Richiede verifica dell’esito completo.' }
+});
+function effettoPpUsoCatalogo(prodotto, quantita) {
+  const cfg = prodotto ? EFFETTI_PP_USO_CATALOGO[prodotto.product_id] : null;
+  if (!cfg) return { bonus: 0, automatico: false, nota: '' };
+  const q = Math.max(1, Number(quantita) || 1);
+  return {
+    bonus: cfg.automatico ? (Number(cfg.ppPerUso) || 0) * q : 0,
+    automatico: !!cfg.automatico,
+    nota: cfg.nota || ''
+  };
+}
 function prodottoCatalogoApplicabile(nome) {
   const candidati = prodottiCatalogoPerNome(nome).filter(p => p.attivazione_behavior === 'APPLICA_A_TARGET');
   return candidati.length === 1 ? candidati[0] : null;
@@ -2300,6 +2343,33 @@ function prodottoCatalogoApplicabile(nome) {
 function regolaSpecialeCatalogo(productId, ruleType) {
   return (FELIX_PREZZARI_CATALOGO.regole_speciali || []).find(r => r.product_id === productId && (!ruleType || r.rule_type === ruleType)) || null;
 }
+function aggiornaInfoUsoBagaglio(div) {
+  if (!div) return;
+  const info = div.querySelector('.f-bag-usa-info');
+  if (!info) return;
+  const nome = String(div.querySelector('.f-bag-nome')?.value || '').trim();
+  const qty = Math.max(1, parseInt(div.querySelector('.f-bag-qty-usa')?.value, 10) || 1);
+  if (!nome) {
+    info.innerHTML = 'Seleziona un oggetto del catalogo: il tool userà il suo contatore quando presente, oppure scalerà la quantità, e mostrerà gli eventuali effetti collegati.';
+    return;
+  }
+  const p = prodottoCatalogoUnivoco(nome);
+  if (!p) {
+    const esiste = prodottiCatalogoPerNome(nome).length > 0;
+    info.innerHTML = esiste
+      ? '⚠ Il nome indicato esiste più volte nel catalogo e non può essere associato in modo univoco. Usa Quantità/Contatore oppure specifica manualmente la variazione.'
+      : '⚠ Il nome indicato non è riconosciuto nel catalogo. Per elementi manuali usa Quantità o Contatore.';
+    return;
+  }
+  const pp = effettoPpUsoCatalogo(p, qty);
+  const effetto = String(p.effetti_off || 'Nessun effetto OFFGame specificato.').replace(/\n/g, '<br>');
+  const bonus = pp.automatico && pp.bonus
+    ? '<br><b>Bonus calcolato:</b> +' + normNum(pp.bonus) + ' PP'
+    : (EFFETTI_PP_USO_CATALOGO[p.product_id] ? '<br><b>Effetto PP condizionale:</b> non viene sommato automaticamente.' : '');
+  const nota = pp.nota ? '<br><b>Nota:</b> ' + pp.nota : '';
+  info.innerHTML = '<b>' + p.nome + '</b> · ' + (p.usi_raw || 'uso da catalogo') + '<br>' + effetto + bonus + nota;
+}
+
 function aggiornaInfoApplicazioneBagaglio(div) {
   if (!div) return;
   const info = div.querySelector('.f-bag-applica-info');
@@ -2327,6 +2397,32 @@ const desc = div.querySelector('.f-bag-desc-nuovo').value.trim();
 const prodottoCatalogo = prodottiCatalogoPerNome(nome);
 const catalogProductId = prodottoCatalogo.length === 1 ? prodottoCatalogo[0].product_id : '';
 return { azione: 'nuovo', categoria, nome, qty, desc, catalogProductId, riga: `NUOVO ${categoria}: ${nome} [${qty}]${desc ? ': ' + desc : ''}`, narrativa: `- NUOVO ${CATEGORIE_BAGAGLIO_LISTA.find(c => c.value === categoria).label}: ${nome} [${qty}]${desc ? ': ' + desc : ''}` };
+}
+
+if (azione === 'usa') {
+const qty = Math.max(1, parseInt(div.querySelector('.f-bag-qty-usa')?.value, 10) || 1);
+const prodottoCatalogo = prodottoCatalogoUnivoco(nome);
+if (!prodottoCatalogo) return null;
+const pp = effettoPpUsoCatalogo(prodottoCatalogo, qty);
+const tipoContatore = String(prodottoCatalogo.contatore_tipo || '').toUpperCase();
+const usaContatore = ['USI','POST','ROLE'].includes(tipoContatore) && !!String(prodottoCatalogo.scheda_suffix_auto || '').trim();
+const riga = usaContatore
+  ? 'CONTATORE ' + tipoContatore + ': ' + nome + ': +' + qty
+  : nome + ': -' + qty;
+const extraPp = pp.automatico && pp.bonus ? ' — +' + normNum(pp.bonus) + ' PP' : '';
+const verifica = !pp.automatico && EFFETTI_PP_USO_CATALOGO[prodottoCatalogo.product_id] ? ' — effetto PP da verificare' : '';
+return {
+  azione: 'usa', categoria, nome, qtyUsata: qty,
+  catalogProductId: prodottoCatalogo.product_id,
+  tipoScarico: usaContatore ? 'CONTATORE' : 'QUANTITA',
+  tipoContatore: usaContatore ? tipoContatore : '',
+  bonusPp: pp.bonus,
+  bonusPpAutomatico: pp.automatico,
+  effetto: prodottoCatalogo.effetti_off || '',
+  notaEffetto: pp.nota || '',
+  riga,
+  narrativa: '- ' + nome + ': usato/consumato ×' + qty + extraPp + verifica
+};
 }
 
 if (azione === 'applica') {
@@ -2428,6 +2524,9 @@ const r = riga.trim();
 let m = r.match(/^\-\s*(.+?):\s*-(\d+)\s*[—-]\s*applicato a\s+(.+)$/i);
 if (m) return {categoria:'OGGETTO',nome:m[1].trim(),azione:'applica',qtyApplicata:parseInt(m[2],10)||1,targetName:m[3].trim()};
 
+m = r.match(/^\-\s*(.+?):\s*usato\/consumato\s*[×x]\s*(\d+)(?:\s*[—-]\s*\+([\d.,]+)\s*PP)?(?:\s*[—-]\s*effetto PP da verificare)?\s*$/i);
+if (m) return {categoria:'OGGETTO',nome:m[1].trim(),azione:'usa',qtyUsata:parseInt(m[2],10)||1,bonusPp:m[3]?parseValoreNum(m[3]):0};
+
 m = r.match(/^\-\s*(.+?):\s*-(\d+)\s*[—-]\s*oggetto da trasferire a\s*\[URL=([^\]]+)\](.+?)\[\/URL\]\s*$/i);
 if (m) return {
 categoria: 'OGGETTO',
@@ -2475,6 +2574,12 @@ div.querySelector('.f-bag-desc-nuovo').value = dati.desc;
   if (div.querySelector('.f-bag-data-applica')) div.querySelector('.f-bag-data-applica').value = dati.dataApplicazione || '';
   trigger(div.querySelector('.f-bag-azione-radio[value="applica"]'),'change');
   aggiornaInfoApplicazioneBagaglio(div);
+  return div;
+}
+if (dati.azione === 'usa') {
+  div.querySelector('.f-bag-qty-usa').value = dati.qtyUsata || 1;
+  trigger(div.querySelector('.f-bag-azione-radio[value="usa"]'),'change');
+  aggiornaInfoUsoBagaglio(div);
   return div;
 }
 if (dati.azione === 'trasferisci') {
@@ -4276,7 +4381,7 @@ const extraRaw = extraAttivi ? document.getElementById('galeoniExtraRimanenti')?
 const extraBase = extraRaw === '' || extraRaw == null ? null : Number(extraRaw);
 const payload = {
   versione: 3,
-  protocolRevision: '3.1-commerce-sync',
+  protocolRevision: '3.2-bag-use-effects',
   catalogVersion: String(FELIX_PREZZARI_CATALOGO.versione || '1'),
   tipoPg,
   nomePg: nomePG,
@@ -4600,6 +4705,18 @@ function validaCompilazioneDettagliata() {
     if ((azione === 'qty' || azione === 'usi') && !(Math.abs(parseFloat(div.querySelector('.f-bag-delta')?.value)) > 0)) {
       errori.push(`Bagaglio ${i+1}: indica la quantità da ${azione === 'usi' ? 'consumare/recuperare' : 'aggiungere/togliere'}.`);
       marcaErrore(div, div.querySelector('.f-bag-delta'), 'Inserisci una quantità maggiore di 0.');
+    }
+    if (azione === 'usa') {
+      const p = prodottoCatalogoUnivoco(nome);
+      const qty = parseInt(div.querySelector('.f-bag-qty-usa')?.value, 10) || 0;
+      if (!p) {
+        errori.push('Bagaglio ' + (i+1) + ': “' + nome + '” non è riconosciuto in modo univoco nel catalogo per Usa / Consuma.');
+        marcaErrore(div, div.querySelector('.f-bag-nome'), 'Seleziona un oggetto univoco del catalogo; per elementi manuali usa Quantità o Contatore.');
+      }
+      if (!(qty > 0)) {
+        errori.push('Bagaglio ' + (i+1) + ': indica quanti usi/unità di ' + nome + ' sono stati consumati.');
+        marcaErrore(div, div.querySelector('.f-bag-qty-usa'), 'Inserisci una quantità maggiore di 0.');
+      }
     }
     if (azione === 'applica') {
       const p = prodottoCatalogoApplicabile(nome);
@@ -4957,14 +5074,24 @@ totaleGenerale['Punti Post'] = (totaleGenerale['Punti Post'] || 0) - conversione
 totaleGenerale['Galeoni'] = (totaleGenerale['Galeoni'] || 0) + conversione.galeoni;
 }
 
+const movimentiBagaglio = leggiMovimentiBagaglioDalDOM();
+const bonusPpDaOggetti = movimentiBagaglio
+  .filter(m => m.azione === 'usa' && m.bonusPpAutomatico)
+  .reduce((tot, m) => tot + (Number(m.bonusPp) || 0), 0);
+if (bonusPpDaOggetti) totaleGenerale['Punti Post'] = (totaleGenerale['Punti Post'] || 0) + bonusPpDaOggetti;
+
 document.getElementById('outBoxA').value = fmtRighe(totaleGenerale).join('\n') || '(nessuna variazione)';
 document.getElementById('outBoxE').value = tutteBoxELines.join(', ') || '(nessuna)';
 document.getElementById('outBoxF').value = tutteBoxFLines.join(', ') || '(nessuna)';
-const movimentiBagaglio = leggiMovimentiBagaglioDalDOM();
 const pozioniProdotte = leggiPozioniProdotteDalDOM();
 movimentiBagaglio.filter(m=>m.azione==='applica').forEach(m=>operazioniCatalogo.push({
   tipo:'APPLICA_OGGETTO', productId:m.catalogProductId, sourceName:m.nome, targetName:m.targetName,
   targetType:m.targetType, quantita:m.qtyApplicata, effetto:m.effetto, vincoli:m.vincoli, dataApplicazione:m.dataApplicazione || ''
+}));
+movimentiBagaglio.filter(m=>m.azione==='usa').forEach(m=>operazioniCatalogo.push({
+  tipo:'USA_OGGETTO', productId:m.catalogProductId, sourceName:m.nome, quantita:m.qtyUsata,
+  tipoScarico:m.tipoScarico, tipoContatore:m.tipoContatore || '', bonusPp:Number(m.bonusPp)||0,
+  bonusPpAutomatico:!!m.bonusPpAutomatico, effetto:m.effetto || '', notaEffetto:m.notaEffetto || ''
 }));
 const righeBoxGManuali = movimentiBagaglio.map(m => m.riga).filter(Boolean);
 const righeBoxGPozioniProdotte = pozioniProdotte.map(p => `NUOVO POZIONE: ${p.nome} [${p.dosi}]: ${p.tail}`);
