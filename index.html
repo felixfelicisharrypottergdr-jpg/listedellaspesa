@@ -1045,7 +1045,7 @@ button.big {
 </div>
 </div>
 <div id="continua_lista_box" style="display:none; margin-top:16px;">
-<div class="hint">Incolla qui sotto <b>l'intero post</b> della tua Lista della Spesa già pubblicata sul forum (quella che il tool ti ha dato l'ultima volta, non ancora accreditata) — va bene copiarla così com'è, riquadro "⚙️ Dati tecnici per l'Accredito" incluso. Il tool ricostruirà Role, missioni, Materie, Sapienze e il resto già compilati, così puoi aggiungere solo quello che ti serve in più senza riscrivere tutto da capo.</div>
+<div class="hint">Apri <b>Modifica</b> sul tuo post e incolla qui <b>l’intero codice</b> della tua Lista della Spesa già pubblicata sul forum (quella che il tool ti ha dato l'ultima volta, non ancora accreditata) — va bene copiarla così com'è, riquadro "⚙️ Dati tecnici per l'Accredito" incluso. Il tool ricostruirà Role, missioni, Materie, Sapienze e il resto già compilati, così puoi aggiungere solo quello che ti serve in più senza riscrivere tutto da capo.</div>
 <textarea id="inputListaPrecedente" style="min-height:180px;" placeholder="Incolla qui l'intero post pubblicato in precedenza..."></textarea>
 <button type="button" class="big" id="btn_carica_lista" style="margin-top:10px;">Carica e continua →</button>
 <div id="esito_caricamento" style="margin-top:12px; display:none;"></div>
@@ -1075,7 +1075,7 @@ button.big {
 </div>
 <div class="fmt-case">
 <div class="fmt-case-label">4. Pubblica il risultato così com'è</div>
-<div class="fmt-case-desc">Premi il pulsante fisso <b>"Calcola e apri il Risultato"</b>, poi copia il riquadro <b>"📋 Lista della Spesa da pubblicare sul Forum"</b> e incollalo, tale e quale, nel topic della tua Lista della Spesa — <b>incluso il riquadro richiudibile "📎 Dati per l'Accredito"</b> in fondo, che non è decorativo: è la parte che lo Staff userà davvero. Non modificarlo a meno che non ti serva aggiungere qualcosa che il tool non ti ha permesso di scrivere (es. un link di prova non previsto). Questo è il testo da cui lo Staff inserirà nella tua scheda tutti i premi che hai richiesto: se qualcosa qui è impreciso o mancante, lo sarà anche quello che ti verrà accreditato — vale la pena ricontrollarlo con attenzione prima di pubblicarlo.</div>
+<div class="fmt-case-desc">Premi il pulsante fisso <b>"Calcola e apri il Risultato"</b>, poi copia il riquadro <b>"📋 Lista della Spesa da pubblicare sul Forum"</b> e incollalo, tale e quale, nel topic della tua Lista della Spesa — <b>incluso il riquadro richiudibile "Dati tecnici per l'Accredito"</b> in fondo, che non è decorativo: è la parte che lo Staff userà davvero. Non modificarlo a meno che non ti serva aggiungere qualcosa che il tool non ti ha permesso di scrivere (es. un link di prova non previsto). Questo è il testo da cui lo Staff inserirà nella tua scheda tutti i premi che hai richiesto: se qualcosa qui è impreciso o mancante, lo sarà anche quello che ti verrà accreditato — vale la pena ricontrollarlo con attenzione prima di pubblicarlo.</div>
 </div>
 </div>
 </div>
@@ -4347,17 +4347,55 @@ return righe.join('\n');
 }
 
 function costruisciRecapFinale(totaleGenerale) {
-const pp = totaleGenerale['Punti Post'] || 0;
-const gal = totaleGenerale['Galeoni'] || 0;
-const altri = Object.entries(totaleGenerale).filter(([k, v]) => k !== 'Punti Post' && k !== 'Galeoni' && Math.round((v || 0) * 100) !== 0);
-const righe = [];
-righe.push(`[quote]`);
-righe.push(`[size=10][font=medievalsharp]<b>[color=maroon]RIEPILOGO DELLA RICHIESTA[/color]</b>[/font][/size]`);
-righe.push(`<b>Punti Post</b>  →  ${pp ? (pp >= 0 ? '+' : '') + normNum(pp) + ' PP' : '//'}`);
-righe.push(`<b>Galeoni</b>  →  ${gal ? (gal >= 0 ? '+' : '') + normNum(gal) + ' G' : '//'}`);
-righe.push(`<b>Altre variazioni</b>  →  ${altri.length ? altri.map(([k, v]) => `${v >= 0 ? '+' : ''}${normNum(v)} ${k}`).join(' · ') : '//'}`);
-righe.push(`[/quote]`);
-return righe.join('\n');
+  const righe = Object.entries(totaleGenerale)
+    .filter(([, valore]) => Math.abs(Number(valore) || 0) > 0.000001)
+    .sort(([a],[b]) => (a === 'Punti Post' ? -1 : b === 'Punti Post' ? 1 : a === 'Galeoni' ? -1 : b === 'Galeoni' ? 1 : 0))
+    .map(([nome, valore]) => `${valore > 0 ? '+' : ''}${normNum(valore)} ${nome === 'Punti Post' ? 'PP' : nome === 'Galeoni' ? 'G' : nome}`);
+  return `[size=10][color=#6B2432]<b>TOTALE RICHIESTO</b>[/color][/size]\n<b>${righe.length ? righe.join(' · ') : 'Nessuna variazione'}</b>`;
+}
+
+
+// Metadati destinati SOLO alla funzione "Continua una Lista".
+// Il Generatore Accrediti ignora questi campi: per l'accredito usa BOX e acquisti strutturati.
+function catturaRipristinoCommercio() {
+  const valore = (root, sel) => root.querySelector(sel)?.value ?? '';
+  const rigaCatalogo = r => ({
+    vendor: valore(r,'.f-cat-vendor'), offerId: valore(r,'.f-cat-offer'),
+    qty: valore(r,'.f-cat-qty'), specificName: valore(r,'.f-cat-specific-name'),
+    targetName: valore(r,'.f-cat-target-name'), targetOfferId: valore(r,'.f-cat-target-offer'),
+    configMode: valore(r,'.f-cat-config-mode'), expClass: valore(r,'.f-cat-exp-class'),
+    expNum: valore(r,'.f-cat-exp-num'), expReplace: valore(r,'.f-cat-exp-replace')
+  });
+  const rigaManuale = r => ({
+    nome: valore(r,'.f-nome-ogg'), qty: valore(r,'.f-qty-ogg'),
+    usiMax: valore(r,'.f-usi-ogg'), destinazione: valore(r,'.f-destinazione-ogg'),
+    prezzo: valore(r,'.f-prezzo-ogg'),
+    prezzoTipo: r.querySelector('.f-prezzo-tipo-radio:checked')?.value || 'riga'
+  });
+  return {
+    versione: 1,
+    negozi: [...document.querySelectorAll('#negozi_list > .negozio-card')].map(card => {
+      const mode = card.classList.contains('manual-mode') ? 'manuale' : 'catalogo';
+      return {mode, nome:valore(card,'.f-nome-neg'), righe: mode === 'manuale'
+        ? [...card.querySelectorAll('.oggetti_commercio_manual_list > .oggetto-riga-wrapper')].map(rigaManuale).filter(r=>r.nome.trim())
+        : [...card.querySelectorAll('.oggetti_commercio_list > .catalog-purchase')].map(rigaCatalogo).filter(r=>r.offerId)};
+    }).filter(n=>n.righe.length),
+    commercianti: [...document.querySelectorAll('#commercianti_list > .commerciante-card')].map(card => ({
+      nome:valore(card,'.f-nome-neg'), note:valore(card,'.f-note-com'),
+      righe:[...card.querySelectorAll('.oggetti_commercio_list > .oggetto-riga-wrapper')].map(rigaManuale).filter(r=>r.nome.trim())
+    })).filter(n=>n.righe.length || n.nome.trim())
+  };
+}
+function catturaValoriRipristino() {
+  const ids=['convN10','convN50','convN100','tassoBase','galeoniExtraRimanenti',
+             'eGiaPossedute','dialetticaPartenza','dialetticaFinale'];
+  const valori={};
+  ids.forEach(id=>{valori[id]=document.getElementById(id)?.value ?? '';});
+  valori.parametri=[...document.querySelectorAll('#parametri_list > .row')].map(r=>({
+    nome:r.querySelector('.f-param-nome')?.value || '', qty:r.querySelector('.f-param-qty')?.value || '',
+    gia:r.querySelector('.f-param-gia')?.value || ''
+  })).filter(r=>r.nome && Number(r.qty)>0);
+  return valori;
 }
 
 // I Box A/E/F/G devono stare DENTRO il post pubblicato: chi fa gli accrediti
@@ -4381,7 +4419,7 @@ const extraRaw = extraAttivi ? document.getElementById('galeoniExtraRimanenti')?
 const extraBase = extraRaw === '' || extraRaw == null ? null : Number(extraRaw);
 const payload = {
   versione: 3,
-  protocolRevision: '3.2-bag-use-effects',
+  protocolRevision: '3.3-compact-forum-restore',
   catalogVersion: String(FELIX_PREZZARI_CATALOGO.versione || '1'),
   tipoPg,
   nomePg: nomePG,
@@ -4394,6 +4432,8 @@ const payload = {
   catalogoAcquisti: Array.isArray(catalogoAcquisti) ? catalogoAcquisti : [],
   operazioniCatalogo: Array.isArray(operazioniCatalogo) ? operazioniCatalogo : [],
   pozioniProdotte: Array.isArray(pozioniProdotte) ? pozioniProdotte : [],
+  ripristinoCommercio: catturaRipristinoCommercio(),
+  ripristinoValori: catturaValoriRipristino(),
   galeoniExtraBase: Number.isFinite(extraBase) ? extraBase : null
 };
 const righe = [];
@@ -4411,24 +4451,23 @@ return righe.join('\n');
 }
 
 function assemblaPostForum(sezioni, nomePG) {
-const blocchi = [];
-const wrap = contenuto => `[quote]\n${contenuto}\n[/quote]`;
-if (sezioni.segnala.length) blocchi.push(wrap(`[size=13][color=sienna][font=medievalsharp]<b>Segnala e riscatta role e converti PP in Galeoni</b>[/font][/color][/size]\n` + sezioni.segnala.join('\n<hr>\n')));
-if (sezioni.voti.length) blocchi.push(wrap(`[size=13][color=cadetblue][font=medievalsharp]<b>Migliora i tuoi Voti</b>[/font][/color][/size]\n` + sezioni.voti.join('\n<hr>\n')));
-if (sezioni.sapienze.length) blocchi.push(wrap(`[size=13][color=cadetblue][font=medievalsharp]<b>Migliora le tue Sapienze</b>[/font][/color][/size]\n` + sezioni.sapienze.join('\n<hr>\n')));
-if (sezioni.parametri.length) blocchi.push(wrap(`[size=13][color=coral][font=medievalsharp]<b>Acquista Parametri Magici, Fisici e Dialettica</b>[/font][/color][/size]\n` + sezioni.parametri.join('\n')));
-if (sezioni.conoscenze) blocchi.push(wrap(`[size=13][color=darkblue][font=medievalsharp]<b>Acquista Conoscenze</b>[/font][/color][/size]\n` + sezioni.conoscenze));
-if (sezioni.commercio.length) blocchi.push(wrap(`[size=13][color=seagreen][font=medievalsharp]<b>Commercio Magico</b>[/font][/color][/size]\n` + sezioni.commercio.join('\n<hr>\n')));
-if (sezioni.bagaglio.length) blocchi.push(wrap(`[size=13][color=peru][font=medievalsharp]<b>Bagaglio: Oggetti, Pozioni, Immunità</b>[/font][/color][/size]\n` + sezioni.bagaglio.join('\n')));
-if (!blocchi.length) return '';
-blocchi.push(sezioni.recap);
-const titolo = [
-  `[center]`,
-  `[size=16][color=#6B2432][font=medievalsharp]<b>✦ LISTA DELLA SPESA ✦</b>[/font][/color][/size]`,
-  `[size=11][color=#6F625A]<b>Lista della Spesa di ${nomePG || 'PG'}</b>[/color][/size]`,
-  `[/center]`
-].join('\n');
-return titolo + '\n<hr>\n' + blocchi.join('\n\n');
+  const blocchi = [];
+  const sezione = (titolo, colore, contenuto) => {
+    if (contenuto) blocchi.push(`[size=11][color=${colore}][font=Arial]<b>${titolo}</b>[/font][/color][/size]\n${contenuto}`);
+  };
+  // I titoli semantici rimangono stabili: le Liste meno recenti sono ancora recuperabili.
+  if (sezioni.segnala.length) sezione('ROLE E PREMI', '#785326', sezioni.segnala.join('\n\n'));
+  if (sezioni.voti.length) sezione('VOTI', '#386C82', sezioni.voti.join('\n\n'));
+  if (sezioni.sapienze.length) sezione('SAPIENZE', '#386C82', sezioni.sapienze.join('\n\n'));
+  if (sezioni.parametri.length) sezione('PARAMETRI E DIALETTICA', '#965335', sezioni.parametri.join('\n'));
+  if (sezioni.conoscenze) sezione('CONOSCENZE', '#455B84', sezioni.conoscenze);
+  if (sezioni.commercio.length) sezione('COMMERCIO MAGICO', '#386C50', sezioni.commercio.join('\n\n'));
+  if (sezioni.bagaglio.length) sezione('BAGAGLIO E POZIONI', '#855E37', sezioni.bagaglio.join('\n'));
+  if (!blocchi.length) return '';
+  blocchi.push(sezioni.recap);
+  // Il topic ha già il titolo 'Lista della Spesa': una sola intestazione con il PG.
+  const intestazione = `[size=12][color=#6B2432]<b>Richiesta di ${nomePG || 'PG'}</b>[/color][/size]`;
+  return intestazione + '\n\n' + blocchi.join('\n\n');
 }
 
 function leggiMissioneStandaloneDalDOM(mEl) {
@@ -4990,7 +5029,17 @@ negozioEls.forEach((negEl, idx) => {
       const targetReq=p.target_richiesto_acquisto==='SI' || p.modalita_ui==='SELEZIONA_TARGET';
       const narrTarget=targetReq ? ` → ${x.targetName || 'bersaglio non indicato'}` : '';
       if(isExpansion) righeNarrativa.push(`- ${p.nome}: espansione ${x.expClass} n.${x.expNum}${x.expReplace?` (sostituisce ${x.expReplace})`:''} - ${normNum(x.totale)} G`);
-      else righeNarrativa.push(`- ${x.nome} [${x.qty}]${x.desc?` ${x.desc}`:''}${narrTarget} - ${normNum(x.totale)} G`);
+      else {
+        // Nel post pubblico mostriamo SOLO ciò che serve a capire l'acquisto;
+        // tutte le specifiche della versione restano nel payload tecnico per l'accredito e l'archivio.
+        const classificazione=p.richiede_nome_specifico==='SI' ? ` (${p.nome})` : '';
+        const variante=o.variante_label ? ` · ${o.variante_label}` :
+          (o.tipo_offerta==='Alternativa' && o.venditore!==p.negozio_base ? ` · versione ${o.venditore}` : '');
+        const contatore=o.scheda_suffix_auto || p.scheda_suffix_auto || '';
+        const destinazione=p.destinazione_scheda==='DISPENSA'?' · Dispensa':
+          p.destinazione_scheda==='POZIONI'?' · Pozioni':'';
+        righeNarrativa.push(`- ${x.nome}${classificazione} [${x.qty}]${contatore?' '+contatore:''}${variante}${destinazione}${narrTarget} — ${normNum(x.totale)} G`);
+      }
 
       const meta={itemId:p.product_id,productId:p.product_id,offerId:o.offer_id,catalogVersion:String(FELIX_PREZZARI_CATALOGO.versione||'1'),venditore:o.venditore,nome:x.nome,quantita:x.qty,destinazione:p.destinazione_scheda,prezzo:x.totale,modalita:p.modalita_ui,operazione:p.operazione||'',targetName:x.targetName||'',descrizione:x.desc||''};
       catalogoAcquisti.push(meta);
@@ -5072,6 +5121,8 @@ const conversione = calcolaConversione(n10, n50, n100);
 if (conversione.pp) {
 totaleGenerale['Punti Post'] = (totaleGenerale['Punti Post'] || 0) - conversione.pp;
 totaleGenerale['Galeoni'] = (totaleGenerale['Galeoni'] || 0) + conversione.galeoni;
+const dettagli = [[n10,10],[n50,50],[n100,100]].filter(([n])=>n>0).map(([n,taglia])=>`${n} × ${taglia} PP`);
+sezioniPost.segnala.push(`<b>Conversione PP → Galeoni:</b> ${dettagli.join(' · ')} — -${normNum(conversione.pp)} PP / +${normNum(conversione.galeoni)} G`);
 }
 
 const movimentiBagaglio = leggiMovimentiBagaglioDalDOM();
@@ -5104,7 +5155,7 @@ const nomePG = document.getElementById('nomePG').value.trim();
 const postNarrativo = assemblaPostForum(sezioniPost, nomePG);
 const bloccoDati = postNarrativo ? costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG, tipoPgLista, nomePG, movimentiBagaglio, acquistiConoscenzeAccredito, catalogoAcquisti, operazioniCatalogo, pozioniProdotte) : '';
 document.getElementById('outPostForum').value = postNarrativo
-? postNarrativo + '\n<hr>\n' + bloccoDati
+? postNarrativo + '\n\n' + bloccoDati
 : '(nessuna sezione compilata)';
 
 document.getElementById('risultato_vuoto').style.display = 'none';
@@ -5225,11 +5276,13 @@ return { nome: nomeMissione, completamento, prove, premio };
 }
 
 function parseRoleBlocco(blocco) {
-const mTestata = blocco.match(/<b>Role \d+:<\/b>\s*(?:\[URL=([^\\]]+)\](.+?)\[\/URL\]|([^\n—]+?))\s*—\s*([\d.,]+)\s*post scritti/);
+const mTestata = blocco.match(/^<b>Role\s+\d+:<\/b>\s*(.+?)\s+[—–]\s*([\d.,]+)\s+post scritti/m);
 if (!mTestata) return null;
-const link = (mTestata[1] || '').trim();
-const titolo = (mTestata[2] || mTestata[3] || '').trim();
-const numPosts = parseValoreNum(mTestata[4]) || 0;
+const titoloRaw = mTestata[1].trim();
+const mLink = titoloRaw.match(/^\[URL=([^\]]+)\]([\s\S]*?)\[\/URL\]$/i);
+const link = mLink ? mLink[1].trim() : '';
+const titolo = mLink ? mLink[2].trim() : titoloRaw;
+const numPosts = parseValoreNum(mTestata[2]) || 0;
 
 const missioni = [];
 const mMissioniSez = blocco.match(/<b>Missioni FH\/FW completate:<\/b>\s*\n([\s\S]*?)(?=\n<b>|$)/);
@@ -5593,6 +5646,124 @@ if (!negData.righe.length) list.appendChild(creaRigaOggettoAcquistoManuale());
 return div;
 }
 
+
+function ripristinaCatalogoRiga(wrapper, item) {
+  const off=catalogoOfferta(item.offerId);
+  if (!off) return false;
+  const venditore=item.vendor || off.venditore;
+  const v=wrapper.querySelector('.f-cat-vendor');
+  v.value=venditore; trigger(v,'change');
+  const o=wrapper.querySelector('.f-cat-offer');
+  o.value=item.offerId; trigger(o,'change');
+  if (o.value !== item.offerId) return false;
+  const set=(sel,val,evt='input')=>{
+    const el=wrapper.querySelector(sel); if(el && val!==undefined && val!==null){el.value=val; trigger(el,evt);}
+  };
+  set('.f-cat-qty',item.qty || '1');
+  set('.f-cat-specific-name',item.specificName || '');
+  set('.f-cat-target-name',item.targetName || '');
+  set('.f-cat-target-offer',item.targetOfferId || '','change');
+  set('.f-cat-config-mode',item.configMode || 'base','change');
+  set('.f-cat-exp-class',item.expClass || 'X','change');
+  set('.f-cat-exp-num',item.expNum || '1');
+  set('.f-cat-exp-replace',item.expReplace || '','change');
+  return true;
+}
+function ripristinaRigaManuale(wrapper, r) {
+  const set=(sel,val)=>{const el=wrapper.querySelector(sel); if(el && val!==undefined){el.value=val;trigger(el,'input');}};
+  set('.f-nome-ogg',r.nome || ''); set('.f-qty-ogg',r.qty || '1');
+  set('.f-usi-ogg',r.usiMax || ''); set('.f-destinazione-ogg',r.destinazione || 'bagaglio');
+  set('.f-prezzo-ogg',r.prezzo ?? '0');
+  const radio=wrapper.querySelector(`.f-prezzo-tipo-radio[value="${r.prezzoTipo || 'riga'}"]`);
+  if(radio){radio.checked=true;trigger(radio,'change');}
+}
+function ripristinaCommercioDaDati(dati,ricostruito,nonRicostruibile) {
+  const stato=dati?.ripristinoCommercio;
+  let gruppi=[];
+  if(stato && Number(stato.versione)===1 && Array.isArray(stato.negozi)) {
+    gruppi=stato.negozi;
+  } else if(Array.isArray(dati?.catalogoAcquisti) && dati.catalogoAcquisti.length) {
+    // Compatibilità V3 già pubblicate: prima il ripristino perdeva gli Ingredienti
+    // perché rileggeva il testo commerciale invece degli ID nel payload.
+    const acquisti=dati.catalogoAcquisti.filter(x=>x && x.offerId);
+    const rows=acquisti.map(x=>{
+      const p=catalogoProdotto(x.productId || x.itemId);
+      const op=(dati.operazioniCatalogo||[]).find(o=>o.productId===(x.productId || x.itemId) && Math.abs(Number(o.costo)-Number(x.prezzo))<0.001);
+      return {
+        vendor:x.venditore,offerId:x.offerId,qty:x.quantita || 1,
+        specificName:p?.richiede_nome_specifico==='SI' ? x.nome : '',
+        targetName:x.targetName || '',targetOfferId:op?.targetOfferId || '',
+        configMode:op?.tipo==='CONFIGURA_POSTI' ? 'espansione' : 'base',
+        expClass:op?.classificazione || 'X',expNum:op?.numero || 1,
+        expReplace:op?.sostituisce || ''
+      };
+    });
+    if(rows.length) gruppi=[{mode:'catalogo',righe:rows}];
+  }
+  const sales=Array.isArray(stato?.commercianti)?stato.commercianti:[];
+  if(!gruppi.length && !sales.length) return {usato:false,acquisti:0,commercianti:0};
+  const negoziList=document.getElementById('negozi_list');
+  const commerciantiList=document.getElementById('commercianti_list');
+  negoziList.innerHTML='';
+  commerciantiList.innerHTML='';
+  let count=0,falliti=0;
+  gruppi.forEach(g=>{
+    const card=creaCardCommercio('acquisto');
+    const mode=g.mode==='manuale'?'manuale':'catalogo';
+    const radio=card.querySelector(`.f-commerce-mode[value="${mode}"]`);
+    if(radio){radio.checked=true;trigger(radio,'change');}
+    card.classList.toggle('manual-mode',mode==='manuale');
+    if(mode==='manuale') card.querySelector('.f-nome-neg').value=g.nome || 'Inserimento manuale';
+    const target=card.querySelector(mode==='manuale'?'.oggetti_commercio_manual_list':'.oggetti_commercio_list');
+    target.innerHTML='';
+    (g.righe||[]).forEach(r=>{
+      const w=mode==='manuale'?creaRigaOggettoAcquistoManuale():creaRigaOggettoAcquisto();
+      if(mode==='manuale') ripristinaRigaManuale(w,r);
+      else if(!ripristinaCatalogoRiga(w,r)){falliti++;return;}
+      target.appendChild(w);count++;
+    });
+    if(target.children.length) negoziList.appendChild(card);
+  });
+  sales.forEach(g=>{
+    const card=creaCardCommercio('vendita');
+    const nome=card.querySelector('.f-nome-neg');nome.value=g.nome||'';trigger(nome,'input');
+    const note=card.querySelector('.f-note-com');if(note)note.value=g.note||'';
+    const target=card.querySelector('.oggetti_commercio_list');target.innerHTML='';
+    (g.righe||[]).forEach(r=>{const w=creaRigaOggettoVendita();ripristinaRigaManuale(w,r);target.appendChild(w);});
+    commerciantiList.appendChild(card);
+  });
+  if(!negoziList.children.length)negoziList.appendChild(creaCardCommercio('acquisto'));
+  if(!commerciantiList.children.length)commerciantiList.appendChild(creaCardCommercio('vendita'));
+  aggiornaContatoreCommercio();
+  if(count) ricostruito.push(`${count} acquisti da catalogo/manuali (comprese le voci Dispensa)`);
+  if(sales.length) ricostruito.push(`${sales.length} vendite a PNG`);
+  if(falliti) nonRicostruibile.push(`${falliti} offerte non trovate nel catalogo attuale: verifica i prodotti prima di continuare`);
+  const dichiarati=Number(dati?.catalogoAcquisti?.length)||0;
+  if(!(stato && Number(stato.versione)===1) && dichiarati>count)
+    nonRicostruibile.push(`${dichiarati-count} acquisti di una Lista precedente non ricostruiti: controllali nel post originale`);
+  return {usato:true,acquisti:count,commercianti:sales.length};
+}
+function ripristinaValoriDalProtocollo(dati,ricostruito) {
+  const valori=dati?.ripristinoValori;
+  if(!valori || typeof valori!=='object') return false;
+  const ids=['convN10','convN50','convN100','tassoBase','galeoniExtraRimanenti','eGiaPossedute','dialetticaPartenza','dialetticaFinale'];
+  ids.forEach(id=>{if(valori[id]!==undefined){const el=document.getElementById(id);if(el){el.value=valori[id];trigger(el,'input');}}});
+  if(Array.isArray(valori.parametri) && valori.parametri.length){
+    const list=document.getElementById('parametri_list');list.innerHTML='';
+    valori.parametri.forEach(p=>{
+      const r=creaParametroRow();
+      r.querySelector('.f-param-nome').value=p.nome;
+      r.querySelector('.f-param-qty').value=p.qty;
+      const gia=r.querySelector('.f-param-gia');if(gia)gia.value=p.gia;
+      list.appendChild(r);
+    });
+    aggiornaContatoreParam();
+  }
+  const conv=['convN10','convN50','convN100'].map(id=>Number(valori[id])||0);
+  if(conv.some(Boolean))ricostruito.push('Conversione PP → Galeoni');
+  return true;
+}
+
 function popolaCommercianteCardDaDati(comData) {
 const div = creaCardCommercio('vendita');
 div.querySelector('.f-nome-neg').value = comData.nome;
@@ -5638,16 +5809,19 @@ if (mProtocollo) {
 testo = String(testo || '').replace(/\[\/?quote\]/gi, '').replace(/\n{3,}/g, '\n\n');
 
 // --- Nome PG ---
-const mNome = testo.match(/Lista della Spesa di\s+([^<]+?)<\/b>/);
-if (mNome && mNome[1].trim() !== 'PG') {
+const mNome = testo.match(/(?:Lista della Spesa di|Richiesta di)\s+([^<\n]+?)<\/b>/i);
+if (datiProtocolloV2?.nomePg) {
+document.getElementById('nomePG').value = datiProtocolloV2.nomePg;
+ricostruito.push('Nome del PG');
+} else if (mNome && mNome[1].trim() !== 'PG') {
 document.getElementById('nomePG').value = mNome[1].trim();
 ricostruito.push('Nome del PG');
 }
 
 // --- Segnala Role: individuo la sezione, poi divido in blocchi su <hr> ---
-const mSegnala = testo.match(/<b>Segnala e riscatta role e converti PP in Galeoni<\/b>\[\/font\]\[\/color\]\[\/size\]\s*\n([\s\S]*?)(?=\n\[size=13\]|\n\[size=10\]|$)/);
+const mSegnala = testo.match(/<b>(?:Segnala e riscatta role e converti PP in Galeoni|ROLE E PREMI)<\/b>\[\/font\]\[\/color\]\[\/size\]\s*\n([\s\S]*?)(?=\n\[size=(?:13|11|10|9)\]|$)/);
 if (mSegnala) {
-const blocchi = mSegnala[1].replace(/\n<hr>\s*$/, '').split(/\n<hr>\n/);
+const blocchi = mSegnala[1].replace(/\n<hr>\s*$/, '').split(/\n<hr>\n|\n\n+/);
 let nRole = 0, nStandalone = 0;
 document.getElementById('roles_list').innerHTML = '';
 blocchi.forEach(blocco => {
@@ -5679,9 +5853,9 @@ aggiornaContatoreMissioneStandalone();
 }
 
 // --- Migliora Voti ---
-const mVoti = testo.match(/<b>Migliora i tuoi Voti<\/b>\[\/font\]\[\/color\]\[\/size\]\s*\n([\s\S]*?)(?=\n\[size=13\]|\n\[size=10\]|$)/);
+const mVoti = testo.match(/<b>(?:Migliora i tuoi Voti|VOTI)<\/b>\[\/font\]\[\/color\]\[\/size\]\s*\n([\s\S]*?)(?=\n\[size=(?:13|11|10|9)\]|$)/);
 if (mVoti) {
-const blocchi = mVoti[1].replace(/\n<hr>\s*$/, '').split(/\n<hr>\n/);
+const blocchi = mVoti[1].replace(/\n<hr>\s*$/, '').split(/\n<hr>\n|\n\n+/);
 document.getElementById('materie_list').innerHTML = '';
 let n = 0;
 blocchi.forEach(blocco => {
@@ -5694,9 +5868,9 @@ aggiornaContatoreMateria();
 }
 
 // --- Migliora Sapienze ---
-const mSap = testo.match(/<b>Migliora le tue Sapienze<\/b>\[\/font\]\[\/color\]\[\/size\]\s*\n([\s\S]*?)(?=\n\[size=13\]|\n\[size=10\]|$)/);
+const mSap = testo.match(/<b>(?:Migliora le tue Sapienze|SAPIENZE)<\/b>\[\/font\]\[\/color\]\[\/size\]\s*\n([\s\S]*?)(?=\n\[size=(?:13|11|10|9)\]|$)/);
 if (mSap) {
-const blocchi = mSap[1].replace(/\n<hr>\s*$/, '').split(/\n<hr>\n/);
+const blocchi = mSap[1].replace(/\n<hr>\s*$/, '').split(/\n<hr>\n|\n\n+/);
 document.getElementById('sapienze_list').innerHTML = '';
 let n = 0;
 blocchi.forEach(blocco => {
@@ -5709,8 +5883,8 @@ aggiornaContatoreSapienza();
 }
 
 // --- Acquista Parametri Magici, Fisici e Dialettica ---
-const mParam = testo.match(/<b>Acquista Parametri Magici, Fisici e Dialettica<\/b>\[\/font\]\[\/color\]\[\/size\]\s*\n([\s\S]*?)(?=\n\[size=13\]|\n\[size=10\]|$)/);
-if (mParam) {
+const mParam = testo.match(/<b>(?:Acquista Parametri Magici, Fisici e Dialettica|PARAMETRI E DIALETTICA)<\/b>\[\/font\]\[\/color\]\[\/size\]\s*\n([\s\S]*?)(?=\n\[size=(?:13|11|10|9)\]|$)/);
+if (mParam && !Array.isArray(datiProtocolloV2?.ripristinoValori?.parametri)) {
 const righe = mParam[1].split('\n').filter(r => r.trim());
 document.getElementById('parametri_list').innerHTML = '';
 let nParam = 0;
@@ -5734,7 +5908,7 @@ else document.getElementById('parametri_list').appendChild(creaParametroRow());
 }
 
 // --- Acquista Conoscenze ---
-const mCon = testo.match(/<b>Acquista Conoscenze<\/b>\[\/font\]\[\/color\]\[\/size\]\s*\n([\s\S]*?)(?=\n\[size=13\]|\n\[size=10\]|$)/);
+const mCon = testo.match(/<b>(?:Acquista Conoscenze|CONOSCENZE)<\/b>\[\/font\]\[\/color\]\[\/size\]\s*\n([\s\S]*?)(?=\n\[size=(?:13|11|10|9)\]|$)/);
 if (mCon) {
 const blocchi = mCon[1].split(/\n\n+/).filter(b => b.includes('Tipo di conoscenza:'));
 document.getElementById('acquisti_list').innerHTML = '';
@@ -5748,17 +5922,21 @@ else document.getElementById('acquisti_list').appendChild(creaAcquistoCard());
 aggiornaContatoreAcquisto();
 }
 
-// --- Commercio Magico ---
-const mCom = testo.match(/<b>Commercio Magico<\/b>\[\/font\]\[\/color\]\[\/size\]\s*\n([\s\S]*?)(?=\n\[size=13\]|\n\[size=10\]|$)/);
-if (mCom) {
-const blocchi = mCom[1].replace(/\n<hr>\s*$/, '').split(/\n<hr>\n/);
+// --- Commercio Magico: prima il protocollo (ID offerte e nomi specifici),
+// poi la lettura narrativa per Liste precedenti prive dei dati strutturati. ---
+const commercioRipristinato = ripristinaCommercioDaDati(datiProtocolloV2, ricostruito, nonRicostruibile);
+const mCom = testo.match(/<b>(?:Commercio Magico|COMMERCIO MAGICO)<\/b>\[\/font\]\[\/color\]\[\/size\]\s*\n([\s\S]*?)(?=\n\[size=(?:13|11|10|9)\]|$)/);
+if (mCom && !commercioRipristinato.usato) {
+const blocchi = mCom[1].replace(/\n<hr>\s*$/, '').split(/\n<hr>\n|\n\n+/);
 document.getElementById('negozi_list').innerHTML = '';
 document.getElementById('commercianti_list').innerHTML = '';
 let nNeg = 0, nCom = 0;
 blocchi.forEach(blocco => {
 if (blocco.includes('<b>Negozio scelto:</b>')) {
 const negData = parseNegozioBlocco(blocco);
-if (negData) { document.getElementById('negozi_list').appendChild(popolaNegozioCardDaDati(negData)); nNeg++; }
+if (negData?.righe?.length) { document.getElementById('negozi_list').appendChild(popolaNegozioCardDaDati(negData)); nNeg++; }
+if (negData && !negData.righe.length && blocco.includes('Lista acquisti:'))
+  nonRicostruibile.push('Acquisti non ricostruibili dal testo visibile: copia il codice completo del post usando Modifica.');
 } else if (blocco.includes('<b>PNG Commerciante scelto:</b>')) {
 const comData = parseCommercianteBlocco(blocco);
 if (comData) { document.getElementById('commercianti_list').appendChild(popolaCommercianteCardDaDati(comData)); nCom++; }
@@ -5771,8 +5949,26 @@ if (!nCom) document.getElementById('commercianti_list').appendChild(creaCardComm
 aggiornaContatoreCommercio();
 }
 
+if (mCom && commercioRipristinato.usato && !datiProtocolloV2?.ripristinoCommercio) {
+  // V3 di transizione: gli acquisti del catalogo vengono dai metadati, ma le
+  // eventuali vendite e i negozi manuali erano descritti solo nel post.
+  mCom[1].split(/\n<hr>\n|\n\n+/).forEach(blocco=>{
+    if(blocco.includes('<b>PNG Commerciante scelto:</b>')){
+      const d=parseCommercianteBlocco(blocco);
+      if(d){const list=document.getElementById('commercianti_list');
+        if(list.children.length===1 && !list.firstElementChild.querySelector('.f-nome-neg')?.value &&
+           !list.firstElementChild.querySelector('.f-nome-ogg')?.value)list.innerHTML='';
+        list.appendChild(popolaCommercianteCardDaDati(d));ricostruito.push('Vendita a PNG');}
+    } else if(/<b>Negozio scelto:<\/b>\s*Inserimento manuale/i.test(blocco)){
+      const d=parseNegozioBlocco(blocco);
+      if(d){document.getElementById('negozi_list').appendChild(popolaNegozioCardDaDati(d));ricostruito.push('Acquisto manuale');}
+    }
+  });
+  aggiornaContatoreCommercio();
+}
+
 // --- Bagaglio: Oggetti, Pozioni, Immunità ---
-const mBag = testo.match(/<b>Bagaglio: Oggetti, Pozioni, Immunità<\/b>\[\/font\]\[\/color\]\[\/size\]\s*\n([\s\S]*?)(?=\n\[size=13\]|\n\[size=10\]|$)/);
+const mBag = testo.match(/<b>(?:Bagaglio: Oggetti, Pozioni, Immunità|BAGAGLIO E POZIONI)<\/b>\[\/font\]\[\/color\]\[\/size\]\s*\n([\s\S]*?)(?=\n\[size=(?:13|11|10|9)\]|$)/);
 if (mBag) {
 document.querySelector('.movimenti_bagaglio_list').innerHTML = '';
 let n = 0;
@@ -5793,7 +5989,7 @@ if (Array.isArray(datiProtocolloV2?.pozioniProdotte) && datiProtocolloV2.pozioni
   aggiornaContatorePozioniProdotte(); ricostruito.push(`${datiProtocolloV2.pozioniProdotte.length} Pozioni prodotte`);
 }
 
-nonRicostruibile.push('Conversione PP → Galeoni — se ne avevi fatta una, non compare separata dal totale: se serve ancora, reimpostala');
+if (!ripristinaValoriDalProtocollo(datiProtocolloV2,ricostruito)) nonRicostruibile.push('Conversione PP → Galeoni: se presente, reimpostala manualmente');
 
 return { ricostruito, nonRicostruibile };
 }
@@ -5821,9 +6017,13 @@ return;
 }
 const { ricostruito, nonRicostruibile } = caricaListaSpesaPrecedente(testo);
 esitoDiv.style.display = 'block';
+if (!ricostruito.some(r => r !== 'Nome del PG' && r !== 'Tipo di PG')) {
+  esitoDiv.innerHTML = '<div class="hint" style="border-left-color:var(--red);background:var(--red-soft);color:#5C2020;"><b>Impossibile recuperare la Lista.</b><br>Dal forum apri <b>Modifica</b> sul tuo post e copia il <b>codice completo</b>, incluso il riquadro dei dati tecnici. Il testo visualizzato nella pagina può non contenere i dati necessari, specialmente gli Ingredienti del catalogo. Nessun acquisto è stato ricostruito.</div>';
+  return;
+}
 let html = '<div class="hint" style="border-left-color:var(--green); background:var(--green-soft); color:#234132;">';
 html += '<b>✅ Ricostruito:</b> ' + (ricostruito.length ? ricostruito.join(', ') : 'nulla — controlla di aver incollato il post giusto') + '</div>';
-html += '<div class="hint" style="margin-top:8px;"><b>⚠️ Da ricontrollare/reinserire a mano:</b><br>' + nonRicostruibile.map(x => '• ' + x).join('<br>') + '</div>';
+if (nonRicostruibile.length) html += '<div class="hint" style="margin-top:8px;"><b>Da verificare:</b><br>' + nonRicostruibile.map(x => '• ' + x).join('<br>') + '</div>';
 esitoDiv.innerHTML = html;
 
 const btnProsegui = document.createElement('button');
