@@ -3458,6 +3458,15 @@ datalistEl.appendChild(opt);
 });
 }
 
+function trovaAnnoConoscenzaStudente(materia, conoscenza) {
+  if (!materia || materia === 'ALTRO' || !conoscenza || !studentKnowledgeMap[materia]) return '';
+  const target = normalizeText(conoscenza);
+  const anni = Object.entries(studentKnowledgeMap[materia])
+    .filter(([, nomi]) => (nomi || []).some(n => normalizeText(n) === target))
+    .map(([anno]) => String(anno));
+  return anni.length === 1 ? anni[0] : '';
+}
+
 function creaConoscenzaRow(datalistId) {
 conoscenzaRowCounter++;
 const div = document.createElement('div');
@@ -3629,6 +3638,19 @@ aggiornaDatalist(); aggiornaPreview(); aggiornaBonusTutteE();
 });
 div.querySelector('.f-anno').addEventListener('change', () => { aggiornaDatalist(); aggiornaPreview(); });
 body.addEventListener('change', (e) => {
+  if (e.target.classList?.contains('f-conoscenza')) {
+    const materia = div.querySelector('.f-materia').value;
+    const annoCorretto = trovaAnnoConoscenzaStudente(materia, e.target.value);
+    const annoSelect = div.querySelector('.f-anno');
+    // Se la Conoscenza appartiene in modo univoco a un altro anno, l'anno della
+    // card si adegua automaticamente. Evita richieste del tipo "Runista Magico · anno V"
+    // quando la Conoscenza è in realtà del VII anno.
+    if (annoCorretto && annoSelect.value !== annoCorretto) {
+      annoSelect.value = annoCorretto;
+      aggiornaDatalist();
+      aggiornaPreview();
+    }
+  }
   if (e.target.classList?.contains('f-voto-arrivo')) aggiornaBonusTutteE();
 });
 
@@ -4443,7 +4465,7 @@ function catturaValoriRipristino() {
 // non vede mai il tool compilato, vede solo il testo pubblicato sul forum.
 // Un riquadro richiudibile li tiene fuori dai piedi nella lettura narrativa,
 // ma restano comunque testo presente e copiabile dal post stesso.
-function costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG, tipoPg, nomePG, movimentiBagaglio, conoscenzeAcquistate, catalogoAcquisti, operazioniCatalogo, pozioniProdotte) {
+function costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG, tipoPg, nomePG, movimentiBagaglio, conoscenzeAcquistate, catalogoAcquisti, operazioniCatalogo, pozioniProdotte, votiStudente) {
 const trasferimenti = (movimentiBagaglio || [])
 .filter(m => m.azione === 'trasferisci')
 .map(m => ({
@@ -4466,6 +4488,7 @@ const payload = {
   nomePg: nomePG,
   boxA: fmtRighe(totaleGenerale),
   boxE: tipoPg === 'studente' ? tutteBoxELines : [],
+  votiStudente: tipoPg === 'studente' && Array.isArray(votiStudente) ? votiStudente : [],
   boxF: tipoPg === 'adulto' ? tutteBoxFLines : [],
   boxG: tutteRigheBoxG,
   trasferimenti,
@@ -4606,15 +4629,24 @@ return { materia, anno, inPiano, bulkTD, bulkTDRole, bulkDS, bulkDSRole, bonusTu
 function calcolaMateria(mat, contatoreE) {
 const totali = {};
 const boxELines = [];
+const votiOps = [];
 let contatore = contatoreE;
 
 if (mat.bulkTD) {
 if (!mat.bulkTDRole) totali['Galeoni'] = (totali['Galeoni'] || 0) - 100;
-if (mat.materia && mat.materia !== 'ALTRO') boxELines.push(`TUTTE: ${mat.materia}: T > D`);
+if (mat.materia && mat.materia !== 'ALTRO') {
+  const boxELocalIndex = boxELines.length;
+  boxELines.push(`TUTTE: ${mat.materia}: T > D`);
+  votiOps.push({ type:'all', materia:mat.materia, anno:String(mat.anno || ''), from:'T', to:'D', boxELocalIndex });
+}
 }
 if (mat.bulkDS) {
 if (!mat.bulkDSRole) totali['Galeoni'] = (totali['Galeoni'] || 0) - 100;
-if (mat.materia && mat.materia !== 'ALTRO') boxELines.push(`TUTTE: ${mat.materia}: D > S`);
+if (mat.materia && mat.materia !== 'ALTRO') {
+  const boxELocalIndex = boxELines.length;
+  boxELines.push(`TUTTE: ${mat.materia}: D > S`);
+  votiOps.push({ type:'all', materia:mat.materia, anno:String(mat.anno || ''), from:'D', to:'S', boxELocalIndex });
+}
 }
 
 mat.righe.forEach(r => {
@@ -4622,14 +4654,19 @@ const costo = costoConoscenza(r.votoPartenza, r.votoArrivo, mat.inPiano, contato
 if (costo.pp) totali['Punti Post'] = (totali['Punti Post'] || 0) - costo.pp;
 if (costo.galeoni) totali['Galeoni'] = (totali['Galeoni'] || 0) - costo.galeoni;
 contatore = costo.contatoreFinale;
+const boxELocalIndex = boxELines.length;
 boxELines.push(`${r.conoscenza}: ${r.votoArrivo}`);
+votiOps.push({
+  type:'single', materia:mat.materia, anno:mat.materia === 'ALTRO' ? '' : String(mat.anno || ''),
+  conoscenza:r.conoscenza, votoPartenza:r.votoPartenza, votoArrivo:r.votoArrivo, boxELocalIndex
+});
 });
 
 if (mat.bonusTutteE && mat.materia && mat.materia !== 'ALTRO') {
   totali['Punti Casa'] = (totali['Punti Casa'] || 0) + 7;
 }
 
-return { totali, boxELines, contatoreFinale: contatore };
+return { totali, boxELines, votiOps, contatoreFinale: contatore };
 }
 
 function leggiSapienzaDalDOM(sapEl) {
@@ -4927,13 +4964,19 @@ if (VOTI_BLOCCATI) {
 riepilogoMaterieDiv.innerHTML = '<div class="empty-state">🔒 Sezione non disponibile dal 1 agosto al 30 settembre — eventuali Materie compilate non vengono conteggiate.</div>';
 }
 const tutteBoxELines = [];
+const tutteVotiStudente = [];
 materiaEls.forEach((matEl, idx) => {
 const mat = leggiMateriaDalDOM(matEl);
 if (!mat.materia) return;
 const risultato = calcolaMateria(mat, contatoreE);
 contatoreE = risultato.contatoreFinale;
 sommaIn(totaleGenerale, risultato.totali);
+const boxEBaseIndex = tutteBoxELines.length;
 tutteBoxELines.push(...risultato.boxELines);
+(risultato.votiOps || []).forEach(op => tutteVotiStudente.push({
+  ...op,
+  boxEIndex: boxEBaseIndex + (Number(op.boxELocalIndex) || 0)
+}));
 sezioniPost.voti.push(descriviMateria(mat, risultato.totali));
 
 const righeTesto = fmtRighe(risultato.totali).join(', ');
@@ -5199,7 +5242,7 @@ document.getElementById('outBoxG').value = tutteRigheBoxG.length ? tutteRigheBox
 sezioniPost.recap = costruisciRecapFinale(totaleGenerale);
 const nomePG = document.getElementById('nomePG').value.trim();
 const postNarrativo = assemblaPostForum(sezioniPost, nomePG);
-const bloccoDati = postNarrativo ? costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG, tipoPgLista, nomePG, movimentiBagaglio, acquistiConoscenzeAccredito, catalogoAcquisti, operazioniCatalogo, pozioniProdotte) : '';
+const bloccoDati = postNarrativo ? costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG, tipoPgLista, nomePG, movimentiBagaglio, acquistiConoscenzeAccredito, catalogoAcquisti, operazioniCatalogo, pozioniProdotte, tutteVotiStudente) : '';
 document.getElementById('outPostForum').value = postNarrativo
 ? postNarrativo + '\n\n' + bloccoDati
 : '(nessuna sezione compilata)';
