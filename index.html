@@ -1205,6 +1205,7 @@ Una riga per ogni Oggetto/Pozione/Immunità coinvolto — scegli categoria e cos
       <div class="price-row"><span>Scadente → Accettabile</span><b>15 Galeoni / Conoscenza</b></div>
       <div class="price-row"><span>Accettabile → Oltre Ogni Previsione</span><b>3 PP / Conoscenza</b></div>
       <div class="price-row"><span>Oltre Ogni Previsione → Eccezionale</span><b>4 PP / Conoscenza + 1 PP ogni 10 E</b></div>
+      <div class="price-row"><span>Tutte le Conoscenze della Materia a Eccezionale</span><b>+7 Punti Casa</b></div>
     </div>
     <div class="price-note">Per Eccezionale, il +1 PP si applica ogni 10 Eccezionale già possedute nel Piano di Studi. Il tool usa il numero inserito sotto per calcolare automaticamente il costo effettivo.</div>
   </div>
@@ -2154,7 +2155,13 @@ div.innerHTML = `
 <div style="flex:2;"><label class="tight">Link</label><input type="text" class="f-prova-link" placeholder="?t=...#entry..."></div>
 <div style="max-width:44px;"><button type="button" class="danger" style="width:100%;">✕</button></div>
 `;
-div.querySelector('button').addEventListener('click', () => div.remove());
+div.querySelector('button').addEventListener('click', () => {
+  const card = div.closest('.materia-card');
+  div.remove();
+  // Ricalcola anche la disponibilità del premio "tutte E" dopo la rimozione di una riga.
+  const materiaSel = card?.querySelector('.f-materia');
+  if (materiaSel) materiaSel.dispatchEvent(new Event('change', { bubbles: true }));
+});
 return div;
 }
 
@@ -3571,8 +3578,37 @@ const addRigaBtn = document.createElement('button');
 addRigaBtn.type = 'button'; addRigaBtn.className = 'secondary';
 addRigaBtn.textContent = '+ Aggiungi Conoscenza';
 addRigaBtn.style.marginTop = '6px';
-addRigaBtn.addEventListener('click', () => righeList.appendChild(creaConoscenzaRow(datalistId)));
+addRigaBtn.addEventListener('click', () => {
+  righeList.appendChild(creaConoscenzaRow(datalistId));
+  aggiornaBonusTutteE();
+});
 body.appendChild(addRigaBtn);
+
+// Premio scolastico: la spunta compare solo quando questa richiesta contiene
+// almeno un miglioramento che termina a E. La conferma resta manuale perché
+// il tool non conosce tutti i voti già presenti nella Scheda PG.
+const bonusTutteEBox = document.createElement('div');
+bonusTutteEBox.className = 'fmt-case f-bonus-tutte-e';
+bonusTutteEBox.style.cssText = 'margin-top:12px;display:none;border-color:#B8CFBD;background:#F4F9F4;';
+bonusTutteEBox.innerHTML = `
+  <div class="fmt-case-label" style="color:var(--green);"><i class="fa-solid fa-trophy"></i> Premio: tutte Eccezionale nella Materia</div>
+  <div class="fmt-case-desc">Se con questo miglioramento il PG arriva ad avere <b>tutte E nelle Conoscenze di questa Materia</b>, segnala qui il premio previsto dal regolamento.</div>
+  <div class="checkbox-row" style="margin-top:8px;">
+    <input type="checkbox" class="f-bonus-tutte-e-check" id="${mid}_bonus_tutte_e">
+    <label for="${mid}_bonus_tutte_e" style="color:var(--green);">Sì — completa tutte le Eccezionale della Materia <b>(+7 Punti Casa)</b></label>
+  </div>
+`;
+body.appendChild(bonusTutteEBox);
+const bonusTutteECheck = bonusTutteEBox.querySelector('.f-bonus-tutte-e-check');
+
+function aggiornaBonusTutteE() {
+  const materia = div.querySelector('.f-materia').value;
+  const almenoUnaE = [...righeList.querySelectorAll('.f-voto-arrivo')].some(sel => sel.value === 'E');
+  const disponibile = !!materia && materia !== 'ALTRO' && almenoUnaE;
+  bonusTutteEBox.style.display = disponibile ? 'block' : 'none';
+  bonusTutteECheck.disabled = !disponibile;
+  if (!disponibile) bonusTutteECheck.checked = false;
+}
 
 div.appendChild(body);
 
@@ -3589,12 +3625,16 @@ div.querySelector('.f-materia').addEventListener('change', () => {
 const isAltro = div.querySelector('.f-materia').value === 'ALTRO';
 domandaPiano.style.display = isAltro ? 'none' : 'block';
 if (isAltro) { domandaPiano.querySelector(`#${mid}_piano_no`).checked = true; }
-aggiornaDatalist(); aggiornaPreview();
+aggiornaDatalist(); aggiornaPreview(); aggiornaBonusTutteE();
 });
 div.querySelector('.f-anno').addEventListener('change', () => { aggiornaDatalist(); aggiornaPreview(); });
+body.addEventListener('change', (e) => {
+  if (e.target.classList?.contains('f-voto-arrivo')) aggiornaBonusTutteE();
+});
 
 // prima riga Conoscenza pronta all'uso
 righeList.appendChild(creaConoscenzaRow(datalistId));
+aggiornaBonusTutteE();
 
 return div;
 }
@@ -4325,6 +4365,7 @@ righe.push(`<b><u>${nomeMostrato}${etichettaAnno}</u></b>`);
 if (mat.bulkTD) righe.push(`- Tutte le Conoscenze da Troll a Desolante` + (mat.bulkTDRole ? ' (pagata con una role di studio)' : ' (100 Galeoni)'));
 if (mat.bulkDS) righe.push(`- Tutte le Conoscenze da Desolante a Scadente` + (mat.bulkDSRole ? ' (pagata con una role di studio)' : ' (100 Galeoni)'));
 mat.righe.forEach(r => righe.push(`- ${r.conoscenza}: da ${r.votoPartenza} a ${r.votoArrivo}`));
+if (mat.bonusTutteE) righe.push(`- Tutti Eccezionale nella Materia: +7 Punti Casa`);
 const righeTotale = fmtRighe(totaliMat).join(', ');
 righe.push(`<b>Totale:</b> ${righeTotale || 'nessuna variazione'}`);
 return righe.join('\n');
@@ -4555,7 +4596,8 @@ conoscenza: r.querySelector('.f-conoscenza').value.trim(),
 votoPartenza: r.querySelector('.f-voto-partenza').value,
 votoArrivo: r.querySelector('.f-voto-arrivo').value
 })).filter(r => r.conoscenza);
-return { materia, anno, inPiano, bulkTD, bulkTDRole, bulkDS, bulkDSRole, righe };
+const bonusTutteE = !!matEl.querySelector('.f-bonus-tutte-e-check')?.checked;
+return { materia, anno, inPiano, bulkTD, bulkTDRole, bulkDS, bulkDSRole, bonusTutteE, righe };
 }
 
 // Calcola il costo di UNA Materia; contatoreE è lo stato del contatore globale
@@ -4582,6 +4624,10 @@ if (costo.galeoni) totali['Galeoni'] = (totali['Galeoni'] || 0) - costo.galeoni;
 contatore = costo.contatoreFinale;
 boxELines.push(`${r.conoscenza}: ${r.votoArrivo}`);
 });
+
+if (mat.bonusTutteE && mat.materia && mat.materia !== 'ALTRO') {
+  totali['Punti Casa'] = (totali['Punti Casa'] || 0) + 7;
+}
 
 return { totali, boxELines, contatoreFinale: contatore };
 }
@@ -5361,8 +5407,9 @@ const righe = [];
 [...blocco.matchAll(/^-\s*(.+?):\s*da\s+([A-Z])\s+a\s+([A-Z])\s*$/gm)].forEach(m => {
 righe.push({ conoscenza: m[1].trim(), votoPartenza: m[2], votoArrivo: m[3] });
 });
+const bonusTutteE = /Tutti Eccezionale nella Materia:\s*\+7 Punti Casa/i.test(blocco);
 
-return { materia, anno, bulkTD, bulkTDRole, bulkDS, bulkDSRole, righe };
+return { materia, anno, bulkTD, bulkTDRole, bulkDS, bulkDSRole, bonusTutteE, righe };
 }
 
 function parseSapienzaBlocco(blocco) {
@@ -5585,6 +5632,10 @@ righeList.appendChild(riga);
 } else {
 righeList.appendChild(creaConoscenzaRow(datalistIdReale));
 }
+// Fa comparire l'opzione premio se almeno una riga termina a E, poi ripristina la spunta.
+trigger(righeList.querySelector('.f-voto-arrivo'), 'change');
+const bonusCheck = div.querySelector('.f-bonus-tutte-e-check');
+if (matData.bonusTutteE && bonusCheck && !bonusCheck.disabled) bonusCheck.checked = true;
 return div;
 }
 
