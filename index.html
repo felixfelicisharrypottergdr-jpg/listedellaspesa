@@ -1409,6 +1409,27 @@ Per gli <b>Acquisti da Negozio</b> usa il Catalogo Prezzari integrato: scegli il
 </div>
 </div>
 
+<div class="panel" id="coeff_debito_commercio_panel">
+  <h2>Coefficiente di Debito sugli acquisti</h2>
+  <div class="row" style="align-items:end">
+    <div style="flex:0 1 230px;min-width:190px">
+      <label class="tight" for="coeffDebitoCommercio">Coefficiente da applicare ai prezzi</label>
+      <select id="coeffDebitoCommercio">
+        <option value="1">×1 — Nessun debito</option>
+        <option value="1.2">×1,2</option>
+        <option value="1.3">×1,3</option>
+        <option value="1.4">×1,4</option>
+        <option value="1.5">×1,5</option>
+        <option value="1.6">×1,6</option>
+        <option value="1.7">×1,7</option>
+      </select>
+    </div>
+    <div style="flex:2;min-width:230px">
+      <div class="hint" style="margin:0">Se il PG ha una <b>Crescita a Debito</b>, seleziona il suo coefficiente. Viene applicato <b>solo agli acquisti da Negozio</b>, inclusi quelli manuali, non alle vendite a PNG, ai PP o a eventuali spese già maggiorate nelle Role. I prezzi del Catalogo restano quelli di listino.</div>
+    </div>
+  </div>
+</div>
+
 <div class="panel">
 <h2>Acquisti (da Negozio) <span id="negozio_counter_badge" class="format-tag">0</span></h2>
 <div id="negozi_list"></div>
@@ -1569,6 +1590,13 @@ for (const [k, v] of Object.entries(sorgente)) target[k] = (target[k] || 0) + v;
 function normNum(n) {
 const num = Object.is(Number(n), -0) ? 0 : Number(n);
 return String(num).replace('.', ',');
+}
+function arrotondaGaleoni(n) {
+  return Math.round((Number(n) + Number.EPSILON) * 100) / 100;
+}
+function coefficienteDebitoAcquisti() {
+  const v = Number(document.getElementById('coeffDebitoCommercio')?.value || 1);
+  return [1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7].some(x => Math.abs(x - v) < 0.00001) ? v : 1;
 }
 function normalizeText(s) {
 return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
@@ -3201,7 +3229,7 @@ const noteDebito = document.createElement('div');
 noteDebito.className = 'hint f-coeff-debito-wrap';
 noteDebito.style.marginTop = '4px';
 noteDebito.style.display = 'none';
-noteDebito.innerHTML = 'Il Coefficiente di Debito (1,2–1,7) moltiplica solo i <b>Galeoni spesi</b> qui sopra. Chi ha Crescita a Debito può spendere risorse solo per Role e acquisti di Commercio Magico — non per Conoscenze o Sapienze.';
+noteDebito.innerHTML = 'Il Coefficiente di Debito (1,2–1,7) moltiplica i <b>Galeoni spesi</b> in questa Role. Per gli acquisti da Prezzari esiste un selettore separato nella sezione <b>Commercio Magico</b>. Non applicare due volte la maggiorazione. Chi ha Crescita a Debito può spendere risorse solo per Role e Commercio Magico — non per Conoscenze o Sapienze.';
 body.appendChild(noteDebito);
 
 const domandaGaleoniExtraWrap = document.createElement('div');
@@ -4514,7 +4542,7 @@ function catturaRipristinoCommercio() {
 }
 function catturaValoriRipristino() {
   const ids=['convN10','convN50','convN100','tassoBase','galeoniExtraRimanenti',
-             'eGiaPossedute','dialetticaPartenza','dialetticaFinale','annoPgCorrente'];
+             'eGiaPossedute','dialetticaPartenza','dialetticaFinale','annoPgCorrente','coeffDebitoCommercio'];
   const valori={};
   ids.forEach(id=>{valori[id]=document.getElementById(id)?.value ?? '';});
   valori.parametri=[...document.querySelectorAll('#parametri_list > .row')].map(r=>({
@@ -4528,7 +4556,7 @@ function catturaValoriRipristino() {
 // non vede mai il tool compilato, vede solo il testo pubblicato sul forum.
 // Un riquadro richiudibile li tiene fuori dai piedi nella lettura narrativa,
 // ma restano comunque testo presente e copiabile dal post stesso.
-function costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG, tipoPg, nomePG, movimentiBagaglio, conoscenzeAcquistate, catalogoAcquisti, operazioniCatalogo, pozioniProdotte, votiStudente, verificaPremi) {
+function costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG, tipoPg, nomePG, movimentiBagaglio, conoscenzeAcquistate, catalogoAcquisti, operazioniCatalogo, pozioniProdotte, votiStudente, verificaPremi, commercioDebito) {
 const trasferimenti = (movimentiBagaglio || [])
 .filter(m => m.azione === 'trasferisci')
 .map(m => ({
@@ -4560,6 +4588,7 @@ const payload = {
   trasferimenti,
   conoscenzeAcquistate: Array.isArray(conoscenzeAcquistate) ? conoscenzeAcquistate : [],
   catalogoAcquisti: Array.isArray(catalogoAcquisti) ? catalogoAcquisti : [],
+  commercioDebito: commercioDebito || null,
   operazioniCatalogo: Array.isArray(operazioniCatalogo) ? operazioniCatalogo : [],
   pozioniProdotte: Array.isArray(pozioniProdotte) ? pozioniProdotte : [],
   ripristinoCommercio: catturaRipristinoCommercio(),
@@ -5220,6 +5249,8 @@ riepilogoCommercioDiv.innerHTML = '';
 const righeBoxGCommercio = [];
 const catalogoAcquisti = [];
 const operazioniCatalogo = [];
+const coeffCommercio = coefficienteDebitoAcquisti();
+const commercioDebito = {versione:1, coefficiente:coeffCommercio, baseAcquisti:0, totaleAcquisti:0, maggiorazione:0, negozi:[]};
 
 negozioEls.forEach((negEl, idx) => {
   const manuale = negEl.classList.contains('manual-mode');
@@ -5279,9 +5310,24 @@ negozioEls.forEach((negEl, idx) => {
       const nomeOgg=r.querySelector('.f-nome-ogg').value.trim(), qty=parseInt(r.querySelector('.f-qty-ogg').value,10)||0, usi=r.querySelector('.f-usi-ogg').value, dest=r.querySelector('.f-destinazione-ogg').value, prezzo=parseFloat(r.querySelector('.f-prezzo-ogg').value)||0, per=r.querySelector('.f-prezzo-tipo-radio:checked')?.value==='unitario'; if(!nomeOgg||qty<=0)return; const tot=per?qty*prezzo:prezzo; subtotale+=tot; righeNarrativa.push(`- ${nomeOgg} [${qty}]${usi?` (0/${usi} usi)`:''}${dest==='dispensa'?' [va in Dispensa]':''} - ${normNum(tot)} G`); if(dest==='dispensa'){quantiInDispensa++;return;} const desc=usi?`(0/${usi} usi)`:''; const pref=dest==='pozione'?'NUOVO POZIONE':'NUOVO'; righeBoxGCommercio.push(`${pref}: ${nomeOgg} [${qty}]${desc?': '+desc:''}`);
     });
   }
-  if(subtotale) totaleGenerale['Galeoni']=(totaleGenerale['Galeoni']||0)-subtotale;
-  if(righeNarrativa.length) sezioniPost.commercio.push([`<b>Negozio scelto:</b> ${nomeNegozio}`,`<b>Lista acquisti:</b>`,...righeNarrativa,`<b>Totale:</b> -${normNum(subtotale)} G`].join('\n'));
-  const box=document.createElement('div'); box.className='role-summary'; box.textContent=`Acquisti ${idx+1}: ${subtotale?'-'+normNum(subtotale)+' Galeoni':'nessun acquisto'}${quantiInDispensa?` (${quantiInDispensa} in Dispensa)`:''}`; riepilogoCommercioDiv.appendChild(box); const badge=negEl.querySelector('.role-total-badge'); badge.style.display='inline-block'; badge.textContent=subtotale?`-${normNum(subtotale)} G`:'—';
+  const baseAcquisti = arrotondaGaleoni(subtotale);
+  const spesaEffettiva = arrotondaGaleoni(baseAcquisti * coeffCommercio);
+  const maggiorazione = arrotondaGaleoni(spesaEffettiva - baseAcquisti);
+  if (righeNarrativa.length) {
+    commercioDebito.baseAcquisti = arrotondaGaleoni(commercioDebito.baseAcquisti + baseAcquisti);
+    commercioDebito.totaleAcquisti = arrotondaGaleoni(commercioDebito.totaleAcquisti + spesaEffettiva);
+    commercioDebito.maggiorazione = arrotondaGaleoni(commercioDebito.maggiorazione + maggiorazione);
+    commercioDebito.negozi.push({base:baseAcquisti,effettivo:spesaEffettiva});
+  }
+  if (spesaEffettiva) totaleGenerale['Galeoni'] = arrotondaGaleoni((totaleGenerale['Galeoni'] || 0) - spesaEffettiva);
+  if(righeNarrativa.length) {
+    const dettaglioDebito = coeffCommercio !== 1
+      ? [`<b>Subtotale di listino:</b> ${normNum(baseAcquisti)} G`,
+         `<b>Coefficiente di Debito:</b> ×${normNum(coeffCommercio)} (maggiorazione +${normNum(maggiorazione)} G)`]
+      : [];
+    sezioniPost.commercio.push([`<b>Negozio scelto:</b> ${nomeNegozio}`,`<b>Lista acquisti:</b>`,...righeNarrativa,...dettaglioDebito,`<b>Totale:</b> -${normNum(spesaEffettiva)} G`].join('\n'));
+  }
+  const box=document.createElement('div'); box.className='role-summary'; box.textContent=`Acquisti ${idx+1}: ${spesaEffettiva?'-'+normNum(spesaEffettiva)+' Galeoni':'nessun acquisto'}${coeffCommercio!==1 && subtotale ? ` (listino ${normNum(baseAcquisti)} G ×${normNum(coeffCommercio)})`:''}${quantiInDispensa?` (${quantiInDispensa} in Dispensa)`:''}`; riepilogoCommercioDiv.appendChild(box); const badge=negEl.querySelector('.role-total-badge'); badge.style.display='inline-block'; badge.textContent=spesaEffettiva?`-${normNum(spesaEffettiva)} G`:'—';
 });
 
 commercianteEls.forEach((comEl, idx) => {
@@ -5372,7 +5418,7 @@ for (const k of new Set([...Object.keys(totaleGenerale),...Object.keys(totalePre
 }
 const verificaPremi = {versione:1, tassoBase, roles:rolesVerifica, standalone:standaloneVerifica,
   resto:restoPremiVerifica, totale:{...totaleGenerale}};
-const bloccoDati = postNarrativo ? costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG, tipoPgLista, nomePG, movimentiBagaglio, acquistiConoscenzeAccredito, catalogoAcquisti, operazioniCatalogo, pozioniProdotte, tutteVotiStudente, verificaPremi) : '';
+const bloccoDati = postNarrativo ? costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG, tipoPgLista, nomePG, movimentiBagaglio, acquistiConoscenzeAccredito, catalogoAcquisti, operazioniCatalogo, pozioniProdotte, tutteVotiStudente, verificaPremi, commercioDebito) : '';
 document.getElementById('outPostForum').value = postNarrativo
 ? postNarrativo + '\n\n' + bloccoDati
 : '(nessuna sezione compilata)';
@@ -5972,9 +6018,14 @@ function ripristinaCommercioDaDati(dati,ricostruito,nonRicostruibile) {
 }
 function ripristinaValoriDalProtocollo(dati,ricostruito) {
   const valori=dati?.ripristinoValori;
-  if(!valori || typeof valori!=='object') return false;
-  const ids=['convN10','convN50','convN100','tassoBase','galeoniExtraRimanenti','eGiaPossedute','dialetticaPartenza','dialetticaFinale','annoPgCorrente'];
-  ids.forEach(id=>{if(valori[id]!==undefined){const el=document.getElementById(id);if(el){el.value=valori[id];trigger(el,'input');}}});
+  if(!valori || typeof valori!=='object') {
+    const coeff = Number(dati?.commercioDebito?.coefficiente);
+    if ([1,1.2,1.3,1.4,1.5,1.6,1.7].some(v=>Math.abs(v-coeff)<0.00001))
+      document.getElementById('coeffDebitoCommercio').value=String(coeff);
+    return false;
+  }
+  const ids=['convN10','convN50','convN100','tassoBase','galeoniExtraRimanenti','eGiaPossedute','dialetticaPartenza','dialetticaFinale','annoPgCorrente','coeffDebitoCommercio'];
+  ids.forEach(id=>{const saved = id === 'coeffDebitoCommercio' ? (valori[id] ?? dati?.commercioDebito?.coefficiente) : valori[id]; if(saved!==undefined){const el=document.getElementById(id);if(el){el.value=saved;trigger(el,'input');}}});
   if(Array.isArray(valori.parametri) && valori.parametri.length){
     const list=document.getElementById('parametri_list');list.innerHTML='';
     valori.parametri.forEach(p=>{
