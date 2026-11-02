@@ -1499,61 +1499,46 @@ return { pp, galeoni };
 }
 
 function calcolaRole(role, tassoBase) {
-const numPosts = Number(role.numPosts) || 0;
-const missioni = role.missioni || [];
-const nonCompletamento = missioni.filter(m => !m.completamento);
+// Ogni post dà il premio base. Per le missioni normali si confrontano
+// i premi COMPLETI alternativi: PP a post (con eventuale tetto),
+// oppure PP fissi in aggiunta ai normali PP dei post.
+// Le missioni a completamento si aggiungono sempre in seguito.
+const numPosts = Math.max(0, Number(role.numPosts) || 0);
+const base = Number.isFinite(Number(tassoBase)) ? Number(tassoBase) : 1;
+const missioni = (role.missioni || []).filter(m => String(m.nome || '').trim());
+const normali = missioni.filter(m => !m.completamento);
 const completamento = missioni.filter(m => m.completamento);
-
-let migliore = null;
-nonCompletamento.forEach(m => {
-if (m.ppPostRate) {
-const cap = (m.ppPostCap !== null && m.ppPostCap !== undefined && m.ppPostCap !== '')
-? Math.min(Number(m.ppPostCap), numPosts) : numPosts;
-const contributo = Number(m.ppPostRate) * cap;
-if (!migliore || contributo > migliore.contributo) migliore = { contributo, postCoperti: cap };
-}
-if (m.ppFisso) {
-const contributo = Number(m.ppFisso);
-if (!migliore || contributo > migliore.contributo) migliore = { contributo, postCoperti: 0 };
-}
+let premioPp = numPosts * base;
+const calcolaPost = m => {
+  const cap = m.ppPostCap !== null && m.ppPostCap !== undefined && m.ppPostCap !== ''
+    ? Math.max(0, Math.min(numPosts, Number(m.ppPostCap) || 0)) : numPosts;
+  return (Number(m.ppPostRate) || 0) * cap + base * Math.max(0, numPosts-cap);
+};
+normali.forEach(m => {
+  if (Number(m.ppPostRate)) premioPp = Math.max(premioPp, calcolaPost(m));
+  if (Number(m.ppFisso)) premioPp = Math.max(premioPp, numPosts * base + Number(m.ppFisso));
 });
-const bestPP = migliore ? migliore.contributo : 0;
-const postCoperti = migliore ? migliore.postCoperti : 0;
-const leftoverPosts = Math.max(0, numPosts - postCoperti);
-const leftoverPP = leftoverPosts * tassoBase;
-
-const totali = { 'Punti Post': bestPP + leftoverPP };
-
-TIPI_PREMIO.forEach(tipo => {
-const valori = nonCompletamento.map(m => Number(m[tipo]) || 0).filter(v => v !== 0);
-totali[tipo] = valori.length ? Math.max(...valori) : 0;
+const totali = {'Punti Post': premioPp};
+[...TIPI_PREMIO,...PARAMETRI_MAGICI_FISICI].forEach(tipo => {
+  const valori = normali.map(m => Number(m[tipo]) || 0).filter(v => v !== 0);
+  totali[tipo] = valori.length ? Math.max(...valori) : 0;
 });
-
 completamento.forEach(m => {
-if (m.ppPostRate) {
-const cap = (m.ppPostCap !== null && m.ppPostCap !== undefined && m.ppPostCap !== '')
-? Math.min(Number(m.ppPostCap), numPosts) : numPosts;
-totali['Punti Post'] += Number(m.ppPostRate) * cap;
-}
-if (m.ppFisso) totali['Punti Post'] += Number(m.ppFisso);
-TIPI_PREMIO.forEach(tipo => { totali[tipo] = (totali[tipo] || 0) + (Number(m[tipo]) || 0); });
+  if (Number(m.ppPostRate)) {
+    const cap = m.ppPostCap !== null && m.ppPostCap !== undefined && m.ppPostCap !== ''
+      ? Math.max(0, Math.min(numPosts, Number(m.ppPostCap) || 0)) : numPosts;
+    totali['Punti Post'] += Number(m.ppPostRate) * cap;
+  }
+  if (Number(m.ppFisso)) totali['Punti Post'] += Number(m.ppFisso);
+  [...TIPI_PREMIO,...PARAMETRI_MAGICI_FISICI].forEach(tipo => { totali[tipo] = (totali[tipo] || 0) + (Number(m[tipo]) || 0); });
 });
-
-// Galeoni spesi durante la Role (es. locande): spesa diretta, sempre sottratta
-// per intero, non entra nel confronto "prendi solo il premio più alto". Il
-// Coefficiente di Debito (1 se nessun debito) moltiplica solo questa spesa.
-// Se la spesa e' marcata come Evento/luogo a pagamento (galeoniPerExtra), NON
-// la sottraiamo qui dai Galeoni: la gestisce il chiamante (calcolaTutto), che
-// conosce quanto fondo Extra resta disponibile tra una Role e l'altra.
 const galeoniSpesi = Number(role.galeoniSpesi) || 0;
 const coeffDebito = Number(role.coeffDebito) || 1;
 if (galeoniSpesi && !role.galeoniPerExtra) {
-totali['Galeoni'] = (totali['Galeoni'] || 0) - (galeoniSpesi * coeffDebito);
+  totali['Galeoni'] = (totali['Galeoni'] || 0) - galeoniSpesi * coeffDebito;
 }
-
 return totali;
 }
-
 function sommaIn(target, sorgente) {
 for (const [k, v] of Object.entries(sorgente)) target[k] = (target[k] || 0) + v;
 }
@@ -3003,7 +2988,7 @@ return wrap;
 const avvisoCinquePost = document.createElement('div');
 avvisoCinquePost.className = 'hint';
 avvisoCinquePost.classList.add('mission-rule-note');
-avvisoCinquePost.innerHTML = 'Di norma servono <b>almeno 5 post</b> nella Role. Le eccezioni sono indicate dalla singola Missione.';
+avvisoCinquePost.innerHTML = 'Di norma servono <b>almeno 5 post</b> nella Role. Le eccezioni sono indicate dalla singola Missione. <b>Se completi più missioni nella stessa role, per ogni tipologia di premio ordinario si usa solo quello più alto: i PP e la Bontà non si sommano.</b>';
 body.appendChild(avvisoCinquePost);
 
 // --- Sorgente: dal catalogo (default) o scritta a mano ---
@@ -4408,6 +4393,7 @@ righe.push(`<b>Role ${idx + 1}:</b> ${titoloLink} — ${role.numPosts} post scri
 const missioniValide = role.missioni.filter(m => m.nome);
 if (missioniValide.length) {
 righe.push(`<b>Missioni FH/FW completate:</b>`);
+if (missioniValide.length > 1) righe.push(`<i>Premi ordinari non cumulati per tipologia; premi a completamento sommati separatamente.</i>`);
 missioniValide.forEach(m => {
 righe.push(`- ${m.nome}${fmtProve(m.prove)}${m.completamento ? ' (missione a completamento)' : ''}: ${descriviPremiMissione(m)}`);
 });
@@ -4516,7 +4502,7 @@ function catturaValoriRipristino() {
 // non vede mai il tool compilato, vede solo il testo pubblicato sul forum.
 // Un riquadro richiudibile li tiene fuori dai piedi nella lettura narrativa,
 // ma restano comunque testo presente e copiabile dal post stesso.
-function costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG, tipoPg, nomePG, movimentiBagaglio, conoscenzeAcquistate, catalogoAcquisti, operazioniCatalogo, pozioniProdotte, votiStudente) {
+function costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG, tipoPg, nomePG, movimentiBagaglio, conoscenzeAcquistate, catalogoAcquisti, operazioniCatalogo, pozioniProdotte, votiStudente, verificaPremi) {
 const trasferimenti = (movimentiBagaglio || [])
 .filter(m => m.azione === 'trasferisci')
 .map(m => ({
@@ -4533,7 +4519,8 @@ const extraRaw = extraAttivi ? document.getElementById('galeoniExtraRimanenti')?
 const extraBase = extraRaw === '' || extraRaw == null ? null : Number(extraRaw);
 const payload = {
   versione: 3,
-  protocolRevision: '3.4-anno-corrente-penne-consumabili',
+  protocolRevision: '3.5-premi-missioni-verificabili',
+  verificaPremi: verificaPremi || null,
   annoPg: tipoPg === 'studente' ? annoPgCorrenteSelezionato() : '',
   catalogVersion: String(FELIX_PREZZARI_CATALOGO.versione || '1'),
   tipoPg,
@@ -4977,6 +4964,9 @@ mostraErroriCompilazione([]);
 const tassoBase = parseFloat(document.getElementById('tassoBase').value) || 0;
 const totaleGenerale = {};
 const sezioniPost = { segnala: [], voti: [], sapienze: [], parametri: [], conoscenze: '', commercio: [], bagaglio: [] };
+const rolesVerifica = [];
+const standaloneVerifica = [];
+const totalePremiVerificabili = {};
 
 // --- Role (Segnala e Riscatta) ---
 const roleEls = [...document.querySelectorAll('#roles_list > .role-card')];
@@ -4995,6 +4985,18 @@ if (daExtra) totaliRole['Galeoni Extra'] = (totaliRole['Galeoni Extra'] || 0) - 
 if (daNormali) totaliRole['Galeoni'] = (totaliRole['Galeoni'] || 0) - daNormali;
 }
 sommaIn(totaleGenerale, totaliRole);
+sommaIn(totalePremiVerificabili, totaliRole);
+rolesVerifica.push({
+  titolo:role.titolo, link:role.link, numPosts:role.numPosts,
+  missioni:role.missioni.filter(m => m.nome).map(m => ({
+    nome:m.nome, completamento:!!m.completamento, ppPostRate:Number(m.ppPostRate)||0,
+    ppPostCap:m.ppPostCap == null ? null : Number(m.ppPostCap), ppFisso:Number(m.ppFisso)||0,
+    premi:Object.fromEntries([...TIPI_PREMIO,...PARAMETRI_MAGICI_FISICI].map(k=>[k,Number(m[k])||0]))
+  })),
+  galeoniSpesi:Number(role.galeoniSpesi)||0, coeffDebito:Number(role.coeffDebito)||1,
+  galeoniPerExtra:!!role.galeoniPerExtra,
+  totali:{...totaliRole}
+});
 if (role.titolo || role.missioni.some(m => m.nome)) sezioniPost.segnala.push(descriviRole(role, idx, totaliRole));
 
 const righeTesto = fmtRighe(totaliRole).join(', ');
@@ -5019,6 +5021,11 @@ const m = leggiMissioneStandaloneDalDOM(mEl);
 if (!m.nome) return;
 const totaliM = calcolaMissioneStandalone(m);
 sommaIn(totaleGenerale, totaliM);
+sommaIn(totalePremiVerificabili, totaliM);
+standaloneVerifica.push({nome:m.nome, ppFisso:Number(m.ppFisso)||0,
+  premi:Object.fromEntries(CAMPI_ALTRI.map(c=>[c.key,Number(m[c.key])||0])),
+  parametri:Object.fromEntries(PARAMETRI_MAGICI_FISICI.map(k=>[k,Number(m[k])||0])),
+  totali:{...totaliM}});
 righeNarrativaStandalone.push(descriviMissioneStandalone(m, totaliM));
 
 const righeTesto = fmtRighe(totaliM).join(', ');
@@ -5324,7 +5331,16 @@ document.getElementById('outBoxG').value = tutteRigheBoxG.length ? tutteRigheBox
 sezioniPost.recap = costruisciRecapFinale(totaleGenerale);
 const nomePG = document.getElementById('nomePG').value.trim();
 const postNarrativo = assemblaPostForum(sezioniPost, nomePG);
-const bloccoDati = postNarrativo ? costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG, tipoPgLista, nomePG, movimentiBagaglio, acquistiConoscenzeAccredito, catalogoAcquisti, operazioniCatalogo, pozioniProdotte, tutteVotiStudente) : '';
+// Il controllo è basato sugli input effettivi, non sulle righe descrittive.
+// La differenza è il contributo delle altre sezioni (Voti, Sapienze, Commercio...).
+const restoPremiVerifica = {};
+for (const k of new Set([...Object.keys(totaleGenerale),...Object.keys(totalePremiVerificabili)])) {
+  const valore = (Number(totaleGenerale[k])||0) - (Number(totalePremiVerificabili[k])||0);
+  if (Math.abs(valore)>1e-8) restoPremiVerifica[k]=Number(valore.toFixed(8));
+}
+const verificaPremi = {versione:1, tassoBase, roles:rolesVerifica, standalone:standaloneVerifica,
+  resto:restoPremiVerifica, totale:{...totaleGenerale}};
+const bloccoDati = postNarrativo ? costruisciBlocoDati(totaleGenerale, tutteBoxELines, tutteBoxFLines, tutteRigheBoxG, tipoPgLista, nomePG, movimentiBagaglio, acquistiConoscenzeAccredito, catalogoAcquisti, operazioniCatalogo, pozioniProdotte, tutteVotiStudente, verificaPremi) : '';
 document.getElementById('outPostForum').value = postNarrativo
 ? postNarrativo + '\n\n' + bloccoDati
 : '(nessuna sezione compilata)';
