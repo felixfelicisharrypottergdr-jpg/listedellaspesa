@@ -1297,6 +1297,27 @@ Una riga per ogni Oggetto/Pozione/Immunità coinvolto — scegli categoria e cos
 <button type="button" class="secondary" id="add_sapienza_btn">+ Aggiungi Sapienza</button>
 </div>
 
+<div class="panel" id="bonus_lv5_panel">
+  <h2><i class="fa-solid fa-medal" style="color:var(--gold)"></i> Prestigio per Conoscenze al Livello V</h2>
+  <p class="subtitle">+2 Prestigio per ogni <b>Conoscenza Avanzata di una Sapienza Magica</b> portata al Livello V, fino a 5 premi (+10 Prestigio) complessivi. Le Conoscenze possono appartenere a Sapienze differenti. Il premio non si ripete per una Conoscenza già premiata.</p>
+  <div class="checkbox-row"><input type="checkbox" id="bonusV_enabled"><label for="bonusV_enabled" style="color:var(--ink)">Richiedi il Prestigio per una o più Conoscenze al Livello V</label></div>
+  <div id="bonusV_config" style="display:none;margin-top:12px;">
+    <div class="field-card" style="margin-bottom:12px;">
+      <label for="bonusV_giaRicevuti" class="tight">Quante Conoscenze al Livello V ti hanno già dato +2 Prestigio in passato? (0–5)</label>
+      <input id="bonusV_giaRicevuti" type="number" min="0" max="5" step="1" value="0" style="max-width:140px">
+      <p class="subtitle" style="margin:8px 0 0">Sono conteggiate automaticamente le Conoscenze portate al Livello V in questa stessa Lista. Non inserire qui Conoscenze già premiate.</p>
+    </div>
+    <details class="optional-group" id="bonusV_storico_panel">
+      <summary>Conoscenze già al Livello V in passato, ma mai premiate</summary>
+      <div style="padding:0 14px 14px;">
+        <p class="subtitle">Usa questa sezione solo per recuperare un premio non ancora ottenuto. Inserisci la prova (link alla Scheda PG o all'accredito): lo Staff ne verificherà il diritto.</p>
+        <div id="bonusV_storico_list"></div>
+        <button type="button" class="secondary" id="bonusV_add_storico">+ Aggiungi Conoscenza già al V</button>
+      </div>
+    </details>
+    <div class="info-box" id="bonusV_preview" style="margin-top:12px">Seleziona le Conoscenze e genera i risultati.</div>
+  </div>
+</div>
 <button type="button" class="big" id="calcola_btn_sapienze">Calcola totali →</button>
 </div>
 
@@ -3911,6 +3932,88 @@ aggiornaContatoreSapienza();
 document.getElementById('sapienze_list').appendChild(creaSapienzaCard());
 aggiornaContatoreSapienza();
 
+// Premio Prestigio per Conoscenze Avanzate al Livello V — massimo 5 premi in carriera.
+function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function selezionaConoscenzaV(sapienza, selezionata) {
+  const info = SAPIENZE_CATALOGO[sapienza];
+  const names = info && info.tipo === 'magica' ? info.conoscenze : [];
+  return names.map(n=>`<option value="${escapeHtml(n)}"${n===selezionata?' selected':''}>${escapeHtml(n)}</option>`).join('');
+}
+function creaBonusVStoricoRiga(dati={}) {
+  const row=document.createElement('div');row.className='field-card bonusV-storico-row';
+  row.innerHTML=`<div class="row" style="align-items:flex-end;">
+    <div><label class="tight">Sapienza Magica</label><select class="bonusV-sapienza"><option value="">— Scegli —</option>${SAPIENZE_MAGICHE_ORDINATE.map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('')}</select></div>
+    <div><label class="tight">Conoscenza al Livello V</label><select class="bonusV-conoscenza"><option value="">— Scegli Sapienza —</option></select></div>
+    <div style="flex:0 0 38px"><button type="button" class="danger" title="Rimuovi questa Conoscenza">✕</button></div>
+    </div><label class="tight">Link di prova (Scheda PG o accredito precedente)</label><input type="text" class="bonusV-prova" placeholder="https://..." maxlength="500">`;
+  const sap=row.querySelector('.bonusV-sapienza'), con=row.querySelector('.bonusV-conoscenza');
+  sap.addEventListener('change',()=>{con.innerHTML=selezionaConoscenzaV(sap.value,'');aggiornaAnteprimaPremioV();});
+  con.addEventListener('change',aggiornaAnteprimaPremioV);
+  row.querySelector('.bonusV-prova').addEventListener('input',aggiornaAnteprimaPremioV);
+  row.querySelector('button').addEventListener('click',()=>{row.remove();aggiornaAnteprimaPremioV();});
+  if(dati.sapienza){sap.value=dati.sapienza;con.innerHTML=selezionaConoscenzaV(sap.value,dati.conoscenza||'');}
+  if(dati.prova)row.querySelector('.bonusV-prova').value=dati.prova;
+  return row;
+}
+function premioVNuoviDalDOM(){
+  const seen=new Set(), out=[];
+  [...document.querySelectorAll('#sapienze_list > .sapienza-card')].forEach(card=>{
+    const sap=leggiSapienzaDalDOM(card);
+    if(!sap || sap.tipo!=='magica')return;
+    for(const r of sap.righe){
+      if(r.livelloPartenza>=5 || r.livelloFinale!==5)continue;
+      const key=sap.sapienza+'\u0000'+r.conoscenza;
+      if(!seen.has(key)){seen.add(key);out.push({sapienza:sap.sapienza,conoscenza:r.conoscenza});}
+    }
+  });
+  return out;
+}
+function premioVStoriciDalDOM(){
+  return [...document.querySelectorAll('#bonusV_storico_list > .bonusV-storico-row')].map(r=>({
+    sapienza:r.querySelector('.bonusV-sapienza').value,
+    conoscenza:r.querySelector('.bonusV-conoscenza').value,
+    prova:r.querySelector('.bonusV-prova').value.trim()
+  }));
+}
+function premioVDaDOM(){
+  if(tipoPgListaSelezionato()!=='adulto' || !document.getElementById('bonusV_enabled').checked)return null;
+  const giaAccreditati=Number(document.getElementById('bonusV_giaRicevuti').value);
+  const nuovi=premioVNuoviDalDOM(), precedenti=premioVStoriciDalDOM();
+  return {versione:1,giaAccreditati,nuovi,precedenti,totale:(nuovi.length+precedenti.length)*2};
+}
+function validaPremioV(){
+  const p=premioVDaDOM(); if(!p)return [];
+  const errors=[];
+  if(!Number.isInteger(p.giaAccreditati)||p.giaAccreditati<0||p.giaAccreditati>5)errors.push('Prestigio Livello V: indica un numero intero da 0 a 5 di premi già ricevuti.');
+  if(p.nuovi.length+p.precedenti.length===0)errors.push('Prestigio Livello V: seleziona almeno una Conoscenza portata al V o già al V in passato.');
+  if(p.giaAccreditati+p.nuovi.length+p.precedenti.length>5)errors.push('Prestigio Livello V: superato il massimo di cinque premi (+10 Prestigio) nella carriera.');
+  const keys=new Set();
+  for(const item of [...p.nuovi,...p.precedenti]){
+    if(!item.sapienza || !item.conoscenza || !SAPIENZE_CATALOGO[item.sapienza]?.conoscenze?.includes(item.conoscenza))errors.push('Prestigio Livello V: seleziona una Conoscenza Magica valida.');
+    const key=item.sapienza+'\u0000'+item.conoscenza;
+    if(keys.has(key))errors.push('Prestigio Livello V: la stessa Conoscenza è stata richiesta due volte.');
+    keys.add(key);
+  }
+  p.precedenti.forEach(x=>{if(!x.prova || !/(?:https?:\/\/|\?t=|forumfree)/i.test(x.prova))errors.push('Prestigio Livello V: per le Conoscenze già raggiunte indica il link di prova.');});
+  return [...new Set(errors)];
+}
+function aggiornaAnteprimaPremioV(){
+  const p=premioVDaDOM();const target=document.getElementById('bonusV_preview');if(!target)return;
+  if(!p){target.textContent='';return;}
+  const tot=p.nuovi.length+p.precedenti.length;
+  target.textContent=`Nuove Conoscenze al V: ${p.nuovi.length} · Pregresse non premiate: ${p.precedenti.length} · Premi già ricevuti: ${p.giaAccreditati} · Prestigio richiesto: +${tot*2} (massimo +10 complessivo).`;
+}
+document.getElementById('bonusV_enabled').addEventListener('change',()=>{
+  document.getElementById('bonusV_config').style.display=document.getElementById('bonusV_enabled').checked?'block':'none';
+  aggiornaAnteprimaPremioV();
+});
+document.getElementById('bonusV_giaRicevuti').addEventListener('input',aggiornaAnteprimaPremioV);
+document.getElementById('bonusV_add_storico').addEventListener('click',()=>{
+  document.getElementById('bonusV_storico_list').appendChild(creaBonusVStoricoRiga());aggiornaAnteprimaPremioV();
+});
+document.getElementById('sapienze_list').addEventListener('change',aggiornaAnteprimaPremioV);
+document.getElementById('sapienze_list').addEventListener('click',()=>queueMicrotask(aggiornaAnteprimaPremioV));
+
 // ============ COSTRUZIONE FORM DINAMICO — ACQUISTA PARAMETRI ============
 let paramRowCounter = 0;
 
@@ -4585,6 +4688,7 @@ const payload = {
   boxF: tipoPg === 'adulto' ? tutteBoxFLines : [],
   boxG: tutteRigheBoxG,
   noteStaff: String(document.getElementById('noteStaffManuali')?.value || '').trim().slice(0,2500),
+  prestigioLivelloV: premioVDaDOM(),
   trasferimenti,
   conoscenzeAcquistate: Array.isArray(conoscenzeAcquistate) ? conoscenzeAcquistate : [],
   catalogoAcquisti: Array.isArray(catalogoAcquisti) ? catalogoAcquisti : [],
@@ -5011,6 +5115,7 @@ function calcolaTutto() {
 const nomePGCheck = document.getElementById('nomePG').value.trim();
 const tipoPgCheck = tipoPgListaSelezionato();
 const errori = validaCompilazioneDettagliata();
+errori.push(...validaPremioV());
 if (!nomePGCheck) { errori.unshift('Inserisci il Nome del PG.'); document.getElementById('nomePG')?.classList.add('field-validation-error'); }
 if (!tipoPgCheck) errori.unshift('Seleziona Studente o Adulto.');
 if (ruoloUsaGaleoniExtra() && String(document.getElementById('galeoniExtraRimanenti')?.value ?? '').trim() === '') {
@@ -5163,6 +5268,19 @@ totalBadge.style.display = 'inline-block';
 totalBadge.textContent = righeTesto || '—';
 });
 if (!sapienzaEls.length) riepilogoSapienzeDiv.innerHTML = '<div class="empty-state">Nessuna Sapienza compilata.</div>';
+// Prestigio è un premio distinto dal costo delle Sapienze: +2 per ogni nuova
+// Conoscenza magica al Livello V, compresi i recuperi storici verificabili.
+const premioV = premioVDaDOM();
+if (premioV && premioV.totale > 0) {
+  totaleGenerale['Prestigio'] = (totaleGenerale['Prestigio'] || 0) + premioV.totale;
+  const descrizioni=[...premioV.nuovi.map(x=>`- ${x.sapienza}: ${x.conoscenza} (Livello V raggiunto in questa richiesta)`),
+   ...premioV.precedenti.map(x=>`- ${x.sapienza}: ${x.conoscenza} (già al Livello V, non ancora premiata; prova: ${x.prova})`)];
+  sezioniPost.sapienze.push(`<b>Premio Prestigio per Conoscenze Avanzate al Livello V</b>\n${descrizioni.join('\n')}\n<b>Prestigio richiesto:</b> +${premioV.totale} Prestigio (già premiate in precedenza: ${premioV.giaAccreditati}/5)`);
+  const row=document.createElement('div');row.className='role-summary';
+  row.textContent=`Prestigio Livello V: +${premioV.totale} (${premioV.nuovi.length} nuove, ${premioV.precedenti.length} pregresse; ${premioV.giaAccreditati} già premiate)`;
+  riepilogoSapienzeDiv.appendChild(row);
+}
+
 
 // --- Acquista Parametri e Dialettica ---
 const contatoriParam = Object.create(null);
@@ -6270,6 +6388,18 @@ if (Array.isArray(datiProtocolloV2?.pozioniProdotte) && datiProtocolloV2.pozioni
   const list=document.querySelector('.pozioni_prodotte_list'); list.innerHTML='';
   datiProtocolloV2.pozioniProdotte.forEach(p=>{const div=creaRigaPozioneProdotta(); div.querySelector('.f-pozione-esito').value=p.originale || `- ${p.nome} [${p.dosi}] ${p.tail}`; trigger(div.querySelector('.f-pozione-esito'),'input'); list.appendChild(div);});
   aggiornaContatorePozioniProdotte(); ricostruito.push(`${datiProtocolloV2.pozioniProdotte.length} Pozioni prodotte`);
+}
+
+// Ripristino opzionale del premio Livello V: non modifica le Sapienze.
+const pVRipristino=datiProtocolloV2?.prestigioLivelloV;
+if(pVRipristino && typeof pVRipristino==='object'){
+  const enabled=document.getElementById('bonusV_enabled');enabled.checked=true;
+  document.getElementById('bonusV_config').style.display='block';
+  document.getElementById('bonusV_giaRicevuti').value=String(pVRipristino.giaAccreditati ?? 0);
+  const target=document.getElementById('bonusV_storico_list');target.innerHTML='';
+  (Array.isArray(pVRipristino.precedenti)?pVRipristino.precedenti:[]).forEach(p=>target.appendChild(creaBonusVStoricoRiga(p)));
+  if(target.children.length)document.getElementById('bonusV_storico_panel').open=true;
+  aggiornaAnteprimaPremioV();ricostruito.push('Premio Prestigio Livello V');
 }
 
 // Le note sono dati descrittivi: vanno ripristinate senza creare operazioni.
