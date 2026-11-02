@@ -1096,6 +1096,14 @@ button.big {
 </div>
 </div>
 <div class="hint" id="tipo_pg_hint" style="margin-top:10px;">Scegli il tipo di PG: il tool mostrerà solo le sezioni e il catalogo Missioni pertinenti.</div>
+<div id="anno_pg_corrente_wrap" style="display:none;margin-top:12px;max-width:410px;">
+  <label class="tight" for="annoPgCorrente">Anno scolastico attualmente frequentato <span class="format-tag">per voti e premi scolastici</span></label>
+  <select id="annoPgCorrente">
+    <option value="">— Seleziona l'anno del PG —</option>
+    <option value="5">V anno</option><option value="6">VI anno</option><option value="7">VII anno</option>
+  </select>
+  <div class="hint" style="margin-top:6px;">Le Conoscenze degli anni passati possono essere migliorate, ma <b>non producono premi, Punti Casa o missioni scolastiche</b>. L'anno frequentato non coincide necessariamente con l'anno della Conoscenza.</div>
+</div>
 </div>
 
 <div class="tab-bar" id="tab_bar"></div>
@@ -1982,6 +1990,14 @@ const SEZIONI = [
 function tipoPgListaSelezionato() {
 return document.querySelector('input[name="tipoPgLista"]:checked')?.value || '';
 }
+function annoPgCorrenteSelezionato() {
+  return tipoPgListaSelezionato() === 'studente' ? String(document.getElementById('annoPgCorrente')?.value || '') : '';
+}
+function aggiornamentoAnnoPgCorrente() {
+  document.querySelectorAll('#materie_list > .materia-card').forEach(card => {
+    if (typeof card._aggiornaContestoAnno === 'function') card._aggiornaContestoAnno();
+  });
+}
 
 function ruoloUsaGaleoniExtra() {
   if (tipoPgListaSelezionato() !== 'adulto') return false;
@@ -2025,6 +2041,9 @@ const active = document.querySelector('.tab-btn.active');
 if (active && active.style.display === 'none') apriPagina('segnala');
 const hint = document.getElementById('tipo_pg_hint');
 if (hint) hint.textContent = tipo ? (tipo === 'studente' ? 'Modalità Studente: Voti visibili, Sapienze nascoste.' : 'Modalità Adulto: Sapienze visibili, Voti nascosti.') : 'Scegli Studente o Adulto per mostrare le sezioni compatibili.';
+const annoWrap = document.getElementById('anno_pg_corrente_wrap');
+if (annoWrap) annoWrap.style.display = tipo === 'studente' ? 'block' : 'none';
+aggiornamentoAnnoPgCorrente();
 aggiornaVisibilitaGaleoniExtra();
 if (typeof sincronizzaCataloghiConTipoPg === 'function') sincronizzaCataloghiConTipoPg();
 }
@@ -2055,6 +2074,7 @@ apriPagina(s.id);
 tabBar.appendChild(btn);
 });
 document.querySelectorAll('input[name="tipoPgLista"]').forEach(r => r.addEventListener('change', aggiornaSezioniTipoPg));
+document.getElementById('annoPgCorrente').addEventListener('change', aggiornamentoAnnoPgCorrente);
 aggiornaSezioniTipoPg();
 const quickCalcolaBtn = document.getElementById('quick_calcola_btn');
 if (quickCalcolaBtn) quickCalcolaBtn.addEventListener('click', () => calcolaTutto());
@@ -2309,7 +2329,8 @@ return div;
 
 function prodottiCatalogoPerNome(nome) {
   const key = normalizeText(nome || '');
-  return (FELIX_PREZZARI_CATALOGO.prodotti || []).filter(p => normalizeText(p.nome) === key);
+  const alias = x => { const n=normalizeText(x); return n === 'penna magica' ? 'penne magiche' : n; };
+  return (FELIX_PREZZARI_CATALOGO.prodotti || []).filter(p => alias(p.nome) === alias(key));
 }
 function prodottoCatalogoUnivoco(nome) {
   const candidati = prodottiCatalogoPerNome(nome);
@@ -2330,7 +2351,7 @@ const EFFETTI_PP_USO_CATALOGO = Object.freeze({
   'OBJ-130': { ppPerUso: 3, automatico: true, nota: 'Massimo 1 uso premiato per Role.' },
   'OBJ-135': { ppPerUso: 5, automatico: true, nota: 'L’effetto comprende anche -40 Salute per chi la mangia; la Salute non viene accreditata automaticamente da questa sezione.' },
   'OBJ-192': { ppPerUso: 1, automatico: true },
-  'OBJ-206': { automatico: false, nota: 'Penne Magiche: Studenti = 1 voto extra in una Role di studio; Adulti = +3 PP ogni 5 post fatti nella stessa Role. Richiede verifica del contesto della Role.' },
+  'OBJ-206': { automatico: false, nota: 'Penne Magiche: consumabile da sottrarre al Bagaglio (1 penna per uso). Studenti: un voto extra SOLO durante Role di studio; Adulti: +3 PP ogni 5 post nella stessa Role. Il premio va verificato dallo Staff.' },
   'OBJ-207': { automatico: false, nota: 'Strillettera: il Mittente ottiene +5 PP e +0,5 Bontà/Virtuoso oppure Malvagità/Sinistro dopo la Role; il Destinatario ha effetti propri. Richiede verifica dell’esito completo.' }
 });
 function effettoPpUsoCatalogo(prodotto, quantita) {
@@ -2412,12 +2433,17 @@ const prodottoCatalogo = prodottoCatalogoUnivoco(nome);
 if (!prodottoCatalogo) return null;
 const pp = effettoPpUsoCatalogo(prodottoCatalogo, qty);
 const tipoContatore = String(prodottoCatalogo.contatore_tipo || '').toUpperCase();
-const usaContatore = ['USI','POST','ROLE'].includes(tipoContatore) && !!String(prodottoCatalogo.scheda_suffix_auto || '').trim();
+// Le Penne Magiche sono consumabili monouso: -1 pezzo, non +1 su un contatore 0/1.
+// Si evita così che un gruppo di più penne rimanga bloccato con un contatore saturo.
+const usaContatore = prodottoCatalogo.product_id !== 'OBJ-206' &&
+  ['USI','POST','ROLE'].includes(tipoContatore) && !!String(prodottoCatalogo.scheda_suffix_auto || '').trim();
 const riga = usaContatore
   ? 'CONTATORE ' + tipoContatore + ': ' + nome + ': +' + qty
   : nome + ': -' + qty;
 const extraPp = pp.automatico && pp.bonus ? ' — +' + normNum(pp.bonus) + ' PP' : '';
-const verifica = !pp.automatico && EFFETTI_PP_USO_CATALOGO[prodottoCatalogo.product_id] ? ' — effetto PP da verificare' : '';
+const verifica = prodottoCatalogo.product_id === 'OBJ-206'
+  ? ' — voto extra da verificare nella Role di studio (nessun PP automatico)'
+  : (!pp.automatico && EFFETTI_PP_USO_CATALOGO[prodottoCatalogo.product_id] ? ' — effetto da verificare' : '');
 return {
   azione: 'usa', categoria, nome, qtyUsata: qty,
   catalogProductId: prodottoCatalogo.product_id,
@@ -3460,9 +3486,11 @@ datalistEl.appendChild(opt);
 
 function trovaAnnoConoscenzaStudente(materia, conoscenza) {
   if (!materia || materia === 'ALTRO' || !conoscenza || !studentKnowledgeMap[materia]) return '';
-  const target = normalizeText(conoscenza);
+  // Le Schede possono contenere il suffisso " H", non presente nel catalogo degli anni.
+  const canon = x => normalizeText(x).replace(/\s+h$/, '').trim();
+  const target = canon(conoscenza);
   const anni = Object.entries(studentKnowledgeMap[materia])
-    .filter(([, nomi]) => (nomi || []).some(n => normalizeText(n) === target))
+    .filter(([, nomi]) => (nomi || []).some(n => canon(n) === target))
     .map(([anno]) => String(anno));
   return anni.length === 1 ? anni[0] : '';
 }
@@ -3546,6 +3574,11 @@ domandaPiano.innerHTML = `
 <div class="radio-option"><input type="radio" name="${mid}_piano" value="no" id="${mid}_piano_no" class="f-in-piano-radio"><label for="${mid}_piano_no"><b>No</b> — è una Materia di un altro anno, o acquistata: costo fisso di 4 PP per ogni Eccezionale, senza aumenti</label></div>
 `;
 body.appendChild(domandaPiano);
+const avvisoAnnoPrecedente = document.createElement('div');
+avvisoAnnoPrecedente.className = 'hint';
+avvisoAnnoPrecedente.style.cssText = 'display:none;margin-top:10px;';
+avvisoAnnoPrecedente.textContent = 'Conoscenza fuori dall’anno frequentato: si aggiorna esclusivamente il voto, senza +7 Punti Casa, altri premi scolastici o progresso per «Il Secchione».';
+body.appendChild(avvisoAnnoPrecedente);
 
 // --- blocco T->D e D->S, a livello di intera Materia: scelta esclusiva a 3 opzioni ---
 function creaPassaggioBulk(stepId, fromV, toV, titolo, descrizione) {
@@ -3613,13 +3646,29 @@ const bonusTutteECheck = bonusTutteEBox.querySelector('.f-bonus-tutte-e-check');
 function aggiornaBonusTutteE() {
   const materia = div.querySelector('.f-materia').value;
   const almenoUnaE = [...righeList.querySelectorAll('.f-voto-arrivo')].some(sel => sel.value === 'E');
-  const disponibile = !!materia && materia !== 'ALTRO' && almenoUnaE;
+  const annoAttuale = annoPgCorrenteSelezionato();
+  const disponibile = !!materia && materia !== 'ALTRO' && almenoUnaE &&
+    !!annoAttuale && div.querySelector('.f-anno').value === annoAttuale &&
+    div.querySelector('.f-in-piano-radio:checked')?.value === 'si';
   bonusTutteEBox.style.display = disponibile ? 'block' : 'none';
   bonusTutteECheck.disabled = !disponibile;
   if (!disponibile) bonusTutteECheck.checked = false;
 }
 
 div.appendChild(body);
+function aggiornaContestoAnno() {
+  const annoAttuale = annoPgCorrenteSelezionato();
+  const altro = div.querySelector('.f-materia').value === 'ALTRO';
+  const fuoriAnno = !!annoAttuale && div.querySelector('.f-anno').value !== annoAttuale && !altro;
+  avvisoAnnoPrecedente.style.display = fuoriAnno ? 'block' : 'none';
+  const radioSi = domandaPiano.querySelector('.f-in-piano-radio[value="si"]');
+  if (fuoriAnno && radioSi) {
+    domandaPiano.querySelector('.f-in-piano-radio[value="no"]').checked = true;
+    radioSi.disabled = true;
+  } else if (radioSi) radioSi.disabled = false;
+  aggiornaBonusTutteE();
+}
+div._aggiornaContestoAnno = aggiornaContestoAnno;
 
 function aggiornaDatalist() {
 popolaDatalist(datalist, div.querySelector('.f-materia').value, div.querySelector('.f-anno').value);
@@ -3634,9 +3683,10 @@ div.querySelector('.f-materia').addEventListener('change', () => {
 const isAltro = div.querySelector('.f-materia').value === 'ALTRO';
 domandaPiano.style.display = isAltro ? 'none' : 'block';
 if (isAltro) { domandaPiano.querySelector(`#${mid}_piano_no`).checked = true; }
-aggiornaDatalist(); aggiornaPreview(); aggiornaBonusTutteE();
+aggiornaDatalist(); aggiornaPreview(); aggiornaContestoAnno();
 });
-div.querySelector('.f-anno').addEventListener('change', () => { aggiornaDatalist(); aggiornaPreview(); });
+div.querySelector('.f-anno').addEventListener('change', () => { aggiornaDatalist(); aggiornaPreview(); aggiornaContestoAnno(); });
+domandaPiano.addEventListener('change', aggiornaBonusTutteE);
 body.addEventListener('change', (e) => {
   if (e.target.classList?.contains('f-conoscenza')) {
     const materia = div.querySelector('.f-materia').value;
@@ -3649,6 +3699,7 @@ body.addEventListener('change', (e) => {
       annoSelect.value = annoCorretto;
       aggiornaDatalist();
       aggiornaPreview();
+      aggiornaContestoAnno();
     }
   }
   if (e.target.classList?.contains('f-voto-arrivo')) aggiornaBonusTutteE();
@@ -3656,7 +3707,7 @@ body.addEventListener('change', (e) => {
 
 // prima riga Conoscenza pronta all'uso
 righeList.appendChild(creaConoscenzaRow(datalistId));
-aggiornaBonusTutteE();
+aggiornaContestoAnno();
 
 return div;
 }
@@ -4451,7 +4502,7 @@ function catturaRipristinoCommercio() {
 }
 function catturaValoriRipristino() {
   const ids=['convN10','convN50','convN100','tassoBase','galeoniExtraRimanenti',
-             'eGiaPossedute','dialetticaPartenza','dialetticaFinale'];
+             'eGiaPossedute','dialetticaPartenza','dialetticaFinale','annoPgCorrente'];
   const valori={};
   ids.forEach(id=>{valori[id]=document.getElementById(id)?.value ?? '';});
   valori.parametri=[...document.querySelectorAll('#parametri_list > .row')].map(r=>({
@@ -4482,7 +4533,8 @@ const extraRaw = extraAttivi ? document.getElementById('galeoniExtraRimanenti')?
 const extraBase = extraRaw === '' || extraRaw == null ? null : Number(extraRaw);
 const payload = {
   versione: 3,
-  protocolRevision: '3.3-compact-forum-restore',
+  protocolRevision: '3.4-anno-corrente-penne-consumabili',
+  annoPg: tipoPg === 'studente' ? annoPgCorrenteSelezionato() : '',
   catalogVersion: String(FELIX_PREZZARI_CATALOGO.versione || '1'),
   tipoPg,
   nomePg: nomePG,
@@ -4596,8 +4648,13 @@ return { titolo, link, numPosts, galeoniSpesi, coeffDebito, galeoniPerExtra, mis
 
 function leggiMateriaDalDOM(matEl) {
 const materia = matEl.querySelector('.f-materia').value;
-const anno = matEl.querySelector('.f-anno').value;
-const inPiano = matEl.querySelector('.f-in-piano-radio:checked')?.value === 'si' && materia !== 'ALTRO';
+const annoDichiarato = matEl.querySelector('.f-anno').value;
+const singolePerAnno = [...matEl.querySelectorAll('.conoscenze_list .f-conoscenza')]
+  .map(el => trovaAnnoConoscenzaStudente(materia, el.value)).filter(Boolean);
+const anniUnivoci = [...new Set(singolePerAnno)];
+const anno = anniUnivoci.length === 1 ? anniUnivoci[0] : annoDichiarato;
+const annoCorrente = annoPgCorrenteSelezionato();
+const inPiano = anno === annoCorrente && matEl.querySelector('.f-in-piano-radio:checked')?.value === 'si' && materia !== 'ALTRO';
 
 const stepCards = [...matEl.querySelectorAll('.f-bulk-step')];
 const valoreScelto = (stepCard) => {
@@ -4619,7 +4676,7 @@ conoscenza: r.querySelector('.f-conoscenza').value.trim(),
 votoPartenza: r.querySelector('.f-voto-partenza').value,
 votoArrivo: r.querySelector('.f-voto-arrivo').value
 })).filter(r => r.conoscenza);
-const bonusTutteE = !!matEl.querySelector('.f-bonus-tutte-e-check')?.checked;
+const bonusTutteE = inPiano && !!matEl.querySelector('.f-bonus-tutte-e-check')?.checked;
 return { materia, anno, inPiano, bulkTD, bulkTDRole, bulkDS, bulkDSRole, bonusTutteE, righe };
 }
 
@@ -4662,7 +4719,7 @@ votiOps.push({
 });
 });
 
-if (mat.bonusTutteE && mat.materia && mat.materia !== 'ALTRO') {
+if (mat.bonusTutteE && mat.inPiano && mat.anno === annoPgCorrenteSelezionato() && mat.materia && mat.materia !== 'ALTRO') {
   totali['Punti Casa'] = (totali['Punti Casa'] || 0) + 7;
 }
 
@@ -4771,6 +4828,31 @@ function marcaErrore(card, campo, testo) {
 function validaCompilazioneDettagliata() {
   pulisciSegnalazioniValidazione();
   const errori = [];
+  if (tipoPgListaSelezionato() === 'studente') {
+    const annoAttuale = annoPgCorrenteSelezionato();
+    const cards = [...document.querySelectorAll('#materie_list > .materia-card')];
+    const materie = VOTI_BLOCCATI ? [] : cards.map(leggiMateriaDalDOM)
+      .filter(m => m.materia && (m.bulkTD || m.bulkDS || m.righe.length));
+    const missioniAttive = [...document.querySelectorAll('#roles_list .missione-card, #missioni_standalone_list .missione-standalone-card')]
+      .map(el => String(el.querySelector('.f-nome')?.value || el.querySelector('.f-nome-manuale')?.value || el.querySelector('.cat-missione')?.value || ''));
+    const secchione = missioniAttive.some(nome => normalizeText(nome).includes('il secchione'));
+    if ((materie.length || secchione) && !annoAttuale) {
+      errori.push('Indica l’anno scolastico attualmente frequentato dal PG: è necessario per evitare premi non dovuti.');
+      document.getElementById('annoPgCorrente')?.classList.add('field-validation-error');
+    }
+    if (secchione && materie.length && annoAttuale && !materie.some(m => m.anno === annoAttuale)) {
+      errori.push('«Il Secchione»: in questa richiesta stai migliorando solo Conoscenze di anni diversi da quello frequentato. Non puoi ottenere la missione da questi voti. Elimina la missione oppure richiedila separatamente con una prova valida.');
+      document.getElementById('annoPgCorrente')?.classList.add('field-validation-error');
+    }
+    cards.forEach((card, i) => {
+      const materia = leggiMateriaDalDOM(card);
+      const anni = [...new Set(materia.righe.map(r => trovaAnnoConoscenzaStudente(materia.materia,r.conoscenza)).filter(Boolean))];
+      if (anni.length > 1) {
+        errori.push(`Materia ${i+1}: le Conoscenze indicate appartengono ad anni differenti. Separa le Conoscenze in schede Materia diverse.`);
+        marcaErrore(card, card.querySelector('.f-conoscenza'), 'Le Conoscenze devono appartenere allo stesso anno scolastico.');
+      }
+    });
+  }
   document.querySelectorAll('#roles_list > .role-card').forEach((role, idx) => {
     const titolo = role.querySelector('.f-titolo');
     const link = role.querySelector('.f-link');
@@ -5651,8 +5733,10 @@ const div = creaMateriaCard();
 const selMateria = div.querySelector('.f-materia');
 selMateria.value = matData.materia; trigger(selMateria, 'change');
 div.querySelector('.f-anno').value = matData.anno; trigger(div.querySelector('.f-anno'), 'change');
-if (matData.materia !== 'ALTRO') {
+  if (matData.materia !== 'ALTRO' && matData.anno === annoPgCorrenteSelezionato()) {
 div.querySelector('.f-in-piano-radio[value="si"]').checked = true;
+} else {
+  div.querySelector('.f-in-piano-radio[value="no"]').checked = true;
 }
 
 const stepCards = [...div.querySelectorAll('.f-bulk-step')];
@@ -5677,6 +5761,7 @@ righeList.appendChild(creaConoscenzaRow(datalistIdReale));
 }
 // Fa comparire l'opzione premio se almeno una riga termina a E, poi ripristina la spunta.
 trigger(righeList.querySelector('.f-voto-arrivo'), 'change');
+if (typeof div._aggiornaContestoAnno === 'function') div._aggiornaContestoAnno();
 const bonusCheck = div.querySelector('.f-bonus-tutte-e-check');
 if (matData.bonusTutteE && bonusCheck && !bonusCheck.disabled) bonusCheck.checked = true;
 return div;
@@ -5840,7 +5925,7 @@ function ripristinaCommercioDaDati(dati,ricostruito,nonRicostruibile) {
 function ripristinaValoriDalProtocollo(dati,ricostruito) {
   const valori=dati?.ripristinoValori;
   if(!valori || typeof valori!=='object') return false;
-  const ids=['convN10','convN50','convN100','tassoBase','galeoniExtraRimanenti','eGiaPossedute','dialetticaPartenza','dialetticaFinale'];
+  const ids=['convN10','convN50','convN100','tassoBase','galeoniExtraRimanenti','eGiaPossedute','dialetticaPartenza','dialetticaFinale','annoPgCorrente'];
   ids.forEach(id=>{if(valori[id]!==undefined){const el=document.getElementById(id);if(el){el.value=valori[id];trigger(el,'input');}}});
   if(Array.isArray(valori.parametri) && valori.parametri.length){
     const list=document.getElementById('parametri_list');list.innerHTML='';
@@ -5894,6 +5979,11 @@ if (mProtocollo) {
     if (datiProtocollo && ['studente','adulto'].includes(datiProtocollo.tipoPg)) {
       const radio = document.querySelector(`input[name="tipoPgLista"][value="${datiProtocollo.tipoPg}"]`);
       if (radio) { radio.checked = true; aggiornaSezioniTipoPg(); ricostruito.push('Tipo di PG'); }
+      if (['5','6','7'].includes(String(datiProtocollo.annoPg || ''))) {
+        document.getElementById('annoPgCorrente').value = String(datiProtocollo.annoPg);
+        aggiornamentoAnnoPgCorrente();
+        ricostruito.push('Anno scolastico del PG');
+      }
     }
   } catch (e) {}
 }
