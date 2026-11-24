@@ -4551,16 +4551,79 @@ if (v) parti.push(`${v >= 0 ? '+' : ''}${normNum(v)} ${p} (permanente)`);
 return parti.length ? parti.join(', ') : 'nessun premio dichiarato';
 }
 
+function analizzaContributoMissioniRole(role, tassoBase) {
+const missioni = (role.missioni || []).filter(m => String(m.nome || '').trim());
+const numPosts = Math.max(0, Number(role.numPosts) || 0);
+const base = Number.isFinite(Number(tassoBase)) ? Number(tassoBase) : 1;
+const normali = missioni.filter(m => !m.completamento);
+const completamento = missioni.filter(m => m.completamento);
+const risultato = new Map();
+missioni.forEach(m => risultato.set(m, {tipi:new Set(), esclusaTotale:false, note:[]}));
+
+const calcolaPpMissione = m => {
+  const cap = m.ppPostCap !== null && m.ppPostCap !== undefined && m.ppPostCap !== ''
+    ? Math.max(0, Math.min(numPosts, Number(m.ppPostCap) || 0)) : numPosts;
+  const ppRate = Number(m.ppPostRate) || 0;
+  const ppFisso = Number(m.ppFisso) || 0;
+  const candidati = [];
+  candidati.push({tipo:'base', valore:numPosts * base});
+  if (ppRate) candidati.push({tipo:'ppPostRate', valore: ppRate * cap + base * Math.max(0, numPosts - cap)});
+  if (ppFisso) candidati.push({tipo:'ppFisso', valore: numPosts * base + ppFisso});
+  return candidati;
+};
+
+const ppCandidates = normali.flatMap(m => calcolaPpMissione(m).filter(c => c.tipo !== 'base').map(c => ({m, ...c})));
+const bestPp = ppCandidates.length ? Math.max(numPosts * base, ...ppCandidates.map(c => c.valore)) : numPosts * base;
+  ppCandidates.forEach(c => {
+    if (Math.abs(c.valore - bestPp) < 0.00001) risultato.get(c.m).tipi.add('Punti Post');
+  });
+
+[...TIPI_PREMIO, ...PARAMETRI_MAGICI_FISICI].forEach(tipo => {
+  const valori = normali.map(m => ({m, v:Number(m[tipo]) || 0})).filter(x => x.v !== 0);
+  if (!valori.length) return;
+  const maxVal = Math.max(...valori.map(x => x.v));
+  valori.forEach(x => {
+    if (Math.abs(x.v - maxVal) < 0.00001) risultato.get(x.m).tipi.add(tipo);
+  });
+});
+
+completamento.forEach(m => {
+  const info = risultato.get(m);
+  info.tipi.add('missione a completamento');
+  if (Number(m.ppPostRate) || Number(m.ppFisso)) info.tipi.add('Punti Post');
+  [...TIPI_PREMIO, ...PARAMETRI_MAGICI_FISICI].forEach(tipo => {
+    if (Number(m[tipo]) || 0) info.tipi.add(tipo);
+  });
+});
+
+normali.forEach(m => {
+  const info = risultato.get(m);
+  if (!info.tipi.size) {
+    info.esclusaTotale = true;
+    info.note.push('non cumulata nel totale');
+  }
+});
+
+return risultato;
+}
+
 function descriviRole(role, idx, totaliRole) {
 const righe = [];
 const titoloLink = role.link ? `[URL=${role.link}]${role.titolo || 'Role senza titolo'}[/URL]` : (role.titolo || 'Role senza titolo');
 righe.push(`<b>Role ${idx + 1}:</b> ${titoloLink} — ${role.numPosts} post scritti`);
 const missioniValide = role.missioni.filter(m => m.nome);
+const contributiMissioni = analizzaContributoMissioniRole(role, document.getElementById('tassoBase').value);
 if (missioniValide.length) {
 righe.push(`<b>Missioni FH/FW completate:</b>`);
 if (missioniValide.length > 1) righe.push(`<i>Premi ordinari non cumulati per tipologia; premi a completamento sommati separatamente.</i>`);
 missioniValide.forEach(m => {
-righe.push(`- ${m.nome}${fmtProve(m.prove)}${m.completamento ? ' (missione a completamento)' : ''}: ${descriviPremiMissione(m)}`);
+  const testo = `- ${m.nome}${fmtProve(m.prove)}${m.completamento ? ' (missione a completamento)' : ''}: ${descriviPremiMissione(m)}`;
+  const info = contributiMissioni.get(m);
+  if (info?.esclusaTotale) {
+    righe.push(`- <s>${m.nome}${fmtProve(m.prove)}${m.completamento ? ' (missione a completamento)' : ''}: ${descriviPremiMissione(m)}</s>`);
+  } else {
+    righe.push(testo);
+  }
 });
 }
 if (role.galeoniSpesi) {
